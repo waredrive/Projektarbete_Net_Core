@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Forum.MVC", "Forum\Forum.MV
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Forum.Persistence", "Forum.Data\Forum.Persistence.csproj", "{8B7C5A7A-F156-4F78-A852-254FB756F510}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Forum.Domain", "Forum.Domain\Forum.Domain.csproj", "{7F8B8BFA-713A-4D7B-8243-4F56E918E615}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Forum.Domain", "Forum.Domain\Forum.Domain.csproj", "{7F8B8BFA-713A-4D7B-8243-4F56E918E615}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
