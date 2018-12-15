@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Forum.Data\Forum.Persistence.csproj" />
-    <ProjectReference Include="..\Forum.Domain\Forum.Domain.csproj" />
   </ItemGroup>
 
 </Project>
