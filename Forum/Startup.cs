@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Forum.MVC.Models.Services;
 using Forum.Persistence.Entities;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -24,6 +25,9 @@ namespace Forum.MVC {
       services.AddDbContext<ForumDbContext>(o => o.UseSqlServer(_config.GetConnectionString("ForumDb_Dev")));
       services.AddDbContext<ForumIdentityDbContext>(o => o.UseSqlServer(_config.GetConnectionString("ForumDb_Identity_Dev")));
       services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ForumIdentityDbContext>().AddDefaultTokenProviders();
+
+      services.AddScoped<AccountService>();
+
       services.AddMvc();
     }
 

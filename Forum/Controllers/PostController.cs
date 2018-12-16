@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Forum.MVC.Models.ViewModels;
+using Forum.MVC.Models.PostViewModels;
+using Forum.MVC.Models.TopicViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.MVC.Controllers
@@ -28,25 +29,25 @@ namespace Forum.MVC.Controllers
       return View();
     }
 
-    [Route("Edit")]
+    [Route("edit/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id) {
       return View();
     }
 
-    [Route("Edit")]
+    [Route("edit")]
     [HttpPost]
     public async Task<IActionResult> Edit( PostIndexVM PostIndexVM) {
       return View();
     }
 
-    [Route("Delete")]
+    [Route("delete/{id}")]
     [HttpGet]
     public async Task<IActionResult> Delete(int id) {
       return View();
     }
 
-    [Route("Delete")]
+    [Route("delete")]
     [HttpPost]
     public async Task<IActionResult> Delete(PostIndexVM PostIndexVM) {
       return View();
