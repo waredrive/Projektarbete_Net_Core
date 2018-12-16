@@ -1,10 +1,12 @@
 ﻿using System.Threading.Tasks;
 using Forum.MVC.Models.AccountViewModels;
 using Forum.MVC.Models.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.MVC.Controllers {
+
   [RequireHttps]
   [Route("account")]
   public class AccountController : Controller {
@@ -14,12 +16,14 @@ namespace Forum.MVC.Controllers {
       _accountService = accountService;
     }
 
+    [AllowAnonymous]
     [Route("register")]
     [HttpGet]
     public IActionResult Register() {
       return View();
     }
 
+    [AllowAnonymous]
     [Route("register")]
     [HttpPost]
     public async Task<IActionResult> Register(RegisterViewModel model) {
@@ -37,12 +41,14 @@ namespace Forum.MVC.Controllers {
       return View(model);
     }
 
+    [AllowAnonymous]
     [Route("login")]
     [HttpGet]
     public IActionResult Login() {
       return View();
     }
 
+    [AllowAnonymous]
     [Route("login")]
     [HttpPost]
     public async Task<IActionResult> Login(LoginViewModel model) {

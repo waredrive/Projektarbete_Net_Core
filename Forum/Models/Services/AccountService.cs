@@ -40,7 +40,7 @@ namespace Forum.MVC.Models.Services {
         var member = new Member {
           Id = userFromDb.Id,
           AccountNavigation = account,
-          BirthDate = registerVM.Birthdate.ToUniversalTime(),
+          BirthDate = registerVM.Birthdate,
           FirstName = registerVM.FirstName,
           LastName = registerVM.LastName
         };

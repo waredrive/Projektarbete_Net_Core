@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Forum.MVC.Models.PostViewModels;
 using Forum.MVC.Models.TopicViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.MVC.Controllers
@@ -11,6 +12,7 @@ namespace Forum.MVC.Controllers
   [Route("thread/{threadId}")]
   public class PostController : Controller {
 
+    [AllowAnonymous]
     [Route("")]
     [HttpGet]
     public IActionResult Index(int threadId) {

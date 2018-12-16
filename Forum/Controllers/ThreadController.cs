@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Forum.MVC.Models.ThreadViewModels;
 using Forum.MVC.Models.TopicViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.MVC.Controllers {
   [Route("forum/{topicId}")]
   public class ThreadController : Controller {
 
+    [AllowAnonymous]
     [Route("")]
     [HttpGet]
     public IActionResult Index(int topicId) {
