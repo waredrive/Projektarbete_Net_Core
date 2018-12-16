@@ -31,6 +31,7 @@ namespace Forum.Persistence.Entities.ForumData
         public int? Role { get; set; }
 
         public virtual Account BlockedByNavigation { get; set; }
+        public virtual Role RoleNavigation { get; set; }
         public virtual ICollection<Account> InverseBlockedByNavigation { get; set; }
         public virtual ICollection<Member> Member { get; set; }
         public virtual ICollection<Post> PostCreatedByNavigation { get; set; }

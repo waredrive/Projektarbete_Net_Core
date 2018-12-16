@@ -18,9 +18,9 @@ namespace Forum.Persistence.Entities.ForumData
         public virtual DbSet<Account> Account { get; set; }
         public virtual DbSet<Member> Member { get; set; }
         public virtual DbSet<Post> Post { get; set; }
+        public virtual DbSet<Role> Role { get; set; }
         public virtual DbSet<Thread> Thread { get; set; }
         public virtual DbSet<Topic> Topic { get; set; }
-
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -32,6 +32,11 @@ namespace Forum.Persistence.Entities.ForumData
                     .WithMany(p => p.InverseBlockedByNavigation)
                     .HasForeignKey(d => d.BlockedBy)
                     .HasConstraintName("FK__Account__Blocked__25518C17");
+
+                entity.HasOne(d => d.RoleNavigation)
+                    .WithMany(p => p.Account)
+                    .HasForeignKey(d => d.Role)
+                    .HasConstraintName("FK__Account__Role__2CF2ADDF");
             });
 
             modelBuilder.Entity<Member>(entity =>
@@ -79,6 +84,20 @@ namespace Forum.Persistence.Entities.ForumData
                     .WithMany(p => p.Post)
                     .HasForeignKey(d => d.Thread)
                     .HasConstraintName("FK__Post__Thread__73BA3083");
+            });
+
+            modelBuilder.Entity<Role>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.Description)
+                    .IsRequired()
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Type)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<Thread>(entity =>
