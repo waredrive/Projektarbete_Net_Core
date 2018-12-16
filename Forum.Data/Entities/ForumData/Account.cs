@@ -28,7 +28,7 @@ namespace Forum.Persistence.Entities.ForumData
         public DateTime? BlockedOn { get; set; }
         public int? BlockedBy { get; set; }
         public DateTime? BlockedEnd { get; set; }
-        public int? Role { get; set; }
+        public int Role { get; set; }
 
         public virtual Account BlockedByNavigation { get; set; }
         public virtual Role RoleNavigation { get; set; }

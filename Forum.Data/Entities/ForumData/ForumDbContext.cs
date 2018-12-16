@@ -36,7 +36,8 @@ namespace Forum.Persistence.Entities.ForumData
                 entity.HasOne(d => d.RoleNavigation)
                     .WithMany(p => p.Account)
                     .HasForeignKey(d => d.Role)
-                    .HasConstraintName("FK__Account__Role__2CF2ADDF");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Account__Role__2DE6D218");
             });
 
             modelBuilder.Entity<Member>(entity =>
