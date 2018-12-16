@@ -16,10 +16,10 @@ namespace Forum.Persistence.Entities.ForumData
         }
 
         public virtual DbSet<Account> Account { get; set; }
+        public virtual DbSet<Member> Member { get; set; }
         public virtual DbSet<Post> Post { get; set; }
         public virtual DbSet<Thread> Thread { get; set; }
         public virtual DbSet<Topic> Topic { get; set; }
-        public virtual DbSet<User> User { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -32,6 +32,25 @@ namespace Forum.Persistence.Entities.ForumData
                     .WithMany(p => p.InverseBlockedByNavigation)
                     .HasForeignKey(d => d.BlockedBy)
                     .HasConstraintName("FK__Account__Blocked__01142BA1");
+            });
+
+            modelBuilder.Entity<Member>(entity =>
+            {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.FirstName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.LastName)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.HasOne(d => d.AccountNavigation)
+                    .WithMany(p => p.Member)
+                    .HasForeignKey(d => d.Account)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Member__Account__160F4887");
             });
 
             modelBuilder.Entity<Post>(entity =>
@@ -111,23 +130,6 @@ namespace Forum.Persistence.Entities.ForumData
                     .WithMany(p => p.TopicRemovedByNavigation)
                     .HasForeignKey(d => d.RemovedBy)
                     .HasConstraintName("FK__Topic__RemovedBy__5FB337D6");
-            });
-
-            modelBuilder.Entity<User>(entity =>
-            {
-                entity.Property(e => e.Email)
-                    .IsRequired()
-                    .HasMaxLength(50);
-
-                entity.Property(e => e.Username)
-                    .IsRequired()
-                    .HasMaxLength(50);
-
-                entity.HasOne(d => d.AccountNavigation)
-                    .WithMany(p => p.User)
-                    .HasForeignKey(d => d.Account)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__User__Account__68487DD7");
             });
         }
     }

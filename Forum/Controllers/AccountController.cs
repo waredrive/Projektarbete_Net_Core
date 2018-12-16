@@ -31,7 +31,8 @@ namespace Forum.MVC.Controllers {
       if (result.Succeeded)
         return RedirectToAction(nameof(Login));
 
-      foreach (var error in result.Errors) ModelState.AddModelError(string.Empty, error.Description);
+      foreach (var error in result.Errors)
+        ModelState.AddModelError(string.Empty, error.Description);
 
       return View(model);
     }

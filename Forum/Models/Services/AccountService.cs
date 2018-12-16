@@ -3,17 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Forum.MVC.Models.AccountViewModels;
+using Forum.Persistence.Entities.ForumData;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Forum.MVC.Models.Services {
   public class AccountService {
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly ForumDbContext _db;
 
     public AccountService(
-      UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager) {
+      UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ForumDbContext db) {
       _userManager = userManager;
       _signInManager = signInManager;
+      _db = db;
     }
 
     public async Task<IdentityResult> Add(RegisterViewModel registerVM) {
@@ -21,6 +25,26 @@ namespace Forum.MVC.Models.Services {
         Email = registerVM.Email,
         UserName = registerVM.UserName
       };
+
+      var result = await _userManager.CreateAsync(user, registerVM.Password);
+
+      if (result.Succeeded) {
+        var account = new Account {
+          Role = 1,
+          Created = DateTime.UtcNow
+        };
+        _db.Account.Add(account);
+
+        var member = new Member {
+          Id = 
+          AccountNavigation = account,
+          BirthDate = registerVM.Birthdate.ToUniversalTime(),
+          FirstName = registerVM.FirstName,
+          LastName = registerVM.LastName
+
+
+        }
+      }
 
       return await _userManager.CreateAsync(user, registerVM.Password);
     }

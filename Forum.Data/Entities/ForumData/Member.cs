@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace Forum.Persistence.Entities.ForumData
 {
-    public partial class User
+    public partial class Member
     {
-        public int Id { get; set; }
-        public string Username { get; set; }
-        public string Email { get; set; }
+        public string Id { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         public DateTime BirthDate { get; set; }
         public int Account { get; set; }
 

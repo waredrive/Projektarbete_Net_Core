@@ -16,6 +16,19 @@ namespace Forum.MVC.Models.AccountViewModels {
     public string UserName { get; set; }
 
     [Required]
+    [Display(Name = "Firstname")]
+    public string FirstName { get; set; }
+
+    [Required]
+    [Display(Name = "Lastname")]
+    public string LastName { get; set; }
+
+    [Required]
+    [DataType(DataType.Date)]
+    [Display(Name = "Birthdate")]
+    public DateTime Birthdate { get; set; }
+
+    [Required]
     [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
     [DataType(DataType.Password)]
     [Display(Name = "Password")]

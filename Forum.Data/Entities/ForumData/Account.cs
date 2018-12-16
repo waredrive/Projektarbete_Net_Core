@@ -8,6 +8,7 @@ namespace Forum.Persistence.Entities.ForumData
         public Account()
         {
             InverseBlockedByNavigation = new HashSet<Account>();
+            Member = new HashSet<Member>();
             PostCreatedByNavigation = new HashSet<Post>();
             PostEditedByNavigation = new HashSet<Post>();
             PostLockedByNavigation = new HashSet<Post>();
@@ -20,7 +21,6 @@ namespace Forum.Persistence.Entities.ForumData
             TopicEditedByNavigation = new HashSet<Topic>();
             TopicLockedByNavigation = new HashSet<Topic>();
             TopicRemovedByNavigation = new HashSet<Topic>();
-            User = new HashSet<User>();
         }
 
         public int Id { get; set; }
@@ -32,6 +32,7 @@ namespace Forum.Persistence.Entities.ForumData
 
         public virtual Account BlockedByNavigation { get; set; }
         public virtual ICollection<Account> InverseBlockedByNavigation { get; set; }
+        public virtual ICollection<Member> Member { get; set; }
         public virtual ICollection<Post> PostCreatedByNavigation { get; set; }
         public virtual ICollection<Post> PostEditedByNavigation { get; set; }
         public virtual ICollection<Post> PostLockedByNavigation { get; set; }
@@ -44,6 +45,5 @@ namespace Forum.Persistence.Entities.ForumData
         public virtual ICollection<Topic> TopicEditedByNavigation { get; set; }
         public virtual ICollection<Topic> TopicLockedByNavigation { get; set; }
         public virtual ICollection<Topic> TopicRemovedByNavigation { get; set; }
-        public virtual ICollection<User> User { get; set; }
     }
 }
