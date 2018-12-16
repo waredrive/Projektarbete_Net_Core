@@ -37,7 +37,8 @@ namespace Forum.MVC.Controllers {
     [HttpPost]
     public async Task<IActionResult> Create(TopicCreateVM topicCreateVm) {
       await _topicService.Add(topicCreateVm, User);
-      return View();
+      return RedirectToAction(nameof(Index));
+
     }
 
     [Route("edit/{id}")]
