@@ -29,6 +29,8 @@ namespace Forum.MVC.Models.Services {
       var result = await _userManager.CreateAsync(user, registerVM.Password);
 
       if (result.Succeeded) {
+        var userFromDb = await _userManager.FindByNameAsync(registerVM.UserName);
+
         var account = new Account {
           Role = 1,
           Created = DateTime.UtcNow
@@ -36,17 +38,18 @@ namespace Forum.MVC.Models.Services {
         _db.Account.Add(account);
 
         var member = new Member {
-          Id = 
+          Id = userFromDb.Id,
           AccountNavigation = account,
           BirthDate = registerVM.Birthdate.ToUniversalTime(),
           FirstName = registerVM.FirstName,
           LastName = registerVM.LastName
+        };
 
-
-        }
+        _db.Member.Add(member);
+        await _db.SaveChangesAsync();
       }
 
-      return await _userManager.CreateAsync(user, registerVM.Password);
+      return result;
     }
 
     public async Task<SignInResult> Login(LoginViewModel loginVM) {
