@@ -28,24 +28,25 @@ namespace Forum.MVC.Models.Services {
 
       var result = await _userManager.CreateAsync(user, registerVM.Password);
 
-      if (result.Succeeded) {
-        var account = new Account {
-          Role = 1,
-          Created = DateTime.UtcNow
-        };
-        _db.Account.Add(account);
+      if (!result.Succeeded)
+        return result;
 
-        var member = new Member {
-          Id = user.Id,
-          AccountNavigation = account,
-          BirthDate = registerVM.Birthdate,
-          FirstName = registerVM.FirstName,
-          LastName = registerVM.LastName
-        };
+      var account = new Account {
+        Role = 1,
+        Created = DateTime.UtcNow
+      };
+      _db.Account.Add(account);
 
-        _db.Member.Add(member);
-        await _db.SaveChangesAsync();
-      }
+      var member = new Member {
+        Id = user.Id,
+        AccountNavigation = account,
+        BirthDate = registerVM.Birthdate,
+        FirstName = registerVM.FirstName,
+        LastName = registerVM.LastName
+      };
+
+      _db.Member.Add(member);
+      await _db.SaveChangesAsync();
 
       return result;
     }

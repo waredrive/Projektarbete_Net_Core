@@ -65,7 +65,6 @@ namespace Forum.MVC.Controllers {
       return View(model);
     }
 
-    [Route("logout")]
     [HttpGet]
     public IActionResult AccessDenied() {
       return View();

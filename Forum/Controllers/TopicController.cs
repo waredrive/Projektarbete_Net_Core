@@ -2,14 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Forum.MVC.Models.Services;
 using Forum.MVC.Models.TopicViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.MVC.Controllers {
 
   [Route("")]
   public class TopicController : Controller {
+
+    private readonly TopicService _topicService;
+
+    public TopicController(TopicService topicService) {
+      _topicService = topicService;
+    }
 
     [AllowAnonymous]
     [Route("")]
@@ -21,12 +29,14 @@ namespace Forum.MVC.Controllers {
     [Route("create")]
     [HttpGet]
     public async Task<IActionResult> Create(int id) {
+
       return View();
     }
 
     [Route("create")]
     [HttpPost]
-    public async Task<IActionResult> Create(TopicIndexVM topicIndexVM) {
+    public async Task<IActionResult> Create(TopicCreateVM topicCreateVm) {
+      await _topicService.Add(topicCreateVm, User);
       return View();
     }
 
