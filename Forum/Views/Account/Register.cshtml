@@ -1,24 +1,23 @@
 ﻿@model RegisterViewModel
 @{
-    ViewBag.Title = "Register";
+  ViewBag.Title = "Register";
 }
 
-<fieldset class="account">
+<div class="container">
+  <div class="col-12 rounded my-5 bg-light p-5">
 
-    <h1>Register</h1>
+    <h1>Register new account</h1>
     <br />
 
-    <form asp-controller="Account" asp-action="Register"  method="post" class="form-horizontal">
-        <h4>Create a new account.</h4>
-        <hr />
-        <div asp-validation-summary="All" class="text-danger"></div>
-        <div class="form-group">
-            <label asp-for="UserName" class="col-md-2 control-label"></label>
-            <div class="col-md-10">
-                <input type="text" asp-for="UserName" class="form-control" />
-                <span asp-validation-for="UserName" class="text-danger"></span>
-            </div>
+    <form asp-controller="Account" asp-action="Register" method="post" class="form-horizontal">
+      <div asp-validation-summary="All" class="text-danger"></div>
+      <div class="form-group">
+        <label asp-for="UserName" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+          <input type="text" asp-for="UserName" class="form-control" />
+          <span asp-validation-for="UserName" class="text-danger"></span>
         </div>
+      </div>
       <br />
       <div class="form-group">
         <label asp-for="Email" class="col-md-2 control-label"></label>
@@ -52,26 +51,27 @@
         </div>
       </div>
       <br />
-        <div class="form-group">
-            <label asp-for="Password" class="col-md-2 control-label"></label>
-            <div class="col-md-10">
-                <input type="password" asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
+      <div class="form-group">
+        <label asp-for="Password" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+          <input type="password" asp-for="Password" class="form-control" />
+          <span asp-validation-for="Password" class="text-danger"></span>
         </div>
-        <br />
-        <div class="form-group">
-            <label asp-for="ConfirmPassword" class="col-md-2 control-label"></label>
-            <div class="col-md-10">
-                <input type="password" asp-for="ConfirmPassword" class="form-control" />
-                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-            </div>
-        </div>     
-        <br />
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <button type="submit" class="btn btn-default">Register</button>
-            </div>
+      </div>
+      <br />
+      <div class="form-group">
+        <label asp-for="ConfirmPassword" class="col-md-2 control-label"></label>
+        <div class="col-md-10">
+          <input type="password" asp-for="ConfirmPassword" class="form-control" />
+          <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
         </div>
+      </div>
+      <br />
+      <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+          <button type="submit" class="btn btn-default">Register</button>
+        </div>
+      </div>
     </form>
-    </fieldset>
+  </div>
+</div>

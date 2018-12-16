@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading.Tasks;
 
 namespace Forum.MVC.Models.AccountViewModels
@@ -9,6 +10,7 @@ namespace Forum.MVC.Models.AccountViewModels
     public class LoginViewModel
     {
         [Required]
+        [Display(Name="Username")]
         public string UserName { get; set; }
 
         [Required]
