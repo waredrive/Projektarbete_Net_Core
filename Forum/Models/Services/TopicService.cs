@@ -23,14 +23,14 @@ namespace Forum.MVC.Models.Services {
 
     public async Task Add(TopicCreateVM topicCreateVM, ClaimsPrincipal user) {
       var currentUserId = _userManager.GetUserId(user);
-      var currentAccountId = _db.Account.Include(a => a.Member)
-        .SingleOrDefault(a => a.Member.Any(m => m.Id == currentUserId))?.Id;
+      var currentAccount = _db.Account.Include(a => a.Member).Include(a => a.RoleNavigation)
+        .SingleOrDefault(a => a.Member.Any(m => m.Id == currentUserId));
 
-      if (currentAccountId == null)
+      if (currentAccount?.Id == null || currentAccount.RoleNavigation.Id != 1)
         return;
 
       var topic = new Topic {
-        CreatedBy = currentAccountId,
+        CreatedBy = currentAccount.Id,
         ContentText = topicCreateVM.CreatedText,
         CreatedOn = DateTime.UtcNow
       };
