@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Forum.Persistence.Entities
 {
-    public partial class ForumContext : DbContext
+    public partial class ForumDbContext : DbContext
     {
-        public ForumContext()
+        public ForumDbContext()
         {
         }
 
-        public ForumContext(DbContextOptions<ForumContext> options)
+        public ForumDbContext(DbContextOptions<ForumDbContext> options)
             : base(options)
         {
         }
@@ -21,7 +21,8 @@ namespace Forum.Persistence.Entities
         public virtual DbSet<Topic> Topic { get; set; }
         public virtual DbSet<User> User { get; set; }
 
-      protected override void OnModelCreating(ModelBuilder modelBuilder)
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
