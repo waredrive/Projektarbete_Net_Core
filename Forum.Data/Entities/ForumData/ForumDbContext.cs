@@ -31,7 +31,7 @@ namespace Forum.Persistence.Entities.ForumData
                 entity.HasOne(d => d.BlockedByNavigation)
                     .WithMany(p => p.InverseBlockedByNavigation)
                     .HasForeignKey(d => d.BlockedBy)
-                    .HasConstraintName("FK__Account__Blocked__01142BA1");
+                    .HasConstraintName("FK__Account__Blocked__25518C17");
             });
 
             modelBuilder.Entity<Member>(entity =>
@@ -50,7 +50,7 @@ namespace Forum.Persistence.Entities.ForumData
                     .WithMany(p => p.Member)
                     .HasForeignKey(d => d.Account)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Member__Account__160F4887");
+                    .HasConstraintName("FK__Member__Account__245D67DE");
             });
 
             modelBuilder.Entity<Post>(entity =>
@@ -58,22 +58,22 @@ namespace Forum.Persistence.Entities.ForumData
                 entity.HasOne(d => d.CreatedByNavigation)
                     .WithMany(p => p.PostCreatedByNavigation)
                     .HasForeignKey(d => d.CreatedBy)
-                    .HasConstraintName("FK__Post__CreatedBy__6FE99F9F");
+                    .HasConstraintName("FK__Post__CreatedBy__208CD6FA");
 
                 entity.HasOne(d => d.EditedByNavigation)
                     .WithMany(p => p.PostEditedByNavigation)
                     .HasForeignKey(d => d.EditedBy)
-                    .HasConstraintName("FK__Post__EditedBy__70DDC3D8");
+                    .HasConstraintName("FK__Post__EditedBy__2180FB33");
 
                 entity.HasOne(d => d.LockedByNavigation)
                     .WithMany(p => p.PostLockedByNavigation)
                     .HasForeignKey(d => d.LockedBy)
-                    .HasConstraintName("FK__Post__LockedBy__71D1E811");
+                    .HasConstraintName("FK__Post__LockedBy__22751F6C");
 
                 entity.HasOne(d => d.RemovedByNavigation)
                     .WithMany(p => p.PostRemovedByNavigation)
                     .HasForeignKey(d => d.RemovedBy)
-                    .HasConstraintName("FK__Post__RemovedBy__72C60C4A");
+                    .HasConstraintName("FK__Post__RemovedBy__236943A5");
 
                 entity.HasOne(d => d.ThreadNavigation)
                     .WithMany(p => p.Post)
@@ -86,22 +86,22 @@ namespace Forum.Persistence.Entities.ForumData
                 entity.HasOne(d => d.CreatedByNavigation)
                     .WithMany(p => p.ThreadCreatedByNavigation)
                     .HasForeignKey(d => d.CreatedBy)
-                    .HasConstraintName("FK__Thread__CreatedB__5812160E");
+                    .HasConstraintName("FK__Thread__CreatedB__18EBB532");
 
                 entity.HasOne(d => d.EditedByNavigation)
                     .WithMany(p => p.ThreadEditedByNavigation)
                     .HasForeignKey(d => d.EditedBy)
-                    .HasConstraintName("FK__Thread__EditedBy__59063A47");
+                    .HasConstraintName("FK__Thread__EditedBy__19DFD96B");
 
                 entity.HasOne(d => d.LockedByNavigation)
                     .WithMany(p => p.ThreadLockedByNavigation)
                     .HasForeignKey(d => d.LockedBy)
-                    .HasConstraintName("FK__Thread__LockedBy__59FA5E80");
+                    .HasConstraintName("FK__Thread__LockedBy__1AD3FDA4");
 
                 entity.HasOne(d => d.RemovedByNavigation)
                     .WithMany(p => p.ThreadRemovedByNavigation)
                     .HasForeignKey(d => d.RemovedBy)
-                    .HasConstraintName("FK__Thread__RemovedB__5AEE82B9");
+                    .HasConstraintName("FK__Thread__RemovedB__1BC821DD");
 
                 entity.HasOne(d => d.TopicNavigation)
                     .WithMany(p => p.Thread)
@@ -114,22 +114,22 @@ namespace Forum.Persistence.Entities.ForumData
                 entity.HasOne(d => d.CreatedByNavigation)
                     .WithMany(p => p.TopicCreatedByNavigation)
                     .HasForeignKey(d => d.CreatedBy)
-                    .HasConstraintName("FK__Topic__CreatedBy__5CD6CB2B");
+                    .HasConstraintName("FK__Topic__CreatedBy__1CBC4616");
 
                 entity.HasOne(d => d.EditedByNavigation)
                     .WithMany(p => p.TopicEditedByNavigation)
                     .HasForeignKey(d => d.EditedBy)
-                    .HasConstraintName("FK__Topic__EditedBy__5DCAEF64");
+                    .HasConstraintName("FK__Topic__EditedBy__1DB06A4F");
 
                 entity.HasOne(d => d.LockedByNavigation)
                     .WithMany(p => p.TopicLockedByNavigation)
                     .HasForeignKey(d => d.LockedBy)
-                    .HasConstraintName("FK__Topic__LockedBy__5EBF139D");
+                    .HasConstraintName("FK__Topic__LockedBy__1EA48E88");
 
                 entity.HasOne(d => d.RemovedByNavigation)
                     .WithMany(p => p.TopicRemovedByNavigation)
                     .HasForeignKey(d => d.RemovedBy)
-                    .HasConstraintName("FK__Topic__RemovedBy__5FB337D6");
+                    .HasConstraintName("FK__Topic__RemovedBy__1F98B2C1");
             });
         }
     }
