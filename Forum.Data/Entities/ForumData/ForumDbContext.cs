@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Forum.Persistence.Entities
+namespace Forum.Persistence.Entities.ForumData
 {
     public partial class ForumDbContext : DbContext
     {
@@ -25,6 +25,14 @@ namespace Forum.Persistence.Entities
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+
+            modelBuilder.Entity<Account>(entity =>
+            {
+                entity.HasOne(d => d.BlockedByNavigation)
+                    .WithMany(p => p.InverseBlockedByNavigation)
+                    .HasForeignKey(d => d.BlockedBy)
+                    .HasConstraintName("FK__Account__Blocked__01142BA1");
+            });
 
             modelBuilder.Entity<Post>(entity =>
             {

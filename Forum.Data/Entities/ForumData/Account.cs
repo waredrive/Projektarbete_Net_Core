@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Forum.Persistence.Entities
+namespace Forum.Persistence.Entities.ForumData
 {
     public partial class Account
     {
         public Account()
         {
+            InverseBlockedByNavigation = new HashSet<Account>();
             PostCreatedByNavigation = new HashSet<Post>();
             PostEditedByNavigation = new HashSet<Post>();
             PostLockedByNavigation = new HashSet<Post>();
@@ -29,6 +30,8 @@ namespace Forum.Persistence.Entities
         public DateTime? BlockeEnd { get; set; }
         public int? Role { get; set; }
 
+        public virtual Account BlockedByNavigation { get; set; }
+        public virtual ICollection<Account> InverseBlockedByNavigation { get; set; }
         public virtual ICollection<Post> PostCreatedByNavigation { get; set; }
         public virtual ICollection<Post> PostEditedByNavigation { get; set; }
         public virtual ICollection<Post> PostLockedByNavigation { get; set; }

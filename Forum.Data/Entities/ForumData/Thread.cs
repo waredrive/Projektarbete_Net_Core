@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Forum.Persistence.Entities
+namespace Forum.Persistence.Entities.ForumData
 {
     public partial class Thread
     {

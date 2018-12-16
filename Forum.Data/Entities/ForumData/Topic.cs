@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Forum.Persistence.Entities
+namespace Forum.Persistence.Entities.ForumData
 {
-    public partial class Post
+    public partial class Topic
     {
+        public Topic()
+        {
+            Thread = new HashSet<Thread>();
+        }
+
         public int Id { get; set; }
         public DateTime? CreatedOn { get; set; }
         public int? CreatedBy { get; set; }
@@ -14,13 +19,12 @@ namespace Forum.Persistence.Entities
         public int? LockedBy { get; set; }
         public DateTime? RemovedOn { get; set; }
         public int? RemovedBy { get; set; }
-        public int? Thread { get; set; }
         public string ContentText { get; set; }
 
         public virtual Account CreatedByNavigation { get; set; }
         public virtual Account EditedByNavigation { get; set; }
         public virtual Account LockedByNavigation { get; set; }
         public virtual Account RemovedByNavigation { get; set; }
-        public virtual Thread ThreadNavigation { get; set; }
+        public virtual ICollection<Thread> Thread { get; set; }
     }
 }

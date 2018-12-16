@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace Forum.Persistence.Entities {
+namespace Forum.Persistence.Entities.ForumIdentityData {
  public class ForumIdentityDbContext : IdentityDbContext<IdentityUser>{
    public ForumIdentityDbContext(DbContextOptions<ForumIdentityDbContext> options) : base(options) {
      Database.EnsureCreated();
