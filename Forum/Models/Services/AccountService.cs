@@ -2,25 +2,43 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Forum.Data.Entities.Forum;
-using Forum.Models.AccountViewModels;
+using Forum.Models.Context;
+using Forum.Models.Entities;
+using Forum.Models.ViewModels.AccountViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Models.Services {
+
+  public class AuthorizeRolesAttribute : AuthorizeAttribute {
+    public AuthorizeRolesAttribute(params string[] roles) : base() {
+      Roles = string.Join(",", roles);
+    }
+  }
+
+  public static class Roles {
+    public const string Admin = "Admin";
+    public const string User = "User";
+    public const string Moderator = "Moderator";
+  }
+
   public class AccountService {
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
     private readonly ForumDbContext _db;
 
     public AccountService(
-      UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ForumDbContext db) {
+      UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, RoleManager<IdentityRole> roleManager, ForumDbContext db) {
       _userManager = userManager;
       _signInManager = signInManager;
+      _roleManager = roleManager;
       _db = db;
     }
 
     public async Task<IdentityResult> Add(RegisterViewModel registerVM) {
+      await CreateRoles();
       var user = new IdentityUser {
         Email = registerVM.Email,
         UserName = registerVM.UserName
@@ -32,6 +50,8 @@ namespace Forum.Models.Services {
         return result;
 
       try {
+        await _userManager.AddToRoleAsync(user, Roles.User);
+
         var member = new Member {
           Id = user.Id,
           BirthDate = registerVM.Birthdate,
@@ -56,6 +76,26 @@ namespace Forum.Models.Services {
 
     public async Task SignOut() {
       await _signInManager.SignOutAsync();
+    }
+
+    private async Task CreateRoles() {
+      var adminExist = await _roleManager.RoleExistsAsync(Roles.Admin);
+      if (!adminExist) {
+        var role = new IdentityRole {Name = Roles.Admin};
+        await _roleManager.CreateAsync(role);
+      }
+
+      var moderatorExist = await _roleManager.RoleExistsAsync(Roles.Moderator);
+      if (!moderatorExist) {
+        var role = new IdentityRole {Name = Roles.Moderator};
+        await _roleManager.CreateAsync(role);
+      }
+ 
+      var userExist= await _roleManager.RoleExistsAsync(Roles.User);
+      if (!userExist) {
+        var role = new IdentityRole {Name = Roles.User};
+        await _roleManager.CreateAsync(role);
+      }
     }
   }
 }

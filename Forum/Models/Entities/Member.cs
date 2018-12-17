@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Forum.Data.Entities.Forum
+namespace Forum.Models.Entities
 {
     public partial class Member
     {

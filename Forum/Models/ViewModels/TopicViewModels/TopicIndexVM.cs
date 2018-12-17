@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Forum.Models.TopicViewModels {
+namespace Forum.Models.ViewModels.TopicViewModels {
   public class TopicIndexVM {
     public List<TopicIndexTopicVM> Topics { get; set; }
     public List<TopicIndexPostVM> LatestPosts { get; set; }

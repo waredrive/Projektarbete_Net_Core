@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Forum.Models.AccountViewModels {
+namespace Forum.Models.ViewModels.AccountViewModels {
   public class RegisterViewModel {
     [Required]
     [EmailAddress]

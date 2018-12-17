@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Forum.Models.ThreadViewModels {
+namespace Forum.Models.ViewModels.ThreadViewModels {
   public class ThreadIndexVM {
     public List<ThreadIndexThreadVM> Threads { get; set; }
   }

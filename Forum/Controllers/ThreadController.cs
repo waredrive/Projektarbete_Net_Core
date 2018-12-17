@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Forum.Models.ThreadViewModels;
-using Forum.Models.TopicViewModels;
+using Forum.Models.Services;
+using Forum.Models.ViewModels.ThreadViewModels;
+using Forum.Models.ViewModels.TopicViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,24 +31,28 @@ namespace Forum.Controllers {
       return View();
     }
 
+    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
     [Route("edit/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id) {
       return View();
     }
 
+    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
     [Route("edit")]
     [HttpPost]
     public async Task<IActionResult> Edit(ThreadIndexVM threadIndexVM) {
       return View();
     }
 
+    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
     [Route("delete/{id}")]
     [HttpGet]
     public async Task<IActionResult> Delete(int id) {
       return View();
     }
 
+    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
     [Route("delete")]
     [HttpPost]
     public async Task<IActionResult> Delete(ThreadIndexVM threadIndexVM) {

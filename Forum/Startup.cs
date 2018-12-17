@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Forum.Data.Entities.Forum;
-using Forum.Data.Entities.Identity;
+using Forum.Models.Context;
 using Forum.Models.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;

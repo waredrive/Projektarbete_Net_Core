@@ -1,8 +1,9 @@
 ﻿using System;
+using Forum.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Forum.Data.Entities.Forum
+namespace Forum.Models.Context
 {
     public partial class ForumDbContext : DbContext
     {

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Forum.Data.Entities.Forum;
-using Forum.Models.TopicViewModels;
+using Forum.Models.Context;
+using Forum.Models.Entities;
+using Forum.Models.ViewModels.TopicViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +24,6 @@ namespace Forum.Models.Services {
 
     public async Task Add(TopicCreateVM topicCreateVM, ClaimsPrincipal user) {
       var currentUserId = _userManager.GetUserId(user);
-
       if (currentUserId == null)
         return;
 

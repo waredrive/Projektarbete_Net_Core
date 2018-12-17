@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Forum.Models.AccountViewModels;
 using Forum.Models.Services;
+using Forum.Models.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

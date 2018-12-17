@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Forum.Models.PostViewModels;
-using Forum.Models.TopicViewModels;
+using Forum.Models.Services;
+using Forum.Models.ViewModels.PostViewModels;
+using Forum.Models.ViewModels.TopicViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +19,7 @@ namespace Forum.Controllers
     public IActionResult Index(int threadId) {
       return View();
     }
+
 
     [Route("create")]
     [HttpGet]
@@ -49,6 +51,7 @@ namespace Forum.Controllers
       return View();
     }
 
+    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
     [Route("delete")]
     [HttpPost]
     public async Task<IActionResult> Delete(PostIndexVM PostIndexVM) {

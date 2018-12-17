@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Forum.Models.Services;
-using Forum.Models.TopicViewModels;
+using Forum.Models.ViewModels.TopicViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +26,7 @@ namespace Forum.Controllers {
       return View();
     }
 
+    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
     [Route("create")]
     [HttpGet]
     public async Task<IActionResult> Create(int id) {
@@ -33,32 +34,36 @@ namespace Forum.Controllers {
       return View();
     }
 
+    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
     [Route("create")]
     [HttpPost]
     public async Task<IActionResult> Create(TopicCreateVM topicCreateVm) {
       await _topicService.Add(topicCreateVm, User);
       return RedirectToAction(nameof(Index));
-
     }
 
+    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
     [Route("edit/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id) {
       return View();
     }
 
+    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
     [Route("edit")]
     [HttpPost]
     public async Task<IActionResult> Edit(TopicIndexVM topicIndexVM) {
       return View();
     }
 
+    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
     [Route("delete/{id}")]
     [HttpGet]
     public async Task<IActionResult> Delete(int id) {
       return View();
     }
 
+    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
     [Route("delete")]
     [HttpPost]
     public async Task<IActionResult> Delete(TopicIndexVM topicIndexVM) {
