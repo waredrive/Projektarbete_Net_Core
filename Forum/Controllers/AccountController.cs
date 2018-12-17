@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Forum.MVC.Models.AccountViewModels;
 using Forum.MVC.Models.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.MVC.Controllers {
 
+  [AllowAnonymous]
   [RequireHttps]
   [Route("account")]
   public class AccountController : Controller {
@@ -16,21 +18,30 @@ namespace Forum.MVC.Controllers {
       _accountService = accountService;
     }
 
-    [AllowAnonymous]
     [Route("register")]
     [HttpGet]
-    public IActionResult Register() {
+    public async Task<IActionResult> Register() {
+      var password = Guid.NewGuid() + "A!";
+      var result = await _accountService.Add(new RegisterViewModel {
+        Birthdate = DateTime.Now,
+        Password = password,
+        ConfirmPassword = password,
+        Email = "test@test.com",
+        FirstName = "TestName",
+        LastName = "TestSurname",
+        UserName = Guid.NewGuid().ToString()
+      });
+
       return View();
     }
 
-    [AllowAnonymous]
     [Route("register")]
     [HttpPost]
     public async Task<IActionResult> Register(RegisterViewModel model) {
       if (!ModelState.IsValid)
         return View(model);
-
       var result = await _accountService.Add(model);
+
 
       if (result.Succeeded)
         return RedirectToAction(nameof(Login));
@@ -41,24 +52,24 @@ namespace Forum.MVC.Controllers {
       return View(model);
     }
 
-    [AllowAnonymous]
     [Route("login")]
     [HttpGet]
     public IActionResult Login() {
       return View();
     }
 
-    [AllowAnonymous]
+
     [Route("login")]
     [HttpPost]
-    public async Task<IActionResult> Login(LoginViewModel model) {
+    public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null) {
+      ViewData["ReturnUrl"] = returnUrl;
       if (!ModelState.IsValid)
         return View(model);
 
       var result = await _accountService.Login(model);
 
       if (result.Succeeded)
-        return Redirect("/");
+        return Redirect(Url.IsLocalUrl(returnUrl) ? returnUrl : "/");
 
       ModelState.AddModelError(string.Empty, "Invalid login attempt.");
 

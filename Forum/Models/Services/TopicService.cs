@@ -23,8 +23,7 @@ namespace Forum.MVC.Models.Services {
 
     public async Task Add(TopicCreateVM topicCreateVM, ClaimsPrincipal user) {
       var currentUserId = _userManager.GetUserId(user);
-      var currentAccount = _db.Account.Include(a => a.Member).Include(a => a.RoleNavigation)
-        .SingleOrDefault(a => a.Member.Any(m => m.Id == currentUserId));
+      var currentAccount = _db.Account.SingleOrDefault(a => a.Member.Any(m => m.Id == currentUserId));
 
       if (currentAccount?.Id == null || currentAccount.RoleNavigation.Id != 1)
         return;

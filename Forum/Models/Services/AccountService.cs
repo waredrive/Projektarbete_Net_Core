@@ -31,23 +31,28 @@ namespace Forum.MVC.Models.Services {
       if (!result.Succeeded)
         return result;
 
-      var account = new Account {
-        Role = 1,
-        Created = DateTime.UtcNow
-      };
-      _db.Account.Add(account);
+      try {
+        var account = new Account {
+          Role = 1,
+          Created = DateTime.UtcNow
+        };
+        _db.Account.Add(account);
 
-      var member = new Member {
-        Id = user.Id,
-        AccountNavigation = account,
-        BirthDate = registerVM.Birthdate,
-        FirstName = registerVM.FirstName,
-        LastName = registerVM.LastName
-      };
+        var member = new Member {
+          Id = user.Id,
+          AccountNavigation = account,
+          BirthDate = registerVM.Birthdate,
+          FirstName = registerVM.FirstName,
+          LastName = registerVM.LastName
+        };
 
-      _db.Member.Add(member);
-      await _db.SaveChangesAsync();
+        _db.Member.Add(member);
+        await _db.SaveChangesAsync();
 
+      } catch (Exception) {
+        await _userManager.DeleteAsync(user);
+        throw;
+      }
       return result;
     }
 
