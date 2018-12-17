@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Forum.MVC.Models.AccountViewModels;
-using Forum.MVC.Models.Services;
+using Forum.Models.AccountViewModels;
+using Forum.Models.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Forum.MVC.Controllers {
+namespace Forum.Controllers {
 
   [AllowAnonymous]
   [RequireHttps]

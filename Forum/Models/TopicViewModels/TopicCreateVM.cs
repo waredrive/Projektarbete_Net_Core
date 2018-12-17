@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Forum.MVC.Models.TopicViewModels {
+namespace Forum.Models.TopicViewModels {
   public class TopicCreateVM {
     public int CreatedBy { get; set; }
     public DateTime CreatedOn { get; set; }

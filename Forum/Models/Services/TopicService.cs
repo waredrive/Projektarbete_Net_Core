@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Forum.MVC.Models.TopicViewModels;
-using Forum.Persistence.Entities.ForumData;
+using Forum.Data.Entities.Forum;
+using Forum.Models.TopicViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Forum.MVC.Models.Services {
+namespace Forum.Models.Services {
   public class TopicService {
     private readonly ForumDbContext _db;
     private readonly UserManager<IdentityUser> _userManager;
@@ -23,13 +23,12 @@ namespace Forum.MVC.Models.Services {
 
     public async Task Add(TopicCreateVM topicCreateVM, ClaimsPrincipal user) {
       var currentUserId = _userManager.GetUserId(user);
-      var currentAccount = _db.Account.SingleOrDefault(a => a.Member.Any(m => m.Id == currentUserId));
 
-      if (currentAccount?.Id == null || currentAccount.RoleNavigation.Id != 1)
+      if (currentUserId == null)
         return;
 
       var topic = new Topic {
-        CreatedBy = currentAccount.Id,
+        CreatedBy = currentUserId,
         ContentText = topicCreateVM.CreatedText,
         CreatedOn = DateTime.UtcNow
       };

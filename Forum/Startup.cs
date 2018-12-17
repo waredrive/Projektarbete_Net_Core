@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Forum.MVC.Models.Services;
-using Forum.Persistence.Entities.ForumData;
-using Forum.Persistence.Entities.ForumIdentityData;
+using Forum.Data.Entities.Forum;
+using Forum.Data.Entities.Identity;
+using Forum.Models.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -16,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Forum.MVC {
+namespace Forum {
   public class Startup {
     private readonly IConfiguration _config;
 

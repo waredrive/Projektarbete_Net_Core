@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Forum.MVC.Models.AccountViewModels;
-using Forum.Persistence.Entities.ForumData;
+using Forum.Data.Entities.Forum;
+using Forum.Models.AccountViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace Forum.MVC.Models.Services {
+namespace Forum.Models.Services {
   public class AccountService {
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
@@ -32,18 +32,12 @@ namespace Forum.MVC.Models.Services {
         return result;
 
       try {
-        var account = new Account {
-          Role = 1,
-          Created = DateTime.UtcNow
-        };
-        _db.Account.Add(account);
-
         var member = new Member {
           Id = user.Id,
-          AccountNavigation = account,
           BirthDate = registerVM.Birthdate,
           FirstName = registerVM.FirstName,
-          LastName = registerVM.LastName
+          LastName = registerVM.LastName,
+          CreatedOn = DateTime.UtcNow
         };
 
         _db.Member.Add(member);

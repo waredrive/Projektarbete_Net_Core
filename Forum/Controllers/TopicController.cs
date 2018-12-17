@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Forum.MVC.Models.Services;
-using Forum.MVC.Models.TopicViewModels;
+using Forum.Models.Services;
+using Forum.Models.TopicViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Forum.MVC.Controllers {
+namespace Forum.Controllers {
 
   [Route("")]
   public class TopicController : Controller {

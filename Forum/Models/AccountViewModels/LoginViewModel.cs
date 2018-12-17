@@ -5,7 +5,7 @@ using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
 
-namespace Forum.MVC.Models.AccountViewModels
+namespace Forum.Models.AccountViewModels
 {
     public class LoginViewModel
     {
