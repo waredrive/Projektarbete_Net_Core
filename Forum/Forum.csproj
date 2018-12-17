@@ -15,8 +15,4 @@
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Forum.Data\Forum.Persistence.csproj" />
-  </ItemGroup>
-
 </Project>
