@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Forum.Attributes;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.TopicViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.Controllers {
-
   [Route("")]
   public class TopicController : Controller {
-
     private readonly TopicService _topicService;
 
     public TopicController(TopicService topicService) {
@@ -30,7 +25,6 @@ namespace Forum.Controllers {
     [Route("create")]
     [HttpGet]
     public async Task<IActionResult> Create(int id) {
-
       return View();
     }
 

@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Forum.Models.Services;
+﻿using System.Threading.Tasks;
+using Forum.Attributes;
 using Forum.Models.ViewModels.PostViewModels;
 using Forum.Models.ViewModels.TopicViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Forum.Controllers
-{
+namespace Forum.Controllers {
   [Route("thread/{threadId}")]
   public class PostController : Controller {
-
     [AllowAnonymous]
     [Route("")]
     [HttpGet]
@@ -41,7 +36,7 @@ namespace Forum.Controllers
 
     [Route("edit")]
     [HttpPost]
-    public async Task<IActionResult> Edit( PostIndexVM PostIndexVM) {
+    public async Task<IActionResult> Edit(PostIndexVM PostIndexVM) {
       return View();
     }
 

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Forum.Models.Services;
+﻿using System.Threading.Tasks;
+using Forum.Attributes;
 using Forum.Models.ViewModels.ThreadViewModels;
 using Forum.Models.ViewModels.TopicViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -11,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace Forum.Controllers {
   [Route("forum/{topicId}")]
   public class ThreadController : Controller {
-
     [AllowAnonymous]
     [Route("")]
     [HttpGet]

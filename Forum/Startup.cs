@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Forum.Models.Context;
+﻿using Forum.Models.Context;
 using Forum.Models.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -24,8 +19,10 @@ namespace Forum {
 
     public void ConfigureServices(IServiceCollection services) {
       services.AddDbContext<ForumDbContext>(o => o.UseSqlServer(_config.GetConnectionString("ForumDb_Dev")));
-      services.AddDbContext<ForumIdentityDbContext>(o => o.UseSqlServer(_config.GetConnectionString("ForumDb_Identity_Dev")));
-      services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ForumIdentityDbContext>().AddDefaultTokenProviders();
+      services.AddDbContext<ForumIdentityDbContext>(o =>
+        o.UseSqlServer(_config.GetConnectionString("ForumDb_Identity_Dev")));
+      services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ForumIdentityDbContext>()
+        .AddDefaultTokenProviders();
       services.AddScoped<AccountService>();
       services.AddScoped<TopicService>();
       services.AddMvc(o => {
@@ -37,10 +34,7 @@ namespace Forum {
     }
 
     public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
-
-      if (env.IsDevelopment()) {
-        app.UseDeveloperExceptionPage();
-      }
+      if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
       app.UseHttpsRedirection();
       app.UseAuthentication();

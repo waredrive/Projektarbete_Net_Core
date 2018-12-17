@@ -1,36 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Forum.Attributes;
 using Forum.Models.Context;
 using Forum.Models.Entities;
 using Forum.Models.ViewModels.AccountViewModels;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Models.Services {
-
-  public class AuthorizeRolesAttribute : AuthorizeAttribute {
-    public AuthorizeRolesAttribute(params string[] roles) : base() {
-      Roles = string.Join(",", roles);
-    }
-  }
-
-  public static class Roles {
-    public const string Admin = "Admin";
-    public const string User = "User";
-    public const string Moderator = "Moderator";
-  }
-
   public class AccountService {
+    private readonly ForumDbContext _db;
+    private readonly RoleManager<IdentityRole> _roleManager;
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
-    private readonly ForumDbContext _db;
 
     public AccountService(
-      UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, RoleManager<IdentityRole> roleManager, ForumDbContext db) {
+      UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
+      RoleManager<IdentityRole> roleManager, ForumDbContext db) {
       _userManager = userManager;
       _signInManager = signInManager;
       _roleManager = roleManager;
@@ -62,11 +47,12 @@ namespace Forum.Models.Services {
 
         _db.Member.Add(member);
         await _db.SaveChangesAsync();
-
-      } catch (Exception) {
+      }
+      catch (Exception) {
         await _userManager.DeleteAsync(user);
         throw;
       }
+
       return result;
     }
 
@@ -90,8 +76,8 @@ namespace Forum.Models.Services {
         var role = new IdentityRole {Name = Roles.Moderator};
         await _roleManager.CreateAsync(role);
       }
- 
-      var userExist= await _roleManager.RoleExistsAsync(Roles.User);
+
+      var userExist = await _roleManager.RoleExistsAsync(Roles.User);
       if (!userExist) {
         var role = new IdentityRole {Name = Roles.User};
         await _roleManager.CreateAsync(role);

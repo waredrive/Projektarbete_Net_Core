@@ -1,22 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Forum.Models.Context;
 using Forum.Models.Entities;
 using Forum.Models.ViewModels.TopicViewModels;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Models.Services {
   public class TopicService {
     private readonly ForumDbContext _db;
-    private readonly UserManager<IdentityUser> _userManager;
     private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly UserManager<IdentityUser> _userManager;
 
-    public TopicService(ForumDbContext db, UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager) {
+    public TopicService(ForumDbContext db, UserManager<IdentityUser> userManager,
+      SignInManager<IdentityUser> signInManager) {
       _db = db;
       _userManager = userManager;
       _signInManager = signInManager;

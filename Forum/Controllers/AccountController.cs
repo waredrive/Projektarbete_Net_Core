@@ -3,11 +3,9 @@ using System.Threading.Tasks;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.Controllers {
-
   [AllowAnonymous]
   [RequireHttps]
   [Route("account")]
