@@ -35,6 +35,7 @@ namespace Forum.Controllers {
 
     [Route("register")]
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model) {
       if (!ModelState.IsValid)
         return View(model);
@@ -59,8 +60,10 @@ namespace Forum.Controllers {
 
     [Route("login")]
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null) {
-      ViewData["ReturnUrl"] = returnUrl;
+      ViewBag.ReturnUrl = returnUrl;
+
       if (!ModelState.IsValid)
         return View(model);
 

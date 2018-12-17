@@ -31,6 +31,7 @@ namespace Forum.Controllers {
     [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
     [Route("create")]
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(TopicCreateVM topicCreateVm) {
       await _topicService.Add(topicCreateVm, User);
       return RedirectToAction(nameof(Index));
@@ -46,6 +47,7 @@ namespace Forum.Controllers {
     [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
     [Route("edit")]
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(TopicIndexVM topicIndexVM) {
       return View();
     }
@@ -60,6 +62,7 @@ namespace Forum.Controllers {
     [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
     [Route("delete")]
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(TopicIndexVM topicIndexVM) {
       return View();
     }

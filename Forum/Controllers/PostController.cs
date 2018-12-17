@@ -24,6 +24,7 @@ namespace Forum.Controllers {
 
     [Route("create")]
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(TopicIndexVM topicIndexVM) {
       return View();
     }
@@ -36,6 +37,7 @@ namespace Forum.Controllers {
 
     [Route("edit")]
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(PostIndexVM PostIndexVM) {
       return View();
     }
@@ -49,6 +51,7 @@ namespace Forum.Controllers {
     [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
     [Route("delete")]
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(PostIndexVM PostIndexVM) {
       return View();
     }
