@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 namespace Forum.Models.Context {
  public class ForumIdentityDbContext : IdentityDbContext<IdentityUser>{
    public ForumIdentityDbContext(DbContextOptions<ForumIdentityDbContext> options) : base(options) {
-     Database.EnsureCreated();
    }
   }
 }

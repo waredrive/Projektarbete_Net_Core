@@ -20,7 +20,7 @@ namespace Forum {
     public void ConfigureServices(IServiceCollection services) {
       services.AddDbContext<ForumDbContext>(o => o.UseSqlServer(_config.GetConnectionString("ForumDb_Dev")));
       services.AddDbContext<ForumIdentityDbContext>(o =>
-        o.UseSqlServer(_config.GetConnectionString("ForumDb_Identity_Dev")));
+        o.UseSqlServer(_config.GetConnectionString("ForumDb_Dev")));
       services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ForumIdentityDbContext>()
         .AddDefaultTokenProviders();
       services.AddScoped<AccountService>();

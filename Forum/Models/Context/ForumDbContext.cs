@@ -12,10 +12,17 @@ namespace Forum.Models.Context
         }
 
         public ForumDbContext(DbContextOptions<ForumDbContext> options)
-            : base(options) {
-          Database.EnsureCreated();
+            : base(options)
+        {
         }
 
+        public virtual DbSet<AspNetRoleClaims> AspNetRoleClaims { get; set; }
+        public virtual DbSet<AspNetRoles> AspNetRoles { get; set; }
+        public virtual DbSet<AspNetUserClaims> AspNetUserClaims { get; set; }
+        public virtual DbSet<AspNetUserLogins> AspNetUserLogins { get; set; }
+        public virtual DbSet<AspNetUserRoles> AspNetUserRoles { get; set; }
+        public virtual DbSet<AspNetUserTokens> AspNetUserTokens { get; set; }
+        public virtual DbSet<AspNetUsers> AspNetUsers { get; set; }
         public virtual DbSet<Member> Member { get; set; }
         public virtual DbSet<Post> Post { get; set; }
         public virtual DbSet<Thread> Thread { get; set; }
@@ -25,15 +32,109 @@ namespace Forum.Models.Context
         {
             modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
-            modelBuilder.Entity<Member>(entity =>
+            modelBuilder.Entity<AspNetRoleClaims>(entity =>
             {
+                entity.HasIndex(e => e.RoleId);
+
+                entity.Property(e => e.RoleId).IsRequired();
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.AspNetRoleClaims)
+                    .HasForeignKey(d => d.RoleId);
+            });
+
+            modelBuilder.Entity<AspNetRoles>(entity =>
+            {
+                entity.HasIndex(e => e.NormalizedName)
+                    .HasName("RoleNameIndex")
+                    .IsUnique()
+                    .HasFilter("([NormalizedName] IS NOT NULL)");
+
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.BlockedBy).HasMaxLength(450);
+                entity.Property(e => e.Name).HasMaxLength(256);
 
+                entity.Property(e => e.NormalizedName).HasMaxLength(256);
+            });
+
+            modelBuilder.Entity<AspNetUserClaims>(entity =>
+            {
+                entity.HasIndex(e => e.UserId);
+
+                entity.Property(e => e.UserId).IsRequired();
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.AspNetUserClaims)
+                    .HasForeignKey(d => d.UserId);
+            });
+
+            modelBuilder.Entity<AspNetUserLogins>(entity =>
+            {
+                entity.HasKey(e => new { e.LoginProvider, e.ProviderKey });
+
+                entity.HasIndex(e => e.UserId);
+
+                entity.Property(e => e.UserId).IsRequired();
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.AspNetUserLogins)
+                    .HasForeignKey(d => d.UserId);
+            });
+
+            modelBuilder.Entity<AspNetUserRoles>(entity =>
+            {
+                entity.HasKey(e => new { e.UserId, e.RoleId });
+
+                entity.HasIndex(e => e.RoleId);
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.AspNetUserRoles)
+                    .HasForeignKey(d => d.RoleId);
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.AspNetUserRoles)
+                    .HasForeignKey(d => d.UserId);
+            });
+
+            modelBuilder.Entity<AspNetUserTokens>(entity =>
+            {
+                entity.HasKey(e => new { e.UserId, e.LoginProvider, e.Name });
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.AspNetUserTokens)
+                    .HasForeignKey(d => d.UserId);
+            });
+
+            modelBuilder.Entity<AspNetUsers>(entity =>
+            {
+                entity.HasIndex(e => e.NormalizedEmail)
+                    .HasName("EmailIndex");
+
+                entity.HasIndex(e => e.NormalizedUserName)
+                    .HasName("UserNameIndex")
+                    .IsUnique()
+                    .HasFilter("([NormalizedUserName] IS NOT NULL)");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.Email).HasMaxLength(256);
+
+                entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
+
+                entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
+
+                entity.Property(e => e.UserName).HasMaxLength(256);
+            });
+
+            modelBuilder.Entity<Member>(entity =>
+            {
                 entity.Property(e => e.FirstName)
                     .IsRequired()
                     .HasMaxLength(50);
+
+                entity.Property(e => e.IdentityUserId)
+                    .IsRequired()
+                    .HasMaxLength(450);
 
                 entity.Property(e => e.LastName)
                     .IsRequired()
@@ -43,17 +144,25 @@ namespace Forum.Models.Context
                     .WithMany(p => p.InverseBlockedByNavigation)
                     .HasForeignKey(d => d.BlockedBy)
                     .HasConstraintName("FK__Member__BlockedB__46B27FE2");
+
+                entity.HasOne(d => d.IdentityUser)
+                    .WithMany(p => p.Member)
+                    .HasForeignKey(d => d.IdentityUserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Member__Identity__693CA210");
             });
 
             modelBuilder.Entity<Post>(entity =>
             {
-                entity.Property(e => e.CreatedBy).HasMaxLength(450);
+                entity.HasIndex(e => e.CreatedBy);
 
-                entity.Property(e => e.EditedBy).HasMaxLength(450);
+                entity.HasIndex(e => e.EditedBy);
 
-                entity.Property(e => e.LockedBy).HasMaxLength(450);
+                entity.HasIndex(e => e.LockedBy);
 
-                entity.Property(e => e.RemovedBy).HasMaxLength(450);
+                entity.HasIndex(e => e.RemovedBy);
+
+                entity.HasIndex(e => e.Thread);
 
                 entity.HasOne(d => d.CreatedByNavigation)
                     .WithMany(p => p.PostCreatedByNavigation)
@@ -83,13 +192,15 @@ namespace Forum.Models.Context
 
             modelBuilder.Entity<Thread>(entity =>
             {
-                entity.Property(e => e.CreatedBy).HasMaxLength(450);
+                entity.HasIndex(e => e.CreatedBy);
 
-                entity.Property(e => e.EditedBy).HasMaxLength(450);
+                entity.HasIndex(e => e.EditedBy);
 
-                entity.Property(e => e.LockedBy).HasMaxLength(450);
+                entity.HasIndex(e => e.LockedBy);
 
-                entity.Property(e => e.RemovedBy).HasMaxLength(450);
+                entity.HasIndex(e => e.RemovedBy);
+
+                entity.HasIndex(e => e.Topic);
 
                 entity.HasOne(d => d.CreatedByNavigation)
                     .WithMany(p => p.ThreadCreatedByNavigation)
@@ -119,13 +230,13 @@ namespace Forum.Models.Context
 
             modelBuilder.Entity<Topic>(entity =>
             {
-                entity.Property(e => e.CreatedBy).HasMaxLength(450);
+                entity.HasIndex(e => e.CreatedBy);
 
-                entity.Property(e => e.EditedBy).HasMaxLength(450);
+                entity.HasIndex(e => e.EditedBy);
 
-                entity.Property(e => e.LockedBy).HasMaxLength(450);
+                entity.HasIndex(e => e.LockedBy);
 
-                entity.Property(e => e.RemovedBy).HasMaxLength(450);
+                entity.HasIndex(e => e.RemovedBy);
 
                 entity.HasOne(d => d.CreatedByNavigation)
                     .WithMany(p => p.TopicCreatedByNavigation)

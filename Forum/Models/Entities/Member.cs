@@ -22,16 +22,18 @@ namespace Forum.Models.Entities
             TopicRemovedByNavigation = new HashSet<Topic>();
         }
 
-        public string Id { get; set; }
+        public int Id { get; set; }
+        public string IdentityUserId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime BirthDate { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime? BlockedOn { get; set; }
-        public string BlockedBy { get; set; }
+        public int? BlockedBy { get; set; }
         public DateTime? BlockedEnd { get; set; }
 
         public virtual Member BlockedByNavigation { get; set; }
+        public virtual AspNetUsers IdentityUser { get; set; }
         public virtual ICollection<Member> InverseBlockedByNavigation { get; set; }
         public virtual ICollection<Post> PostCreatedByNavigation { get; set; }
         public virtual ICollection<Post> PostEditedByNavigation { get; set; }

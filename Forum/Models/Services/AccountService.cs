@@ -38,7 +38,7 @@ namespace Forum.Models.Services {
         await _userManager.AddToRoleAsync(user, Roles.User);
 
         var member = new Member {
-          Id = user.Id,
+          IdentityUserId = user.Id,
           BirthDate = registerVM.Birthdate,
           FirstName = registerVM.FirstName,
           LastName = registerVM.LastName,
