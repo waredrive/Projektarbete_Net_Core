@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -19,9 +20,9 @@ namespace Forum {
 
     public void ConfigureServices(IServiceCollection services) {
       services.AddDbContext<ForumDbContext>(o => o.UseSqlServer(_config.GetConnectionString("ForumDb_Dev")));
-      services.AddDbContext<ForumIdentityDbContext>(o =>
+      services.AddDbContext<IdentityDbContext>(o =>
         o.UseSqlServer(_config.GetConnectionString("ForumDb_Dev")));
-      services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<ForumIdentityDbContext>()
+      services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<IdentityDbContext>()
         .AddDefaultTokenProviders();
       services.AddScoped<AccountService>();
       services.AddScoped<TopicService>();
