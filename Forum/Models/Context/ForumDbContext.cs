@@ -12,8 +12,8 @@ namespace Forum.Models.Context
         }
 
         public ForumDbContext(DbContextOptions<ForumDbContext> options)
-            : base(options)
-        {
+            : base(options) {
+          Database.EnsureCreated();
         }
 
         public virtual DbSet<Member> Member { get; set; }
