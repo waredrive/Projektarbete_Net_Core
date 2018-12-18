@@ -128,13 +128,13 @@ namespace Forum.Models.Context
 
             modelBuilder.Entity<Member>(entity =>
             {
+                entity.Property(e => e.Id).ValueGeneratedNever();
+
+                entity.Property(e => e.BlockedBy).HasMaxLength(450);
+
                 entity.Property(e => e.FirstName)
                     .IsRequired()
                     .HasMaxLength(50);
-
-                entity.Property(e => e.IdentityUserId)
-                    .IsRequired()
-                    .HasMaxLength(450);
 
                 entity.Property(e => e.LastName)
                     .IsRequired()
@@ -145,11 +145,11 @@ namespace Forum.Models.Context
                     .HasForeignKey(d => d.BlockedBy)
                     .HasConstraintName("FK__Member__BlockedB__46B27FE2");
 
-                entity.HasOne(d => d.IdentityUser)
-                    .WithMany(p => p.Member)
-                    .HasForeignKey(d => d.IdentityUserId)
+                entity.HasOne(d => d.IdNavigation)
+                    .WithOne(p => p.Member)
+                    .HasForeignKey<Member>(d => d.Id)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Member__Identity__693CA210");
+                    .HasConstraintName("FK__Member__Id__7C4F7684");
             });
 
             modelBuilder.Entity<Post>(entity =>

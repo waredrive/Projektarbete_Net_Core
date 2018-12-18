@@ -11,7 +11,6 @@ namespace Forum.Models.Entities
             AspNetUserLogins = new HashSet<AspNetUserLogins>();
             AspNetUserRoles = new HashSet<AspNetUserRoles>();
             AspNetUserTokens = new HashSet<AspNetUserTokens>();
-            Member = new HashSet<Member>();
         }
 
         public string Id { get; set; }
@@ -30,10 +29,10 @@ namespace Forum.Models.Entities
         public bool LockoutEnabled { get; set; }
         public int AccessFailedCount { get; set; }
 
+        public virtual Member Member { get; set; }
         public virtual ICollection<AspNetUserClaims> AspNetUserClaims { get; set; }
         public virtual ICollection<AspNetUserLogins> AspNetUserLogins { get; set; }
         public virtual ICollection<AspNetUserRoles> AspNetUserRoles { get; set; }
         public virtual ICollection<AspNetUserTokens> AspNetUserTokens { get; set; }
-        public virtual ICollection<Member> Member { get; set; }
     }
 }

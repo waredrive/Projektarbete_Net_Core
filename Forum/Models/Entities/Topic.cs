@@ -12,13 +12,13 @@ namespace Forum.Models.Entities
 
         public int Id { get; set; }
         public DateTime? CreatedOn { get; set; }
-        public int? CreatedBy { get; set; }
+        public string CreatedBy { get; set; }
         public DateTime? EditedOn { get; set; }
-        public int? EditedBy { get; set; }
+        public string EditedBy { get; set; }
         public DateTime? LockedOn { get; set; }
-        public int? LockedBy { get; set; }
+        public string LockedBy { get; set; }
         public DateTime? RemovedOn { get; set; }
-        public int? RemovedBy { get; set; }
+        public string RemovedBy { get; set; }
         public string ContentText { get; set; }
 
         public virtual Member CreatedByNavigation { get; set; }
