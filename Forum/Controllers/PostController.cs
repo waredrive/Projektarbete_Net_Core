@@ -48,7 +48,6 @@ namespace Forum.Controllers {
       return View();
     }
 
-    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
     [Route("delete")]
     [HttpPost]
     [ValidateAntiForgeryToken]

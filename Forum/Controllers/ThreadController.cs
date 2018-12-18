@@ -43,14 +43,14 @@ namespace Forum.Controllers {
       return View();
     }
 
-    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
+    [AuthorizeRoles(Roles.Admin)]
     [Route("delete/{id}")]
     [HttpGet]
     public async Task<IActionResult> Delete(int id) {
       return View();
     }
 
-    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
+    [AuthorizeRoles(Roles.Admin)]
     [Route("delete")]
     [HttpPost]
     [ValidateAntiForgeryToken]
