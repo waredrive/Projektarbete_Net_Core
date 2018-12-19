@@ -54,7 +54,8 @@ namespace Forum.Controllers {
     [Route("login")]
     [HttpGet]
     public IActionResult Login(string returnUrl = null) {
-      return View();
+      var model = new LoginViewModel {ReturnUrl = returnUrl};
+      return View(model);
     }
 
 

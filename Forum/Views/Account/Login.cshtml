@@ -9,7 +9,7 @@
     <h1>Log in</h1>
     <br />
 
-    <form asp-controller="Account" role="form" asp-action="Login" class="form">
+    <form asp-controller="Account" role="form" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl" class="form">
       <div asp-validation-summary="ModelOnly" class="input-validation-error"></div>
 
       <div class="form-group">
