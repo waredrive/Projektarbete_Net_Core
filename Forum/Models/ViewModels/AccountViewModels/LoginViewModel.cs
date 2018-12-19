@@ -5,19 +5,19 @@ using System.Linq;
 using System.Security.Principal;
 using System.Threading.Tasks;
 
-namespace Forum.Models.ViewModels.AccountViewModels
-{
-    public class LoginViewModel
-    {
-        [Required]
-        [Display(Name="Username")]
-        public string UserName { get; set; }
+namespace Forum.Models.ViewModels.AccountViewModels {
+  public class LoginViewModel {
+    [Required]
+    [Display(Name = "Username")]
+    public string UserName { get; set; }
 
-        [Required]
-        [DataType(DataType.Password)]
-        public string Password { get; set; }
+    [Required]
+    [DataType(DataType.Password)]
+    public string Password { get; set; }
 
-        [Display(Name = "Remember me?")]
-        public bool RememberMe { get; set; }
-    }
+    [Display(Name = "Remember me?")]
+    public bool RememberMe { get; set; }
+
+    public string ReturnUrl { get; set; }
+  }
 }

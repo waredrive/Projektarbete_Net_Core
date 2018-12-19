@@ -53,7 +53,7 @@ namespace Forum.Controllers {
 
     [Route("login")]
     [HttpGet]
-    public IActionResult Login() {
+    public IActionResult Login(string returnUrl = null) {
       return View();
     }
 
@@ -61,8 +61,7 @@ namespace Forum.Controllers {
     [Route("login")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl;
+    public async Task<IActionResult> Login(LoginViewModel model) {
 
       if (!ModelState.IsValid)
         return View(model);
@@ -70,7 +69,7 @@ namespace Forum.Controllers {
       var result = await _accountService.Login(model);
 
       if (result.Succeeded)
-        return Redirect(Url.IsLocalUrl(returnUrl) ? returnUrl : "/");
+        return Redirect(Url.IsLocalUrl(model.ReturnUrl) ? model.ReturnUrl : "/");
 
       ModelState.AddModelError(string.Empty, "Invalid login attempt.");
 
