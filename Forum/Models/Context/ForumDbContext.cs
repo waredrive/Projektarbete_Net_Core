@@ -12,8 +12,7 @@ namespace Forum.Models.Context
         }
 
         public ForumDbContext(DbContextOptions<ForumDbContext> options)
-            : base(options)
-        {
+            : base(options) {
         }
 
         public virtual DbSet<AspNetRoleClaims> AspNetRoleClaims { get; set; }
