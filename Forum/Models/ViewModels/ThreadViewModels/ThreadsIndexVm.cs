@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace Forum.Models.ViewModels.ThreadViewModels {
   public class ThreadsIndexVm {
+    public string Topic { get; set; }
     public List<ThreadsIndexThreadVm> Threads { get; set; }
   }
 

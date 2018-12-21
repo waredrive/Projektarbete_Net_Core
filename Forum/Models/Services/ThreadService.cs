@@ -7,6 +7,7 @@ using Forum.Models.Context;
 using Forum.Models.Entities;
 using Forum.Models.ViewModels.ThreadViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Models.Services {
   public class ThreadService {
@@ -39,6 +40,7 @@ namespace Forum.Models.Services {
 
     public async Task<ThreadsIndexVm> GetThreadsIndexVm(int topicId) {
       var threadsIndexVm = new ThreadsIndexVm {
+        Topic = await _db.Topic.Where(t => t.Id == topicId).Select(t => t.ContentText).FirstOrDefaultAsync(),
         Threads = new List<ThreadsIndexThreadVm>()
       };
 

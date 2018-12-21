@@ -1,11 +1,11 @@
 ﻿@model ThreadsIndexVm
 @{
-  ViewBag.Title = "Thread Index";
+  ViewBag.Title = @Model.Topic;
 }
 <div class="container-fluid">
   <div class="col-12">
     <div class="row">
-      <h1>THREAD</h1>
+      <h1>@Model.Topic</h1>
     </div>
   </div>
   <a asp-controller="Thread" asp-action="Create" class="btn btn-primary">Add new thread</a>

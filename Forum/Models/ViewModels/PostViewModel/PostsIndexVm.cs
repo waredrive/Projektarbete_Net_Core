@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace Forum.Models.ViewModels.PostViewModels {
   public class PostsIndexVm {
+    public string Thread { get; set; }
     public List<PostsIndexPostVm> Posts { get; set; }
   }
 
