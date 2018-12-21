@@ -1,4 +1,4 @@
-﻿@model RegisterViewModel
+﻿@model RegisterVm
 @{
   ViewBag.Title = "Register";
 }
@@ -14,7 +14,7 @@
       <div class="form-group">
         <label asp-for="UserName" class="col-md-2 control-label"></label>
         <div class="col-md-10">
-          <input type="text" asp-for="UserName" class="form-control" />
+          <input asp-for="UserName" class="form-control" />
           <span asp-validation-for="UserName" class="text-danger"></span>
         </div>
       </div>
@@ -22,7 +22,7 @@
       <div class="form-group">
         <label asp-for="Email" class="col-md-2 control-label"></label>
         <div class="col-md-10">
-          <input type="email" asp-for="Email" class="form-control" />
+          <input asp-for="Email" class="form-control" />
           <span asp-validation-for="Email" class="text-danger"></span>
         </div>
       </div>
@@ -30,7 +30,7 @@
       <div class="form-group">
         <label asp-for="FirstName" class="col-md-2 control-label"></label>
         <div class="col-md-10">
-          <input type="text" asp-for="FirstName" class="form-control" />
+          <input asp-for="FirstName" class="form-control" />
           <span asp-validation-for="FirstName" class="text-danger"></span>
         </div>
       </div>
@@ -38,7 +38,7 @@
       <div class="form-group">
         <label asp-for="LastName" class="col-md-2 control-label"></label>
         <div class="col-md-10">
-          <input type="text" asp-for="LastName" class="form-control" />
+          <input asp-for="LastName" class="form-control" />
           <span asp-validation-for="LastName" class="text-danger"></span>
         </div>
       </div>
@@ -46,7 +46,7 @@
       <div class="form-group">
         <label asp-for="Birthdate" class="col-md-2 control-label"></label>
         <div class="col-md-10">
-          <input type="date" asp-for="Birthdate" class="form-control" />
+          <input asp-for="Birthdate" class="form-control" />
           <span asp-validation-for="Birthdate" class="text-danger"></span>
         </div>
       </div>

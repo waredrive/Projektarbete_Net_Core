@@ -1,4 +1,4 @@
-﻿@model TopicCreateVm
+﻿@model ThreadCreateVm
 
 @{
   ViewBag.Title = "Create Topic";
@@ -9,19 +9,19 @@
     <h1>Create Topic</h1>
     <br />
 
-    <form asp-controller="Topic" role="form" asp-action="Create" class="form">
+    <form asp-controller="Thread" role="form" asp-action="Create" class="form">
       <div asp-validation-summary="All" class="input-validation-error"></div>
 
       <div class="form-group">
-        <label asp-for="TopicText" class="col-md-2 control-label"></label>
+        <label asp-for="ThreadText" class="col-md-2 control-label"></label>
         <div class="col-md-10">
-          <textarea asp-for="TopicText" class="form-control" ></textarea>
-          <span asp-validation-for="TopicText" class="field-validation-error"></span>
+          <textarea asp-for="ThreadText" class="form-control"></textarea>
+          <span asp-validation-for="ThreadText" class="field-validation-error"></span>
         </div>
         <br />
         <div>
           <label>&nbsp;</label>
-          <button type="submit" class="btn btn-primary">Create Topic</button>
+          <button type="submit" class="btn btn-primary">Create Thread</button>
         </div>
       </div>
     </form>

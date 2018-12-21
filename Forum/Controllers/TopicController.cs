@@ -17,53 +17,53 @@ namespace Forum.Controllers {
     [AllowAnonymous]
     [Route("")]
     [HttpGet]
-    public IActionResult Index() {
-      return View();
+    public async Task<IActionResult> Index() {
+      return View(await _topicService.GetTopicsIndexVm());
     }
 
     [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
-    [Route("create")]
+    [Route("Create")]
     [HttpGet]
     public async Task<IActionResult> Create(int id) {
       return View();
     }
 
     [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
-    [Route("create")]
+    [Route("Create")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(TopicCreateVM topicCreateVm) {
+    public async Task<IActionResult> Create(TopicCreateVm topicCreateVm) {
       await _topicService.Add(topicCreateVm, User);
       return RedirectToAction(nameof(Index));
     }
 
     [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
-    [Route("edit/{id}")]
+    [Route("Edit/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id) {
       return View();
     }
 
     [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
-    [Route("edit")]
+    [Route("Edit")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(TopicIndexVM topicIndexVM) {
+    public async Task<IActionResult> Edit(TopicsIndexVm topicIndexVm) {
       return View();
     }
 
     [AuthorizeRoles(Roles.Admin)]
-    [Route("delete/{id}")]
+    [Route("Delete/{id}")]
     [HttpGet]
     public async Task<IActionResult> Delete(int id) {
       return View();
     }
 
     [AuthorizeRoles(Roles.Admin)]
-    [Route("delete")]
+    [Route("Delete")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(TopicIndexVM topicIndexVM) {
+    public async Task<IActionResult> Delete(TopicsIndexVm topicIndexVm) {
       return View();
     }
   }

@@ -1,4 +1,34 @@
-﻿
-@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model ThreadsIndexVm
+@{
+  ViewBag.Title = "Threads Index";
+}
+<div class="container-fluid">
+  <div class="col-12">
+    <div class="row">
+      <h1>HEADER</h1>
+    </div>
+  </div>
+  <a asp-controller="Thread" asp-action="Create" class="btn btn-primary">Add new thread</a>
+  <div class="row">
+    <div class="col-12">
+      <table class="table table-striped table-dark">
+        @foreach (var thread in Model.Threads) {
+          <tr>
+            <th scope="row">ICON</th>
+            <td>
+              <a asp-controller="Post" asp-action="index" asp-route-threadId="@thread.ThreadId">@thread.ThreadText</a>
+            </td>
+            <td>@thread.CreatedBy</td>
+            <td>@thread.CreatedOn</td>
+          </tr>
+        }
+      </table>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 text-light">
+OTHER STUFF
+    </div>
+  </div>
+</div>
+

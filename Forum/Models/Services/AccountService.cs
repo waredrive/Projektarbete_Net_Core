@@ -22,14 +22,14 @@ namespace Forum.Models.Services {
       _db = db;
     }
 
-    public async Task<IdentityResult> Add(RegisterViewModel registerVM) {
+    public async Task<IdentityResult> Add(RegisterVm registerVm) {
       await CreateRoles();
       var user = new IdentityUser {
-        Email = registerVM.Email,
-        UserName = registerVM.UserName
+        Email = registerVm.Email,
+        UserName = registerVm.UserName
       };
 
-      var result = await _userManager.CreateAsync(user, registerVM.Password);
+      var result = await _userManager.CreateAsync(user, registerVm.Password);
 
       if (!result.Succeeded)
         return result;
@@ -39,9 +39,9 @@ namespace Forum.Models.Services {
 
         var member = new Member {
           Id = user.Id,
-          BirthDate = registerVM.Birthdate,
-          FirstName = registerVM.FirstName,
-          LastName = registerVM.LastName,
+          BirthDate = registerVm.Birthdate,
+          FirstName = registerVm.FirstName,
+          LastName = registerVm.LastName,
           CreatedOn = DateTime.UtcNow
         };
 
@@ -56,8 +56,8 @@ namespace Forum.Models.Services {
       return result;
     }
 
-    public async Task<SignInResult> Login(LoginViewModel loginVM) {
-      return await _signInManager.PasswordSignInAsync(loginVM.UserName, loginVM.Password, loginVM.RememberMe, false);
+    public async Task<SignInResult> Login(LoginVm loginVm) {
+      return await _signInManager.PasswordSignInAsync(loginVm.UserName, loginVm.Password, loginVm.RememberMe, false);
     }
 
     public async Task SignOut() {

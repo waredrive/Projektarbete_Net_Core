@@ -1,60 +1,68 @@
 ﻿using System.Threading.Tasks;
 using Forum.Attributes;
+using Forum.Models.Services;
 using Forum.Models.ViewModels.ThreadViewModels;
 using Forum.Models.ViewModels.TopicViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.Controllers {
-  [Route("forum/{topicId}")]
+  [Route("Forum/{topicId}")]
   public class ThreadController : Controller {
+    private readonly ThreadService _threadService;
+
+    public ThreadController(ThreadService threadService) {
+      _threadService = threadService;
+    }
+
     [AllowAnonymous]
     [Route("")]
     [HttpGet]
-    public IActionResult Index(int topicId) {
-      return View();
+    public async Task<IActionResult> Index(int topicId) {
+      return View(await _threadService.GetThreadsIndexVm());
     }
 
-    [Route("create")]
+    [Route("Create")]
     [HttpGet]
     public async Task<IActionResult> Create(int id) {
       return View();
     }
 
-    [Route("create")]
+    [Route("Create")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(TopicIndexVM topicIndexVM) {
-      return View();
+    public async Task<IActionResult> Create(ThreadCreateVm threadCreateVm) {
+      await _threadService.Add(threadCreateVm, User);
+      return RedirectToAction(nameof(Index));
     }
 
     [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
-    [Route("edit/{id}")]
+    [Route("Edit/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id) {
       return View();
     }
 
     [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
-    [Route("edit")]
+    [Route("Edit")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(ThreadIndexVM threadIndexVM) {
+    public async Task<IActionResult> Edit(ThreadsIndexVm threadsIndexVm) {
       return View();
     }
 
     [AuthorizeRoles(Roles.Admin)]
-    [Route("delete/{id}")]
+    [Route("Delete/{id}")]
     [HttpGet]
     public async Task<IActionResult> Delete(int id) {
       return View();
     }
 
     [AuthorizeRoles(Roles.Admin)]
-    [Route("delete")]
+    [Route("Delete")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(ThreadIndexVM threadIndexVM) {
+    public async Task<IActionResult> Delete(ThreadsIndexVm threadsIndexVm) {
       return View();
     }
   }

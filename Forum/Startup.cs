@@ -26,12 +26,14 @@ namespace Forum {
         .AddDefaultTokenProviders();
       services.AddScoped<AccountService>();
       services.AddScoped<TopicService>();
+      services.AddScoped<ThreadService>();
       services.AddMvc(o => {
         var policy = new AuthorizationPolicyBuilder()
           .RequireAuthenticatedUser()
           .Build();
         o.Filters.Add(new AuthorizeFilter(policy));
       });
+      services.AddRouting(options => options.LowercaseUrls = true);
     }
 
     public void Configure(IApplicationBuilder app, IHostingEnvironment env) {

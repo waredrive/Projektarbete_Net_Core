@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Forum.Models.ViewModels.AccountViewModels {
-  public class RegisterViewModel {
+  public class RegisterVm {
     [Required]
     [EmailAddress]
     [Display(Name = "Email")]

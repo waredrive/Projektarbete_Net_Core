@@ -1,4 +1,4 @@
-﻿@model LoginViewModel
+﻿@model LoginVm
 
 @{
     ViewBag.Title = "Log in";
@@ -10,13 +10,13 @@
     <br />
 
     <form asp-controller="Account" role="form" asp-action="Login" asp-route-returnUrl="@Model.ReturnUrl" class="form">
-      <div asp-validation-summary="ModelOnly" class="input-validation-error"></div>
+      <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
       <div class="form-group">
         <label asp-for="UserName" class="col-md-2 control-label"></label>
         <div class="col-md-10">
-          <input type="text" asp-for="UserName" class="form-control" />
-          <span asp-validation-for="UserName" class="field-validation-error"></span>
+          <input asp-for="UserName" class="form-control" />
+          <span asp-validation-for="UserName" class="text-danger"></span>
         </div>
       </div>
       <br />
@@ -24,14 +24,14 @@
         <label asp-for="Password" class="col-md-2 control-label"></label>
         <div class="col-md-10">
           <input type="password" asp-for="Password" class="form-control" />
-          <span asp-validation-for="Password" class="field-validation-error"></span>
+          <span asp-validation-for="Password" class="text-danger"></span>
         </div>
       </div>
       <br />
       <div class="form-group">
         <label asp-for="RememberMe" class="col-md-2 control-label"></label>
-        <input type="checkbox" asp-for="RememberMe" />
-        <span asp-validation-for="RememberMe" class="field-validation-error"></span>
+        <input asp-for="RememberMe" />
+        <span asp-validation-for="RememberMe" class="text-danger"></span>
       </div>
       <br />
       <div>

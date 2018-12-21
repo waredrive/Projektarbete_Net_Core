@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.Controllers {
-  [Route("thread/{threadId}")]
+  [Route("Thread/{threadId}")]
   public class PostController : Controller {
     [AllowAnonymous]
     [Route("")]
@@ -16,42 +16,42 @@ namespace Forum.Controllers {
     }
 
 
-    [Route("create")]
+    [Route("Create")]
     [HttpGet]
     public async Task<IActionResult> Create(int id) {
       return View();
     }
 
-    [Route("create")]
+    [Route("Create")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(TopicIndexVM topicIndexVM) {
+    public async Task<IActionResult> Create(TopicsIndexVm topicIndexVm) {
       return View();
     }
 
-    [Route("edit/{id}")]
+    [Route("Edit/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id) {
       return View();
     }
 
-    [Route("edit")]
+    [Route("Edit")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(PostIndexVM PostIndexVM) {
+    public async Task<IActionResult> Edit(PostIndexVm PostIndexVm) {
       return View();
     }
 
-    [Route("delete/{id}")]
+    [Route("Delete/{id}")]
     [HttpGet]
     public async Task<IActionResult> Delete(int id) {
       return View();
     }
 
-    [Route("delete")]
+    [Route("Delete")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(PostIndexVM PostIndexVM) {
+    public async Task<IActionResult> Delete(PostIndexVm PostIndexVm) {
       return View();
     }
   }

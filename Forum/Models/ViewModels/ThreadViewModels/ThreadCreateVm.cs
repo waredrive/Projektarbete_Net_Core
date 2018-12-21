@@ -4,10 +4,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Forum.Models.ViewModels.TopicViewModels {
-  public class TopicCreateVm {
+namespace Forum.Models.ViewModels.ThreadViewModels {
+  public class ThreadCreateVm {
     [Required]
-    [Display(Name="Topic Text")]
-    public string TopicText { get; set; }
+    [Display(Name = "Thread Text")]
+    public string ThreadText { get; set; }
   }
 }

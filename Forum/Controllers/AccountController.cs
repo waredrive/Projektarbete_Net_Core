@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Forum.Controllers {
   [AllowAnonymous]
   [RequireHttps]
-  [Route("account")]
+  [Route("Account")]
   public class AccountController : Controller {
     private readonly AccountService _accountService;
 
@@ -16,27 +16,27 @@ namespace Forum.Controllers {
       _accountService = accountService;
     }
 
-    [Route("register")]
+    [Route("Register")]
     [HttpGet]
     public async Task<IActionResult> Register() {
-      var password = Guid.NewGuid() + "A!";
-      var result = await _accountService.Add(new RegisterViewModel {
-        Birthdate = DateTime.Now,
-        Password = password,
-        ConfirmPassword = password,
-        Email = "test@test.com",
-        FirstName = "TestName",
-        LastName = "TestSurname",
-        UserName = Guid.NewGuid().ToString()
-      });
+      //var password = Guid.NewGuid() + "A!";
+      //var result = await _accountService.Add(new RegisterVm {
+      //  Birthdate = DateTime.Now,
+      //  Password = password,
+      //  ConfirmPassword = password,
+      //  Email = "test@test.com",
+      //  FirstName = "TestName",
+      //  LastName = "TestSurname",
+      //  UserName = Guid.NewGuid().ToString()
+      //});
 
       return View();
     }
 
-    [Route("register")]
+    [Route("Register")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Register(RegisterViewModel model) {
+    public async Task<IActionResult> Register(RegisterVm model) {
       if (!ModelState.IsValid)
         return View(model);
       var result = await _accountService.Add(model);
@@ -51,18 +51,18 @@ namespace Forum.Controllers {
       return View(model);
     }
 
-    [Route("login")]
+    [Route("Login")]
     [HttpGet]
     public IActionResult Login(string returnUrl = null) {
-      var model = new LoginViewModel {ReturnUrl = returnUrl};
+      var model = new LoginVm {ReturnUrl = returnUrl};
       return View(model);
     }
 
 
-    [Route("login")]
+    [Route("Login")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(LoginViewModel model) {
+    public async Task<IActionResult> Login(LoginVm model) {
 
       if (!ModelState.IsValid)
         return View(model);
@@ -78,11 +78,12 @@ namespace Forum.Controllers {
     }
 
     [HttpGet]
-    public IActionResult AccessDenied() {
+    [Route("AccessDenied")]
+    public IActionResult AccessDenied(string returnUrl = null) {
       return View();
     }
 
-    [Route("logout")]
+    [Route("Logout")]
     [HttpPost]
     public async Task<IActionResult> Logout() {
       await _accountService.SignOut();

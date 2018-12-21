@@ -4,6 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Forum.Models.ViewModels.PostViewModels {
-  public class PostIndexVM {
+  public class PostIndexVm {
   }
 }
