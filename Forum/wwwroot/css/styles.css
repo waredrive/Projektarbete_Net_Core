@@ -1,0 +1,17 @@
+﻿a {
+  text-decoration: none !important;
+  color: black;
+}
+
+  a:hover {
+    color: #3d3d3d;
+  }
+
+  a.light {
+    text-decoration: none !important;
+    color: #f8f9fa;
+  }
+
+    a.light:hover {
+      color: #d6d6d6;
+    }

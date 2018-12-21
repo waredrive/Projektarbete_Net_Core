@@ -7,6 +7,7 @@ using Forum.Models.Context;
 using Forum.Models.Entities;
 using Forum.Models.ViewModels.TopicViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Models.Services {
   public class TopicService {
@@ -42,17 +43,19 @@ namespace Forum.Models.Services {
         LatestThreads = new List<TopicsIndexThreadVm>(),
         TotalMembers = _userManager.Users.Count(),
         TotalPosts = _db.Post.Count(),
-        NewestMember = _userManager.FindByIdAsync(_db.Member.OrderByDescending(m => m.CreatedOn).First().Id).Result.UserName
+        NewestMember = _userManager.FindByIdAsync(_db.Member.OrderByDescending(m => m.CreatedOn).First().Id).Result.UserName,
       };
 
-      topicsIndexVm.Topics.AddRange(_db.Topic.Select(t => new TopicsIndexTopicVm {
+      topicsIndexVm.Topics.AddRange(_db.Topic.Include(t => t.Thread).Select(t => new TopicsIndexTopicVm {
         TopicId = t.Id,
         CreatedOn = (DateTime)t.CreatedOn,
         CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
-        TopicText = t.ContentText
+        TopicText = t.ContentText,
+        ThreadCount = t.Thread.Count,
+        PostCount = t.Thread.Select(tt => tt.Post.Count).Sum()
       }));
 
-      topicsIndexVm.LatestThreads.AddRange(_db.Thread.OrderBy(t => t.CreatedOn).Take(10).Select( t => new TopicsIndexThreadVm {
+      topicsIndexVm.LatestThreads.AddRange(_db.Thread.OrderByDescending(t => t.CreatedOn).Take(10).Select( t => new TopicsIndexThreadVm {
         ThreadId = t.Id,
         CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
         CreatedOn = (DateTime)t.CreatedOn,

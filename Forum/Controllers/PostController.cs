@@ -1,5 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Forum.Attributes;
+using Forum.Models.Services;
+using Forum.Models.ViewModels.PostViewModel;
 using Forum.Models.ViewModels.PostViewModels;
 using Forum.Models.ViewModels.TopicViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -8,25 +10,32 @@ using Microsoft.AspNetCore.Mvc;
 namespace Forum.Controllers {
   [Route("Thread/{threadId}")]
   public class PostController : Controller {
+    private readonly PostService _postService;
+
+    public PostController(PostService postService) {
+      _postService = postService;
+    }
+
     [AllowAnonymous]
     [Route("")]
     [HttpGet]
-    public IActionResult Index(int threadId) {
-      return View();
+    public async Task<IActionResult> Index(int threadId) {
+      return View(await _postService.GetTopicsIndexVm(threadId));
     }
 
 
     [Route("Create")]
     [HttpGet]
-    public async Task<IActionResult> Create(int id) {
-      return View();
+    public async Task<IActionResult> Create(int threadId) {
+      return View(new PostCreateVm { ThreadId = threadId });
     }
 
     [Route("Create")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(TopicsIndexVm topicIndexVm) {
-      return View();
+    public async Task<IActionResult> Create(PostCreateVm postCreateVm) {
+      await _postService.Add(postCreateVm, User);
+      return RedirectToAction(nameof(Index));
     }
 
     [Route("Edit/{id}")]
@@ -38,7 +47,7 @@ namespace Forum.Controllers {
     [Route("Edit")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(PostIndexVm PostIndexVm) {
+    public async Task<IActionResult> Edit(PostsIndexVm postsIndexVm) {
       return View();
     }
 
@@ -51,7 +60,7 @@ namespace Forum.Controllers {
     [Route("Delete")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(PostIndexVm PostIndexVm) {
+    public async Task<IActionResult> Delete(PostsIndexVm postsIndexVm) {
       return View();
     }
   }

@@ -27,6 +27,7 @@ namespace Forum {
       services.AddScoped<AccountService>();
       services.AddScoped<TopicService>();
       services.AddScoped<ThreadService>();
+      services.AddScoped<PostService>();
       services.AddMvc(o => {
         var policy = new AuthorizationPolicyBuilder()
           .RequireAuthenticatedUser()

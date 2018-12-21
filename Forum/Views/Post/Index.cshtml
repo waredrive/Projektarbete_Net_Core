@@ -1,4 +1,32 @@
-﻿
-@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model PostsIndexVm
+@{
+  ViewBag.Title = "Post Index";
+}
+<div class="container-fluid">
+  <div class="col-12">
+    <div class="row">
+      <h1>POSTS</h1>
+    </div>
+  </div>
+  <a asp-controller="Post" asp-action="Create" class="btn btn-primary">Add new post</a>
+  <div class="row">
+    <div class="col-12">
+      <table class="table table-striped table-dark">
+        @foreach (var post in Model.Posts) {
+          <tr>
+            <td>
+              @post.PostText
+            </td>
+            <td>@post.CreatedBy</td>
+            <td>@post.CreatedOn</td>
+          </tr>
+        }
+      </table>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 text-light">
+      OTHER STUFF
+    </div>
+  </div>
+</div>

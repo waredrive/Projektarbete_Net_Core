@@ -1,11 +1,11 @@
 ﻿@model ThreadsIndexVm
 @{
-  ViewBag.Title = "Threads Index";
+  ViewBag.Title = "Thread Index";
 }
 <div class="container-fluid">
   <div class="col-12">
     <div class="row">
-      <h1>HEADER</h1>
+      <h1>THREAD</h1>
     </div>
   </div>
   <a asp-controller="Thread" asp-action="Create" class="btn btn-primary">Add new thread</a>
@@ -14,12 +14,12 @@
       <table class="table table-striped table-dark">
         @foreach (var thread in Model.Threads) {
           <tr>
-            <th scope="row">ICON</th>
             <td>
-              <a asp-controller="Post" asp-action="index" asp-route-threadId="@thread.ThreadId">@thread.ThreadText</a>
+              <a asp-controller="Post" asp-action="index" asp-route-threadId="@thread.ThreadId" class="light">@thread.ThreadText</a>
             </td>
             <td>@thread.CreatedBy</td>
             <td>@thread.CreatedOn</td>
+            <td><p>Replies: @thread.PostCount</p></td>
           </tr>
         }
       </table>

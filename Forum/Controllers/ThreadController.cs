@@ -19,13 +19,13 @@ namespace Forum.Controllers {
     [Route("")]
     [HttpGet]
     public async Task<IActionResult> Index(int topicId) {
-      return View(await _threadService.GetThreadsIndexVm());
+      return View(await _threadService.GetThreadsIndexVm(topicId));
     }
 
     [Route("Create")]
     [HttpGet]
-    public async Task<IActionResult> Create(int id) {
-      return View();
+    public async Task<IActionResult> Create(int topicId) {
+      return View(new ThreadCreateVm {TopicId = topicId});
     }
 
     [Route("Create")]

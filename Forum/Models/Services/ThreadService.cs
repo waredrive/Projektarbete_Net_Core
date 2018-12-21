@@ -27,6 +27,7 @@ namespace Forum.Models.Services {
         return;
 
       var thread = new Thread {
+        Topic = threadCreateVm.TopicId,
         CreatedBy = currentUserId,
         ContentText = threadCreateVm.ThreadText,
         CreatedOn = DateTime.UtcNow
@@ -36,16 +37,17 @@ namespace Forum.Models.Services {
       await _db.SaveChangesAsync();
     }
 
-    public async Task<ThreadsIndexVm> GetThreadsIndexVm() {
+    public async Task<ThreadsIndexVm> GetThreadsIndexVm(int topicId) {
       var threadsIndexVm = new ThreadsIndexVm {
         Threads = new List<ThreadsIndexThreadVm>()
       };
 
-      threadsIndexVm.Threads.AddRange(_db.Thread.Select(t => new ThreadsIndexThreadVm() {
+      threadsIndexVm.Threads.AddRange(_db.Thread.Where(t => t.Topic == topicId).Select(t => new ThreadsIndexThreadVm() {
         ThreadId = t.Id,
         CreatedOn = (DateTime)t.CreatedOn,
         CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
-        ThreadText = t.ContentText
+        ThreadText = t.ContentText,
+        PostCount = t.Post.Count
       }));
 
       return threadsIndexVm;
