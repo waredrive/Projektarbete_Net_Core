@@ -206,6 +206,8 @@ namespace Forum.Models.Context
 
                 entity.HasIndex(e => e.Topic);
 
+                entity.Property(e => e.ContentText).HasMaxLength(80);
+
                 entity.Property(e => e.CreatedBy).IsRequired();
 
                 entity.HasOne(d => d.CreatedByNavigation)
@@ -245,6 +247,8 @@ namespace Forum.Models.Context
                 entity.HasIndex(e => e.LockedBy);
 
                 entity.HasIndex(e => e.RemovedBy);
+
+                entity.Property(e => e.ContentText).HasMaxLength(50);
 
                 entity.Property(e => e.CreatedBy).IsRequired();
 

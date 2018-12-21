@@ -1,26 +1,26 @@
-﻿@model TopicCreateVm
+﻿@model TopicEditVm
 
 @{
-  ViewBag.Title = "Create Topic";
+  ViewBag.Title = "Update Topic";
 }
 
 <div class="container">
   <div class="col-12 rounded my-5 bg-light p-5">
-    <h1>Create Topic</h1>
+    <h1>Edit Topic</h1>
     <br />
-
-    <form asp-controller="Topic" asp-action="Create">
+    <form asp-controller="Topic" asp-action="Edit">
+      @Html.HiddenFor(m => m.TopicId)
       <div asp-validation-summary="ModelOnly" class="text-danger"></div>
       <div class="form-group">
         <label asp-for="TopicText" class="col-md-2 control-label"></label>
         <div class="col-md-10">
-          <input asp-for="TopicText" class="form-control" />
+          <input asp-for="TopicText" rows="10" class="form-control"/>
           <span asp-validation-for="TopicText" class="text-danger"></span>
         </div>
         <br />
         <div>
           <label>&nbsp;</label>
-          <button type="submit" class="btn btn-primary">Create Topic</button>
+          <button type="submit" class="btn btn-primary">Update Topic</button>
         </div>
       </div>
     </form>

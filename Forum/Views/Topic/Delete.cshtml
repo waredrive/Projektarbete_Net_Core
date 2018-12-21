@@ -1,0 +1,31 @@
+﻿@model TopicDeleteVm
+
+@{
+  ViewBag.Title = "Delete Topic";
+}
+
+<div class="container">
+  <div class="col-12 rounded my-5 bg-light p-5">
+    <h1>Delete: @Model.TopicText</h1>
+    <br />
+    <div class="row">
+      <div class="col-6">
+        <p>Created by: @Model.CreatedBy</p>
+        <p>Created on: @Model.CreatedOn</p>
+      </div>
+      <div class="col-6">
+        <p>Total threads in topic: @Model.ThreadCount</p>
+        <p>Total posts in topic: @Model.PostCount</p>
+      </div>
+    </div>
+    <div class="row py-3">
+      <div class="col-12">
+        <form asp-controller="Topic" asp-action="Delete">
+          @Html.HiddenFor(m => m.TopicId)
+          <button type="submit" class="btn btn-danger">Delete Topic</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>

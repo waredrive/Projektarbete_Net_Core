@@ -19,17 +19,6 @@ namespace Forum.Controllers {
     [Route("Register")]
     [HttpGet]
     public async Task<IActionResult> Register() {
-      //var password = Guid.NewGuid() + "A!";
-      //var result = await _accountService.Add(new RegisterVm {
-      //  Birthdate = DateTime.Now,
-      //  Password = password,
-      //  ConfirmPassword = password,
-      //  Email = "test@test.com",
-      //  FirstName = "TestName",
-      //  LastName = "TestSurname",
-      //  UserName = Guid.NewGuid().ToString()
-      //});
-
       return View();
     }
 

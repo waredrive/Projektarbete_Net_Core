@@ -32,19 +32,22 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(ThreadCreateVm threadCreateVm) {
+      if (!ModelState.IsValid)
+        return (View(threadCreateVm));
+
       await _threadService.Add(threadCreateVm, User);
       return RedirectToAction(nameof(Index));
     }
 
     [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
-    [Route("Edit/{id}")]
+    [Route("Update/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id) {
       return View();
     }
 
     [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
-    [Route("Edit")]
+    [Route("Update")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(ThreadsIndexVm threadsIndexVm) {

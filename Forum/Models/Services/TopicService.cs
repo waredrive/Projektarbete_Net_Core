@@ -47,7 +47,7 @@ namespace Forum.Models.Services {
         NewestMember = _userManager.FindByIdAsync(_db.Member.OrderByDescending(m => m.CreatedOn).First().Id).Result.UserName,
       };
 
-     topicsIndexVm.Topics.AddRange(_db.Topic.Include(t => t.Thread).Select(t => new TopicsIndexTopicVm {
+      topicsIndexVm.Topics.AddRange(_db.Topic.Include(t => t.Thread).Select(t => new TopicsIndexTopicVm {
         LatestActiveThread = _db.Post.Where(p => p.ThreadNavigation.Topic == t.Id).OrderByDescending(p => p.CreatedOn).Take(1).Select(p => new TopicsIndexThreadVm {
           ThreadId = p.Thread,
           ThreadText = p.ThreadNavigation.ContentText,
@@ -62,7 +62,7 @@ namespace Forum.Models.Services {
         PostCount = t.Thread.Select(tt => tt.Post.Count).Sum()
       }));
 
-      topicsIndexVm.LatestThreads.AddRange(_db.Thread.OrderByDescending(t => t.CreatedOn).Take(10).Select( t => new TopicsIndexThreadVm {
+      topicsIndexVm.LatestThreads.AddRange(_db.Thread.OrderByDescending(t => t.CreatedOn).Take(10).Select(t => new TopicsIndexThreadVm {
         ThreadId = t.Id,
         CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
         CreatedOn = t.CreatedOn,
@@ -71,12 +71,58 @@ namespace Forum.Models.Services {
 
       topicsIndexVm.LatestPosts.AddRange(_db.Post.OrderByDescending(p => p.CreatedOn).Take(10).Select(p => new TopicsIndexPostVm {
         ThreadId = p.Thread,
-       ThreadText = p.ThreadNavigation.ContentText,
+        ThreadText = p.ThreadNavigation.ContentText,
         LatestCommentTime = p.CreatedOn,
         LatestCommenter = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName
       }));
 
       return topicsIndexVm;
+    }
+
+    public async Task<TopicEditVm> GetTopicCreateVm(int id) {
+      return await _db.Topic.Where(t => t.Id == id).Select(t => new TopicEditVm {
+        TopicId = t.Id,
+        TopicText = t.ContentText
+      }).FirstOrDefaultAsync();
+    }
+
+    public async Task Update(TopicEditVm topicEditVm, ClaimsPrincipal user) {
+      var currentUserId = _userManager.GetUserId(user);
+      if (currentUserId == null)
+        return;
+
+      var topicFromDb = await _db.Topic.FindAsync(topicEditVm.TopicId);
+      topicFromDb.ContentText = topicEditVm.TopicText;
+      topicFromDb.EditedBy = currentUserId;
+      topicFromDb.EditedOn = DateTime.UtcNow;
+
+      await _db.SaveChangesAsync();
+    }
+
+    public async Task<TopicDeleteVm> GetTopicDeleteVm(int id) {
+      return await _db.Topic.Include(t => t.Thread).Where(t => t.Id == id).Select(t => new TopicDeleteVm() {
+        CreatedOn = t.CreatedOn,
+        CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
+        ThreadCount = t.Thread.Count,
+        PostCount = _db.Post.Count(p => p.ThreadNavigation.Topic == t.Id),
+        TopicId = t.Id,
+        TopicText = t.ContentText
+      }).FirstOrDefaultAsync();
+    }
+
+    public async Task Remove(TopicDeleteVm topicDeleteVm) {
+      var topicFromDb = await _db.Topic.FirstOrDefaultAsync(t => t.Id == topicDeleteVm.TopicId);
+      using (var transaction = _db.Database.BeginTransaction()) {
+        try {
+          _db.Post.RemoveRange(_db.Post.Where(p => p.ThreadNavigation.Topic == topicFromDb.Id));
+          _db.Thread.RemoveRange(_db.Thread.Where(t => t.Topic == topicFromDb.Id));
+          _db.Topic.Remove(topicFromDb);
+          await _db.SaveChangesAsync();
+          transaction.Commit();
+        } catch (Exception) {
+          transaction.Rollback();
+        }
+      }
     }
   }
 }

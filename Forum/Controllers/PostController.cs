@@ -34,17 +34,20 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(PostCreateVm postCreateVm) {
+      if (!ModelState.IsValid)
+        return (View(postCreateVm));
+
       await _postService.Add(postCreateVm, User);
       return RedirectToAction(nameof(Index));
     }
 
-    [Route("Edit/{id}")]
+    [Route("Update/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id) {
       return View();
     }
 
-    [Route("Edit")]
+    [Route("Update")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(PostsIndexVm postsIndexVm) {

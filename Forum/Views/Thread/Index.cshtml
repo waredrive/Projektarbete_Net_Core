@@ -1,14 +1,21 @@
-﻿@model ThreadsIndexVm
+﻿@using Forum.Attributes
+@model ThreadsIndexVm
 @{
   ViewBag.Title = @Model.Topic;
 }
 <div class="container-fluid">
   <div class="col-12">
     <div class="row">
-      <h1>@Model.Topic</h1>
+      <h1 class="text-light">@Model.Topic</h1>
     </div>
   </div>
-  <a asp-controller="Thread" asp-action="Create" class="btn btn-primary">Add new thread</a>
+  @if (User.Identity.IsAuthenticated) {
+    <div class="col-12 py-3">
+      <div class="row">
+        <a asp-controller="Thread" asp-action="Create" class="btn btn-primary">Add new thread</a>
+      </div>
+    </div>
+  }
   <div class="row">
     <div class="col-12">
       <table class="table table-striped table-dark">
@@ -20,6 +27,17 @@
             <td>@thread.CreatedBy</td>
             <td>@thread.CreatedOn</td>
             <td><p>Replies: @thread.PostCount</p></td>
+            <td>
+              @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Moderator) || User.Identity.Name == thread.CreatedBy) {
+                <a asp-controller="Thread" asp-action="Edit" asp-route-id="@thread.ThreadId" class="btn btn-primary btn-sm">Edit</a>
+                if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Moderator)) {
+                  <a asp-controller="Thread" asp-action="Block" asp-route-id="@thread.ThreadId" class="btn btn-warning btn-sm">Block</a>
+                }
+                if (User.IsInRole(Roles.Admin)) {
+                  <a asp-controller="Thread" asp-action="Delete" asp-route-id="@thread.ThreadId" class="btn btn-danger btn-sm">Delete</a>
+                }
+              }
+            </td>
           </tr>
         }
       </table>
@@ -27,7 +45,7 @@
   </div>
   <div class="row">
     <div class="col-12 text-light">
-OTHER STUFF
+      OTHER STUFF
     </div>
   </div>
 </div>
