@@ -14,7 +14,7 @@
       <div class="form-group">
         <label asp-for="TopicText" class="col-md-2 control-label"></label>
         <div class="col-md-10">
-          <input asp-for="TopicText" rows="10" class="form-control"/>
+          <input asp-for="TopicText" rows="10" class="form-control" />
           <span asp-validation-for="TopicText" class="text-danger"></span>
         </div>
         <br />
@@ -26,3 +26,7 @@
     </form>
   </div>
 </div>
+
+@section scripts {
+  <partial name="_ValidationScriptsPartial" />
+}

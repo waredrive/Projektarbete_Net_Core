@@ -1,7 +1,7 @@
 ﻿@model LoginVm
 
 @{
-    ViewBag.Title = "Log in";
+  ViewBag.Title = "Log in";
 }
 
 <div class="container">
@@ -39,7 +39,11 @@
         <button type="submit" class="btn btn-primary">Log in</button>
       </div>
       <br />
-        <a asp-action="Register">Register as a new user?</a>
+      <a asp-action="Register">Register as a new user?</a>
     </form>
   </div>
 </div>
+
+@section scripts {
+  <partial name="_ValidationScriptsPartial" />
+}
