@@ -12,7 +12,8 @@ namespace Forum.Models.Context
         }
 
         public ForumDbContext(DbContextOptions<ForumDbContext> options)
-            : base(options) {
+            : base(options)
+        {
         }
 
         public virtual DbSet<AspNetRoleClaims> AspNetRoleClaims { get; set; }
@@ -127,9 +128,9 @@ namespace Forum.Models.Context
 
             modelBuilder.Entity<Member>(entity =>
             {
-                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.HasIndex(e => e.BlockedBy);
 
-                entity.Property(e => e.BlockedBy).HasMaxLength(450);
+                entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.FirstName)
                     .IsRequired()
@@ -163,9 +164,12 @@ namespace Forum.Models.Context
 
                 entity.HasIndex(e => e.Thread);
 
+                entity.Property(e => e.CreatedBy).IsRequired();
+
                 entity.HasOne(d => d.CreatedByNavigation)
                     .WithMany(p => p.PostCreatedByNavigation)
                     .HasForeignKey(d => d.CreatedBy)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Post__CreatedBy__3B40CD36");
 
                 entity.HasOne(d => d.EditedByNavigation)
@@ -186,6 +190,7 @@ namespace Forum.Models.Context
                 entity.HasOne(d => d.ThreadNavigation)
                     .WithMany(p => p.Post)
                     .HasForeignKey(d => d.Thread)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Post__Thread__73BA3083");
             });
 
@@ -201,9 +206,12 @@ namespace Forum.Models.Context
 
                 entity.HasIndex(e => e.Topic);
 
+                entity.Property(e => e.CreatedBy).IsRequired();
+
                 entity.HasOne(d => d.CreatedByNavigation)
                     .WithMany(p => p.ThreadCreatedByNavigation)
                     .HasForeignKey(d => d.CreatedBy)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Thread__CreatedB__3F115E1A");
 
                 entity.HasOne(d => d.EditedByNavigation)
@@ -224,6 +232,7 @@ namespace Forum.Models.Context
                 entity.HasOne(d => d.TopicNavigation)
                     .WithMany(p => p.Thread)
                     .HasForeignKey(d => d.Topic)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Thread__Topic__66603565");
             });
 
@@ -237,9 +246,12 @@ namespace Forum.Models.Context
 
                 entity.HasIndex(e => e.RemovedBy);
 
+                entity.Property(e => e.CreatedBy).IsRequired();
+
                 entity.HasOne(d => d.CreatedByNavigation)
                     .WithMany(p => p.TopicCreatedByNavigation)
                     .HasForeignKey(d => d.CreatedBy)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Topic__CreatedBy__42E1EEFE");
 
                 entity.HasOne(d => d.EditedByNavigation)

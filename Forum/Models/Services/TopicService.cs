@@ -49,13 +49,13 @@ namespace Forum.Models.Services {
 
      topicsIndexVm.Topics.AddRange(_db.Topic.Include(t => t.Thread).Select(t => new TopicsIndexTopicVm {
         LatestActiveThread = _db.Post.Where(p => p.ThreadNavigation.Topic == t.Id).OrderByDescending(p => p.CreatedOn).Take(1).Select(p => new TopicsIndexThreadVm {
-          ThreadId = (int)p.Thread,
+          ThreadId = p.Thread,
           ThreadText = p.ThreadNavigation.ContentText,
-          CreatedOn = (DateTime)p.CreatedOn,
+          CreatedOn = p.CreatedOn,
           CreatedBy = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName
         }).FirstOrDefault(),
         TopicId = t.Id,
-        CreatedOn = (DateTime)t.CreatedOn,
+        CreatedOn = t.CreatedOn,
         CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
         TopicText = t.ContentText,
         ThreadCount = t.Thread.Count,
@@ -65,14 +65,14 @@ namespace Forum.Models.Services {
       topicsIndexVm.LatestThreads.AddRange(_db.Thread.OrderByDescending(t => t.CreatedOn).Take(10).Select( t => new TopicsIndexThreadVm {
         ThreadId = t.Id,
         CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
-        CreatedOn = (DateTime)t.CreatedOn,
+        CreatedOn = t.CreatedOn,
         ThreadText = t.ContentText
       }));
 
       topicsIndexVm.LatestPosts.AddRange(_db.Post.OrderByDescending(p => p.CreatedOn).Take(10).Select(p => new TopicsIndexPostVm {
-        ThreadId = (int)p.Thread,
+        ThreadId = p.Thread,
        ThreadText = p.ThreadNavigation.ContentText,
-        LatestCommentTime = (DateTime)p.CreatedOn,
+        LatestCommentTime = p.CreatedOn,
         LatestCommenter = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName
       }));
 

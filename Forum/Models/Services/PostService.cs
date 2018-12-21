@@ -47,7 +47,7 @@ namespace Forum.Models.Services {
 
       postsIndexVm.Posts.AddRange(_db.Post.Where(p => p.Thread == threadId).Select(p => new PostsIndexPostVm {
         PostId = p.Id,
-        CreatedOn = (DateTime)p.CreatedOn,
+        CreatedOn = p.CreatedOn,
         CreatedBy = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName,
         PostText = p.ContentText
       }));

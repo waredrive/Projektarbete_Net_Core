@@ -11,7 +11,7 @@ namespace Forum.Models.Entities
         }
 
         public int Id { get; set; }
-        public DateTime? CreatedOn { get; set; }
+        public DateTime CreatedOn { get; set; }
         public string CreatedBy { get; set; }
         public DateTime? EditedOn { get; set; }
         public string EditedBy { get; set; }
@@ -20,7 +20,7 @@ namespace Forum.Models.Entities
         public DateTime? RemovedOn { get; set; }
         public string RemovedBy { get; set; }
         public string ContentText { get; set; }
-        public int? Topic { get; set; }
+        public int Topic { get; set; }
 
         public virtual Member CreatedByNavigation { get; set; }
         public virtual Member EditedByNavigation { get; set; }

@@ -46,7 +46,7 @@ namespace Forum.Models.Services {
 
       threadsIndexVm.Threads.AddRange(_db.Thread.Where(t => t.Topic == topicId).Select(t => new ThreadsIndexThreadVm() {
         ThreadId = t.Id,
-        CreatedOn = (DateTime)t.CreatedOn,
+        CreatedOn = t.CreatedOn,
         CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
         ThreadText = t.ContentText,
         PostCount = t.Post.Count
