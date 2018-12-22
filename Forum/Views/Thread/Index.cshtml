@@ -1,5 +1,4 @@
-﻿@using Forum.Attributes
-@model ThreadsIndexVm
+﻿@model ThreadsIndexVm
 @{
   ViewBag.Title = @Model.Topic;
 }
@@ -9,7 +8,7 @@
       <h1 class="text-light">@Model.Topic</h1>
     </div>
   </div>
-  @if (User.Identity.IsAuthenticated && !Model.IsTopicLocked) {
+  @if (User.Identity.IsAuthenticated && !Model.IsTopicLocked || User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Moderator)) {
     <div class="col-md-12 py-3">
       <div class="row">
         <a asp-controller="Thread" asp-action="Create" class="btn btn-primary">Add new thread</a>
@@ -22,21 +21,26 @@
         @foreach (var thread in Model.Threads) {
           <tr>
             <td>
-              <a asp-controller="Post" asp-action="index" asp-route-threadId="@thread.ThreadId" class="light">@thread.ThreadText</a>
+              <a asp-controller="Post" asp-action="index" asp-route-threadId="@thread.ThreadId" class="light"><p class="pb-0 mb-0">@thread.ThreadText</p></a>
+              <small>Started by @thread.CreatedBy, @thread.CreatedOn</small>
             </td>
-            <td>@thread.CreatedBy</td>
-            <td>@thread.CreatedOn</td>
-            <td><p>Replies: @thread.PostCount</p></td>
+            <td><p>@thread.PostCount @if (thread.PostCount == 1) {<span>reply</span>} else {<span>replies</span>}</p></td>
             <td>
-              @if (thread.IsUserAuthorized) {
               <div class="btn-group">
-                <a asp-controller="Thread" asp-action="Edit" asp-route-id="@thread.ThreadId" class="btn btn-primary btn-sm">Edit</a>
-                @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Moderator)) {
-                <a asp-controller="Thread" asp-action="Lock" asp-route-id="@thread.ThreadId" class="btn btn-warning btn-sm">Block</a>
+                @if (thread.IsAuthorizedForThreadEdit && thread.LockedBy == null) {
+                  <a asp-controller="Thread" asp-action="Edit" asp-route-id="@thread.ThreadId" class="btn btn-primary btn-sm">Edit</a>
                 }
-                <a asp-controller="Thread" asp-action="Delete" asp-route-id="@thread.ThreadId" class="btn btn-danger btn-sm">Delete</a>
+                @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Moderator)) {
+                  if (thread.LockedBy == null) {
+                    <a asp-controller="Thread" asp-action="Lock" asp-route-id="@thread.ThreadId" class="btn btn-warning btn-sm">Lock</a>
+                  } else {
+                    <a asp-controller="Thread" asp-action="Unlock" asp-route-id="@thread.ThreadId" class="btn btn-warning btn-sm">Unlock</a>
+                  }
+                }
+                @if (thread.IsAuthorizedForThreadDelete) {
+                  <a asp-controller="Thread" asp-action="Delete" asp-route-id="@thread.ThreadId" class="btn btn-danger btn-sm">Delete</a>
+                }
               </div>
-              }
             </td>
           </tr>
         }

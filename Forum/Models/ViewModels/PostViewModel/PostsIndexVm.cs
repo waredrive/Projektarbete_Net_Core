@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 namespace Forum.Models.ViewModels.PostViewModels {
   public class PostsIndexVm {
     public string Thread { get; set; }
+    public bool IsThreadLocked { get; set; }
     public List<PostsIndexPostVm> Posts { get; set; }
   }
 
@@ -15,7 +16,7 @@ namespace Forum.Models.ViewModels.PostViewModels {
     public string CreatedBy { get; set; }
     public DateTime CreatedOn { get; set; }
     public string LockedBy { get; set; }
-    public string RemovedBy { get; set; }
     public string EditedBy { get; set; }
+    public bool IsAuthorizedForPostEditAndDelete { get; set; }
   }
 }

@@ -26,10 +26,10 @@ namespace Forum.Controllers {
     [Route("Create")]
     [HttpGet]
     public async Task<IActionResult> Create(int topicId) {
-      if (_threadService.IsTopicLocked(topicId))
-        return RedirectToAction("AccessDenied", "Account");
+      if (_threadService.IsAuthorizedForThreadCreate(topicId, User))
+        return View(new ThreadCreateVm { TopicId = topicId });
 
-      return View(new ThreadCreateVm {TopicId = topicId});
+      return RedirectToAction("AccessDenied", "Account");
     }
 
     [Route("Create")]
@@ -39,7 +39,7 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return (View(threadCreateVm));
 
-      if (_threadService.IsTopicLocked(threadCreateVm.TopicId))
+      if (!_threadService.IsAuthorizedForThreadCreate(threadCreateVm.TopicId, User))
         return RedirectToAction("AccessDenied", "Account");
 
       await _threadService.Add(threadCreateVm, User);
@@ -49,8 +49,8 @@ namespace Forum.Controllers {
     [Route("Update/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id) {
-      if(await _threadService.IsUserAuthorized(id, User))
-      return View(await _threadService.GetThreadEditVm(id));
+      if (await _threadService.IsAuthorizedForThreadEdit(id, User))
+        return View(await _threadService.GetThreadEditVm(id));
 
       return RedirectToAction("AccessDenied", "Account");
     }
@@ -62,7 +62,7 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return (View(threadEditVm));
 
-      if (!await _threadService.IsUserAuthorized(threadEditVm.ThreadId, User))
+      if (!await _threadService.IsAuthorizedForThreadEdit(threadEditVm.ThreadId, User))
         return RedirectToAction("AccessDenied", "Account");
 
       await _threadService.Update(threadEditVm, User);
@@ -73,14 +73,74 @@ namespace Forum.Controllers {
     [Route("Delete/{id}")]
     [HttpGet]
     public async Task<IActionResult> Delete(int id) {
-      return View();
+      if (await _threadService.IsAuthorizedForThreadDelete(id, User))
+        return View(await _threadService.GetThreadDeleteVm(id));
+
+      return RedirectToAction("AccessDenied", "Account");
     }
 
-    [Route("Delete")]
+    [Route("Delete/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(ThreadsIndexVm threadsIndexVm) {
-      return View();
+    public async Task<IActionResult> Delete(ThreadDeleteVm threadDeleteVm) {
+      if (!ModelState.IsValid)
+        return (View(threadDeleteVm));
+
+      if (!await _threadService.IsAuthorizedForThreadDelete(threadDeleteVm.ThreadId, User))
+        return RedirectToAction("AccessDenied", "Account");
+
+      await _threadService.Remove(threadDeleteVm);
+      return RedirectToAction(nameof(Index));
+    }
+
+    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
+    [Route("Lock/{id}")]
+    [HttpGet]
+    public async Task<IActionResult> Lock(int id) {
+      if (_threadService.IsThreadLocked(id))
+        return RedirectToAction(nameof(Unlock));
+
+      return View(await _threadService.GetThreadLockVm(id));
+    }
+
+    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
+    [Route("Lock/{id}")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Lock(ThreadLockVm threadLockVm) {
+      if (!ModelState.IsValid)
+        return (View(threadLockVm));
+
+      if (_threadService.IsThreadLocked(threadLockVm.ThreadId))
+        return RedirectToAction(nameof(Index));
+
+      await _threadService.Lock(threadLockVm, User);
+      return RedirectToAction(nameof(Index));
+    }
+
+    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
+    [Route("Unlock/{id}")]
+    [HttpGet]
+    public async Task<IActionResult> Unlock(int id) {
+      if (!_threadService.IsThreadLocked(id))
+        return RedirectToAction(nameof(Lock));
+
+      return View(await _threadService.GetThreadUnlockVm(id));
+    }
+
+    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
+    [Route("Unlock/{id}")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Unlock(ThreadUnlockVm threadUnlockVm) {
+      if (!ModelState.IsValid)
+        return (View(threadUnlockVm));
+
+      if (!_threadService.IsThreadLocked(threadUnlockVm.ThreadId))
+        return RedirectToAction(nameof(Index));
+
+      await _threadService.Unlock(threadUnlockVm, User);
+      return RedirectToAction(nameof(Index));
     }
   }
 }

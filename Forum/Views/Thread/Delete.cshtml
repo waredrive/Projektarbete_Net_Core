@@ -1,0 +1,32 @@
+﻿@model ThreadDeleteVm
+
+@{
+  ViewBag.Title = "Delete Thread";
+}
+
+<div class="container">
+  <div class="col-12 rounded my-5 bg-secondary p-5 text-light">
+    <h1>Delete: @Model.ThreadText</h1>
+    <br />
+    <div class="row">
+      <div class="col-6">
+        <p>Created by: @Model.CreatedBy</p>
+        <p>Created on: @Model.CreatedOn</p>
+      </div>
+      <div class="col-6">
+        <p>Total posts in topic: @Model.PostCount</p>
+      </div>
+    </div>
+    <div class="row py-3">
+      <div class="col-12">
+        <form asp-controller="Thread" asp-action="Delete">
+          <div class="btn-group float-right">
+            @Html.HiddenFor(m => m.ThreadId)
+            <input type="submit" class="btn btn-danger rounded-left" value="Delete Thread" />
+            <a asp-controller="Thread" asp-action="Index" class="btn btn-warning">Back</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

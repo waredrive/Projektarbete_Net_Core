@@ -44,6 +44,9 @@ namespace Forum.Controllers {
     [Route("Update/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id) {
+      if (_topicService.IsTopicLocked(id))
+        return RedirectToAction(nameof(Unlock));
+
       return View(await _topicService.GetTopicCreateVm(id));
     }
 
@@ -54,6 +57,9 @@ namespace Forum.Controllers {
     public async Task<IActionResult> Edit(TopicEditVm topicEditVm) {
       if (!ModelState.IsValid)
         return (View(topicEditVm));
+
+      if (_topicService.IsTopicLocked(topicEditVm.TopicId))
+        return RedirectToAction(nameof(Index));
 
       await _topicService.Update(topicEditVm, User);
       return RedirectToAction(nameof(Index));
@@ -83,7 +89,7 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Lock(int id) {
       if (_topicService.IsTopicLocked(id))
-        RedirectToAction(nameof(Unlock));
+        return RedirectToAction(nameof(Unlock));
 
       return View(await _topicService.GetTopicLockVm(id));
     }
@@ -97,7 +103,7 @@ namespace Forum.Controllers {
         return (View(topicLockVm));
 
       if (_topicService.IsTopicLocked(topicLockVm.TopicId))
-        RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(Index));
 
       await _topicService.Lock(topicLockVm, User);
       return RedirectToAction(nameof(Index));
@@ -108,9 +114,9 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Unlock(int id) {
       if (!_topicService.IsTopicLocked(id))
-        RedirectToAction(nameof(Lock));
+        return RedirectToAction(nameof(Lock));
 
-      return View(await _topicService.GetTopicLockVm(id));
+      return View(await _topicService.GetTopicUnlockVm(id));
     }
 
     [AuthorizeRoles(Roles.Admin)]
@@ -122,7 +128,7 @@ namespace Forum.Controllers {
         return (View(topicUnlockVm));
 
       if (!_topicService.IsTopicLocked(topicUnlockVm.TopicId))
-        RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(Index));
 
       await _topicService.Unlock(topicUnlockVm, User);
       return RedirectToAction(nameof(Index));

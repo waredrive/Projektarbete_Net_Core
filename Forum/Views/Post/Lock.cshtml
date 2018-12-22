@@ -1,0 +1,36 @@
+﻿@model PostLockVm
+@{
+  ViewBag.Title = "Lock Post";
+}
+
+<div class="container">
+  <div class="col-12 rounded my-5 bg-secondary p-5 text-light">
+    <h1>Lock Post</h1>
+    <br />
+    <div class="row">
+      <div class="col-12">
+        <p>Created by: @Model.CreatedBy</p>
+        <p>Created on: @Model.CreatedOn</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <fieldset disabled>
+          <label asp-for="PostText" class="control-label"></label>
+          <textarea asp-for="PostText" rows="10" class="form-control"></textarea>
+        </fieldset>
+      </div>
+    </div>
+    <div class="row py-3">
+      <div class="col-12">
+        <form asp-controller="Post" asp-action="Lock">
+          <div class="btn-group float-right">
+            @Html.HiddenFor(m => m.PostId)
+            <input type="submit" class="btn btn-danger rounded-left" value="Lock Post" />
+            <a asp-controller="Post" asp-action="Index" class="btn btn-warning">Back</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

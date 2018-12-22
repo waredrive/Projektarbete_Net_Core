@@ -19,6 +19,7 @@ namespace Forum.Models.ViewModels.ThreadViewModels {
     public string RemovedBy { get; set; }
     public string EditedBy { get; set; }
     public int PostCount { get; set; }
-    public bool IsUserAuthorized { get; set; }
+    public bool IsAuthorizedForThreadEdit { get; set; }
+    public bool IsAuthorizedForThreadDelete { get; set; }
   }
 }

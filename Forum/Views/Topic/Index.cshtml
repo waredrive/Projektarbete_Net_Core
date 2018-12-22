@@ -23,25 +23,24 @@
           <tr>
             <th scope="row">ICON</th>
             <td>
-              <a asp-controller="Thread" asp-action="index" asp-route-topicId="@topic.TopicId" class="light">@topic.TopicText</a>
+              <a asp-controller="Thread" asp-action="index" asp-route-topicId="@topic.TopicId" class="light"><p>@topic.TopicText</p></a>
             </td>
-            <td>@topic.CreatedBy</td>
-            <td>@topic.CreatedOn</td>
             <td>
-              <p>Thread Count: @topic.ThreadCount</p>
-              <p>Post Count: @topic.PostCount</p>
+            <td>
+              <p class="pb-0 mb-0"><span class="font-weight-bold">@topic.ThreadCount </span>@if (topic.ThreadCount == 1) {<span>thread</span>} else {<span>threads</span>}</p>
+              <p><span class="font-weight-bold">@topic.PostCount</span> @if (topic.PostCount == 1) {<span>reply</span>} else {<span>replies</span>}</p>
             </td>
             <td>
               @if (User.IsInRole(Roles.Admin)) {
-              <div class="btn-group">
-                <a asp-controller="Topic" asp-action="Edit" asp-route-id="@topic.TopicId" class="btn btn-primary btn-sm">Edit</a>
-                @if (topic.LockedBy == null) {
-                  <a asp-controller="Topic" asp-action="Lock" asp-route-id="@topic.TopicId" class="btn btn-warning btn-sm">Lock</a>
-                } else {
-                  <a asp-controller="Topic" asp-action="Unlock" asp-route-id="@topic.TopicId" class="btn btn-warning btn-sm">Unlock</a>
-                }
-                <a asp-controller="Topic" asp-action="Delete" asp-route-id="@topic.TopicId" class="btn btn-danger btn-sm">Delete</a>
-              </div>
+                <div class="btn-group">
+                  @if (topic.LockedBy == null) {
+                    <a asp-controller="Topic" asp-action="Edit" asp-route-id="@topic.TopicId" class="btn btn-primary btn-sm">Edit</a>
+                    <a asp-controller="Topic" asp-action="Lock" asp-route-id="@topic.TopicId" class="btn btn-warning btn-sm">Lock</a>
+                  } else {
+                    <a asp-controller="Topic" asp-action="Unlock" asp-route-id="@topic.TopicId" class="btn btn-warning btn-sm">Unlock</a>
+                  }
+                  <a asp-controller="Topic" asp-action="Delete" asp-route-id="@topic.TopicId" class="btn btn-danger btn-sm">Delete</a>
+                </div>
               }
             </td>
             <td>
@@ -85,11 +84,19 @@
       </table>
     </div>
   </div>
-  <div class="row">
+  <div class="row bg-secondary mt-3">
     <div class="col-md-12 text-light">
-      <p>Total members: @Model.TotalMembers</p>
-      <p>Newest member: @Model.NewestMember</p>
-      <p>Total posts: @Model.TotalPosts</p>
+      <div class="row pt-3">
+        <div class="col-md-4">
+          <p class="text-right">Total members: @Model.TotalMembers</p>
+        </div>
+        <div class="col-md-4 text-center">
+          <p class="text-center">Newest member: @Model.NewestMember</p>
+        </div>
+        <div class="col-md-4 text-center">
+          <p class="text-left">Total posts: @Model.TotalPosts</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>

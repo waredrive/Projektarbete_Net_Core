@@ -55,12 +55,10 @@ namespace Forum.Models.Services {
           CreatedBy = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName
         }).FirstOrDefault(),
         TopicId = t.Id,
-        CreatedOn = t.CreatedOn,
-        CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
         TopicText = t.ContentText,
         ThreadCount = t.Thread.Count,
         PostCount = t.Thread.Select(tt => tt.Post.Count).Sum(),
-        LockedBy = _userManager.FindByIdAsync(t.LockedBy).Result.UserName
+        LockedBy = t.LockedBy != null ?_userManager.FindByIdAsync(t.LockedBy).Result.UserName : null
       }));
 
       topicsIndexVm.LatestThreads.AddRange(_db.Thread.OrderByDescending(t => t.CreatedOn).Take(10).Select(t => new TopicsIndexThreadVm {
@@ -149,13 +147,34 @@ namespace Forum.Models.Services {
       await _db.SaveChangesAsync();
     }
 
+    public async Task<TopicUnlockVm> GetTopicUnlockVm(int id) {
+      return await _db.Topic.Include(t => t.Thread).Where(t => t.Id == id).Select(t => new TopicUnlockVm {
+        CreatedOn = t.CreatedOn,
+        CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
+        ThreadCount = t.Thread.Count,
+        PostCount = _db.Post.Count(p => p.ThreadNavigation.Topic == t.Id),
+        LockedBy = _userManager.FindByIdAsync(t.LockedBy).Result.UserName,
+        LockedOn = (DateTime)t.LockedOn,
+        TopicId = t.Id,
+        TopicText = t.ContentText
+      }).FirstOrDefaultAsync();
+    }
 
     public async Task Unlock(TopicUnlockVm topicUnlockVm, ClaimsPrincipal user) {
-      throw new NotImplementedException();
+      var currentUserId = _userManager.GetUserId(user);
+      if (currentUserId == null)
+        return;
+
+      var topicFromDb = await _db.Topic.FirstOrDefaultAsync(t => t.Id == topicUnlockVm.TopicId);
+      topicFromDb.LockedBy = null;
+      topicFromDb.LockedOn = null;
+
+      await _db.SaveChangesAsync();
     }
 
     public bool IsTopicLocked(int id) {
       return _db.Topic.Where(t => t.Id == id).Any(p => p.LockedBy != null);
     }
+
   }
 }
