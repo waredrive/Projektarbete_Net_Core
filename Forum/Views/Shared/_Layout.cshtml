@@ -5,15 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>@ViewBag.Title</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
   <link rel="stylesheet" href="~/css/styles.css"/>
 </head>
 <body class="bg-dark">
-  <div>
-    @RenderBody()
+<nav class="navbar navbar-expand-lg navbar-dark bg-secondary mb-3">
+  <a asp-controller="Topic" asp-action="Index" class="navbar-brand">Forum</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarToggler">
+    <ul class="navbar-nav ml-auto">
+      @if (!User.Identity.IsAuthenticated) {
+        <li class="nav-item">
+          <a asp-controller="Account" asp-action="Register" class="nav-link"><i class="fas fa-user-plus pr-1"></i> Sign Up</a>
+        </li>
+        <li class="nav-item">
+          <a asp-controller="Account" asp-action="Login" class="nav-link" style="vertical-align: middle;"><i class="fas fa-sign-in-alt fa-lg pr-1"></i> Login</a>
+        </li>
+      } else {
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
+            @User.Identity.Name
+          </a>
+          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="#">Go somewhere</a>
+            <form asp-controller="Account" asp-action="Logout" class="dropdown-item">
+              <a href="#" onclick="this.parentNode.submit()"><i class="fas fa-sign-out-alt pr-1"></i>Log out</a>
+            </form>
+          </div>
+        </li>
+      }
+    </ul>
   </div>
-  @RenderSection("scripts", false)
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</nav>
+
+<div>
+  @RenderBody()
+</div>
+@RenderSection("scripts", false)
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </body>
 </html>

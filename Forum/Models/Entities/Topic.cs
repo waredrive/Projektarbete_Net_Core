@@ -17,14 +17,11 @@ namespace Forum.Models.Entities
         public string EditedBy { get; set; }
         public DateTime? LockedOn { get; set; }
         public string LockedBy { get; set; }
-        public DateTime? RemovedOn { get; set; }
-        public string RemovedBy { get; set; }
         public string ContentText { get; set; }
 
         public virtual Member CreatedByNavigation { get; set; }
         public virtual Member EditedByNavigation { get; set; }
         public virtual Member LockedByNavigation { get; set; }
-        public virtual Member RemovedByNavigation { get; set; }
         public virtual ICollection<Thread> Thread { get; set; }
     }
 }

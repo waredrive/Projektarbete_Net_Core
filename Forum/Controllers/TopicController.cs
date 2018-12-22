@@ -77,5 +77,55 @@ namespace Forum.Controllers {
       await _topicService.Remove(topicDeleteVm);
       return RedirectToAction(nameof(Index));
     }
+
+    [AuthorizeRoles(Roles.Admin)]
+    [Route("Lock/{id}")]
+    [HttpGet]
+    public async Task<IActionResult> Lock(int id) {
+      if (_topicService.IsTopicLocked(id))
+        RedirectToAction(nameof(Unlock));
+
+      return View(await _topicService.GetTopicLockVm(id));
+    }
+
+    [AuthorizeRoles(Roles.Admin)]
+    [Route("Lock/{id}")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Lock(TopicLockVm topicLockVm) {
+      if (!ModelState.IsValid)
+        return (View(topicLockVm));
+
+      if (_topicService.IsTopicLocked(topicLockVm.TopicId))
+        RedirectToAction(nameof(Index));
+
+      await _topicService.Lock(topicLockVm, User);
+      return RedirectToAction(nameof(Index));
+    }
+
+    [AuthorizeRoles(Roles.Admin)]
+    [Route("Unlock/{id}")]
+    [HttpGet]
+    public async Task<IActionResult> Unlock(int id) {
+      if (!_topicService.IsTopicLocked(id))
+        RedirectToAction(nameof(Lock));
+
+      return View(await _topicService.GetTopicLockVm(id));
+    }
+
+    [AuthorizeRoles(Roles.Admin)]
+    [Route("Unlock/{id}")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Unlock(TopicUnlockVm topicUnlockVm) {
+      if (!ModelState.IsValid)
+        return (View(topicUnlockVm));
+
+      if (!_topicService.IsTopicLocked(topicUnlockVm.TopicId))
+        RedirectToAction(nameof(Index));
+
+      await _topicService.Unlock(topicUnlockVm, User);
+      return RedirectToAction(nameof(Index));
+    }
   }
 }

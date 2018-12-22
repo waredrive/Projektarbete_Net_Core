@@ -5,27 +5,30 @@
 }
 
 <div class="container">
-  <div class="col-12 rounded my-5 bg-light p-5">
+  <div class="col-12 rounded my-5 bg-secondary p-5 text-light">
     <h1>Create Thread</h1>
     <br />
-
     <form asp-controller="Thread" asp-action="Create">
       <div asp-validation-summary="ModelOnly" class="text-danger"></div>
       <div class="form-group">
-        <label asp-for="ThreadText" class="col-md-2 control-label"></label>
-        <div class="col-md-10">
-          <textarea asp-for="ThreadText" class="form-control"></textarea>
-          <span asp-validation-for="ThreadText" class="text-danger"></span>
-        </div>
-        <br />
-        <div>
-          <label>&nbsp;</label>
-          <button type="submit" class="btn btn-primary">Create Thread</button>
-        </div>
+        <label asp-for="ThreadText" class="control-label"></label>
+        <input asp-for="ThreadText" class="form-control" />
+        <span asp-validation-for="ThreadText" class="text-danger"></span>
       </div>
+      <div class="form-group">
+        <label asp-for="@Model.Post.PostText" class="control-label"></label>
+        <textarea asp-for="@Model.Post.PostText" rows="10" class="form-control"></textarea>
+        <span asp-validation-for="@Model.Post.PostText" class="text-danger"></span>
+      </div>
+      <br/>
+        <div class="btn-group float-right">
+          <button type="submit" class="btn btn-primary">Create</button>
+          <a asp-controller="Thread" asp-action="Index" class="btn btn-warning">Back</a>
+        </div>
     </form>
   </div>
 </div>
+
 @section scripts {
   <partial name="_ValidationScriptsPartial" />
 }

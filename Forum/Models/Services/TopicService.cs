@@ -59,7 +59,8 @@ namespace Forum.Models.Services {
         CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
         TopicText = t.ContentText,
         ThreadCount = t.Thread.Count,
-        PostCount = t.Thread.Select(tt => tt.Post.Count).Sum()
+        PostCount = t.Thread.Select(tt => tt.Post.Count).Sum(),
+        LockedBy = _userManager.FindByIdAsync(t.LockedBy).Result.UserName
       }));
 
       topicsIndexVm.LatestThreads.AddRange(_db.Thread.OrderByDescending(t => t.CreatedOn).Take(10).Select(t => new TopicsIndexThreadVm {
@@ -100,7 +101,7 @@ namespace Forum.Models.Services {
     }
 
     public async Task<TopicDeleteVm> GetTopicDeleteVm(int id) {
-      return await _db.Topic.Include(t => t.Thread).Where(t => t.Id == id).Select(t => new TopicDeleteVm() {
+      return await _db.Topic.Include(t => t.Thread).Where(t => t.Id == id).Select(t => new TopicDeleteVm {
         CreatedOn = t.CreatedOn,
         CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
         ThreadCount = t.Thread.Count,
@@ -123,6 +124,38 @@ namespace Forum.Models.Services {
           transaction.Rollback();
         }
       }
+    }
+
+    public async Task<TopicLockVm> GetTopicLockVm(int id) {
+      return await _db.Topic.Include(t => t.Thread).Where(t => t.Id == id).Select(t => new TopicLockVm { 
+        CreatedOn = t.CreatedOn,
+        CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
+        ThreadCount = t.Thread.Count,
+        PostCount = _db.Post.Count(p => p.ThreadNavigation.Topic == t.Id),
+        TopicId = t.Id,
+        TopicText = t.ContentText
+      }).FirstOrDefaultAsync();
+    }
+
+    public async Task Lock(TopicLockVm topicLockVm, ClaimsPrincipal user) {
+      var currentUserId = _userManager.GetUserId(user);
+      if (currentUserId == null)
+        return;
+
+      var topicFromDb = await _db.Topic.FirstOrDefaultAsync(t => t.Id == topicLockVm.TopicId);
+      topicFromDb.LockedBy = currentUserId;
+      topicFromDb.LockedOn = DateTime.UtcNow;
+
+      await _db.SaveChangesAsync();
+    }
+
+
+    public async Task Unlock(TopicUnlockVm topicUnlockVm, ClaimsPrincipal user) {
+      throw new NotImplementedException();
+    }
+
+    public bool IsTopicLocked(int id) {
+      return _db.Topic.Where(t => t.Id == id).Any(p => p.LockedBy != null);
     }
   }
 }

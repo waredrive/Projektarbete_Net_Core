@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Forum.Models.ViewModels.TopicViewModels {
   public class TopicEditVm {
+    [Required]
     public int TopicId { get; set; }
     [Required]
     [Display(Name = "Topic Text")]

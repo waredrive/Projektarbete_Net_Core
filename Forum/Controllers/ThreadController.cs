@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Forum.Attributes;
 using Forum.Models.Services;
+using Forum.Models.ViewModels.PostViewModel;
 using Forum.Models.ViewModels.ThreadViewModels;
 using Forum.Models.ViewModels.TopicViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -19,12 +20,15 @@ namespace Forum.Controllers {
     [Route("")]
     [HttpGet]
     public async Task<IActionResult> Index(int topicId) {
-      return View(await _threadService.GetThreadsIndexVm(topicId));
+      return View(await _threadService.GetThreadsIndexVm(topicId, User));
     }
 
     [Route("Create")]
     [HttpGet]
     public async Task<IActionResult> Create(int topicId) {
+      if (_threadService.IsTopicLocked(topicId))
+        return RedirectToAction("AccessDenied", "Account");
+
       return View(new ThreadCreateVm {TopicId = topicId});
     }
 
@@ -35,33 +39,43 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return (View(threadCreateVm));
 
+      if (_threadService.IsTopicLocked(threadCreateVm.TopicId))
+        return RedirectToAction("AccessDenied", "Account");
+
       await _threadService.Add(threadCreateVm, User);
       return RedirectToAction(nameof(Index));
     }
 
-    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
     [Route("Update/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id) {
-      return View();
+      if(await _threadService.IsUserAuthorized(id, User))
+      return View(await _threadService.GetThreadEditVm(id));
+
+      return RedirectToAction("AccessDenied", "Account");
     }
 
-    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
-    [Route("Update")]
+    [Route("Update/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(ThreadsIndexVm threadsIndexVm) {
-      return View();
+    public async Task<IActionResult> Edit(ThreadEditVm threadEditVm) {
+      if (!ModelState.IsValid)
+        return (View(threadEditVm));
+
+      if (!await _threadService.IsUserAuthorized(threadEditVm.ThreadId, User))
+        return RedirectToAction("AccessDenied", "Account");
+
+      await _threadService.Update(threadEditVm, User);
+      return RedirectToAction(nameof(Index));
+
     }
 
-    [AuthorizeRoles(Roles.Admin)]
     [Route("Delete/{id}")]
     [HttpGet]
     public async Task<IActionResult> Delete(int id) {
       return View();
     }
 
-    [AuthorizeRoles(Roles.Admin)]
     [Route("Delete")]
     [HttpPost]
     [ValidateAntiForgeryToken]

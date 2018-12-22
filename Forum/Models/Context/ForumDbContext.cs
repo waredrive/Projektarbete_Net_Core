@@ -160,8 +160,6 @@ namespace Forum.Models.Context
 
                 entity.HasIndex(e => e.LockedBy);
 
-                entity.HasIndex(e => e.RemovedBy);
-
                 entity.HasIndex(e => e.Thread);
 
                 entity.Property(e => e.CreatedBy).IsRequired();
@@ -182,11 +180,6 @@ namespace Forum.Models.Context
                     .HasForeignKey(d => d.LockedBy)
                     .HasConstraintName("FK__Post__LockedBy__3D2915A8");
 
-                entity.HasOne(d => d.RemovedByNavigation)
-                    .WithMany(p => p.PostRemovedByNavigation)
-                    .HasForeignKey(d => d.RemovedBy)
-                    .HasConstraintName("FK__Post__RemovedBy__3E1D39E1");
-
                 entity.HasOne(d => d.ThreadNavigation)
                     .WithMany(p => p.Post)
                     .HasForeignKey(d => d.Thread)
@@ -201,8 +194,6 @@ namespace Forum.Models.Context
                 entity.HasIndex(e => e.EditedBy);
 
                 entity.HasIndex(e => e.LockedBy);
-
-                entity.HasIndex(e => e.RemovedBy);
 
                 entity.HasIndex(e => e.Topic);
 
@@ -226,11 +217,6 @@ namespace Forum.Models.Context
                     .HasForeignKey(d => d.LockedBy)
                     .HasConstraintName("FK__Thread__LockedBy__40F9A68C");
 
-                entity.HasOne(d => d.RemovedByNavigation)
-                    .WithMany(p => p.ThreadRemovedByNavigation)
-                    .HasForeignKey(d => d.RemovedBy)
-                    .HasConstraintName("FK__Thread__RemovedB__41EDCAC5");
-
                 entity.HasOne(d => d.TopicNavigation)
                     .WithMany(p => p.Thread)
                     .HasForeignKey(d => d.Topic)
@@ -245,8 +231,6 @@ namespace Forum.Models.Context
                 entity.HasIndex(e => e.EditedBy);
 
                 entity.HasIndex(e => e.LockedBy);
-
-                entity.HasIndex(e => e.RemovedBy);
 
                 entity.Property(e => e.ContentText).HasMaxLength(50);
 
@@ -267,11 +251,6 @@ namespace Forum.Models.Context
                     .WithMany(p => p.TopicLockedByNavigation)
                     .HasForeignKey(d => d.LockedBy)
                     .HasConstraintName("FK__Topic__LockedBy__44CA3770");
-
-                entity.HasOne(d => d.RemovedByNavigation)
-                    .WithMany(p => p.TopicRemovedByNavigation)
-                    .HasForeignKey(d => d.RemovedBy)
-                    .HasConstraintName("FK__Topic__RemovedBy__45BE5BA9");
             });
         }
     }
