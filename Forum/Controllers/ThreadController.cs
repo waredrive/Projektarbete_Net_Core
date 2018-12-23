@@ -11,9 +11,11 @@ namespace Forum.Controllers {
   [Route("Forum/{topicId}")]
   public class ThreadController : Controller {
     private readonly ThreadService _threadService;
+    private readonly AuthorizationService _authorizationService;
 
-    public ThreadController(ThreadService threadService) {
+    public ThreadController(ThreadService threadService, AuthorizationService authorizationService) {
       _threadService = threadService;
+      _authorizationService = authorizationService;
     }
 
     [AllowAnonymous]
@@ -25,7 +27,7 @@ namespace Forum.Controllers {
 
     [Route("Create")]
     [HttpGet]
-    public async Task<IActionResult> Create(int topicId) {
+    public IActionResult Create(int topicId) {
       if (_threadService.IsAuthorizedForThreadCreate(topicId, User))
         return View(new ThreadCreateVm { TopicId = topicId });
 
@@ -49,7 +51,7 @@ namespace Forum.Controllers {
     [Route("UpdateAccount/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id) {
-      if (await _threadService.IsAuthorizedForThreadEdit(id, User))
+      if (await _authorizationService.IsAuthorizedForThreadEdit(id, User))
         return View(await _threadService.GetThreadEditVm(id));
 
       return RedirectToAction("AccessDenied", "Account");
@@ -62,7 +64,7 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return (View(threadEditVm));
 
-      if (!await _threadService.IsAuthorizedForThreadEdit(threadEditVm.ThreadId, User))
+      if (!await _authorizationService.IsAuthorizedForThreadEdit(threadEditVm.ThreadId, User))
         return RedirectToAction("AccessDenied", "Account");
 
       await _threadService.Update(threadEditVm, User);
@@ -73,7 +75,7 @@ namespace Forum.Controllers {
     [Route("Delete/{id}")]
     [HttpGet]
     public async Task<IActionResult> Delete(int id) {
-      if (await _threadService.IsAuthorizedForThreadDelete(id, User))
+      if (await _authorizationService.IsAuthorizedForThreadDelete(id, User))
         return View(await _threadService.GetThreadDeleteVm(id));
 
       return RedirectToAction("AccessDenied", "Account");
@@ -86,7 +88,7 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return (View(threadDeleteVm));
 
-      if (!await _threadService.IsAuthorizedForThreadDelete(threadDeleteVm.ThreadId, User))
+      if (!await _authorizationService.IsAuthorizedForThreadDelete(threadDeleteVm.ThreadId, User))
         return RedirectToAction("AccessDenied", "Account");
 
       await _threadService.Remove(threadDeleteVm);

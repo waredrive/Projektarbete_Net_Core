@@ -12,17 +12,19 @@ using Microsoft.EntityFrameworkCore;
 namespace Forum.Models.Services {
   public class AccountService {
     private readonly ForumDbContext _db;
+    private readonly AuthorizationService _authorizationService;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
 
     public AccountService(
       UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
-      RoleManager<IdentityRole> roleManager, ForumDbContext db) {
+      RoleManager<IdentityRole> roleManager, ForumDbContext db, AuthorizationService authorizationService) {
       _userManager = userManager;
       _signInManager = signInManager;
       _roleManager = roleManager;
       _db = db;
+      _authorizationService = authorizationService;
     }
 
     public async Task<IdentityResult> Add(AccountRegisterVm accountRegisterVm) {
@@ -136,17 +138,8 @@ namespace Forum.Models.Services {
         Email = identityUser.Email,
         FirstName = memberFromDb.FirstName,
         LastName = memberFromDb.LastName,
-        IsAuthorizedForAccountEdit = IsAuthorizedForAccountAndPasswordEdit(identityUser.UserName, user)
+        IsAuthorizedForAccountEdit = _authorizationService.IsAuthorizedForAccountAndPasswordEdit(identityUser.UserName, user)
       };
     }
-
-    public bool IsAuthorizedForAccountAndPasswordEdit(string username, ClaimsPrincipal user) {
-      return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase);
-    }
-
-    public bool IsAuthorizedForAccountDetailsView(string username, ClaimsPrincipal user) {
-      return user.IsInRole(Roles.Admin) || string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase);
-    }
-
   }
 }

@@ -17,14 +17,14 @@ namespace Forum.Controllers {
     [AllowAnonymous]
     [Route("")]
     [HttpGet]
-    public async Task<IActionResult> Index() {
-      return View(await _topicService.GetTopicsIndexVm());
+    public IActionResult Index() {
+      return View(_topicService.GetTopicsIndexVm());
     }
 
     [AuthorizeRoles(Roles.Admin)]
     [Route("Create")]
     [HttpGet]
-    public async Task<IActionResult> Create(int id) {
+    public IActionResult Create(int id) {
       return View();
     }
 

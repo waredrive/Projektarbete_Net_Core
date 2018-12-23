@@ -10,9 +10,11 @@ namespace Forum.Controllers {
   [Route("Account")]
   public class AccountController : Controller {
     private readonly AccountService _accountService;
+    private readonly AuthorizationService _authorizationService;
 
-    public AccountController(AccountService accountService) {
+    public AccountController(AccountService accountService, AuthorizationService authorizationService) {
       _accountService = accountService;
+      _authorizationService = authorizationService;
     }
 
     [AllowAnonymous]
@@ -70,7 +72,7 @@ namespace Forum.Controllers {
     [Route("Update/{username}")]
     [HttpGet]
     public async Task<IActionResult> EditAccount(string username) {
-      if (_accountService.IsAuthorizedForAccountAndPasswordEdit(username, User))
+      if (_authorizationService.IsAuthorizedForAccountAndPasswordEdit(username, User))
         return View(await _accountService.GetAccountEditVm(User));
 
       return RedirectToAction(nameof(AccessDenied));
@@ -83,7 +85,7 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return (View(accountEditVm));
 
-      if (!_accountService.IsAuthorizedForAccountAndPasswordEdit(username, User))
+      if (!_authorizationService.IsAuthorizedForAccountAndPasswordEdit(username, User))
         return RedirectToAction(nameof(AccessDenied));
 
       var result = await _accountService.UpdateAccount(accountEditVm, User);
@@ -100,7 +102,7 @@ namespace Forum.Controllers {
     [Route("Update/Password/{username}")]
     [HttpGet]
     public IActionResult EditPassword(string username) {
-      if (_accountService.IsAuthorizedForAccountAndPasswordEdit(username, User))
+      if (_authorizationService.IsAuthorizedForAccountAndPasswordEdit(username, User))
         return View();
 
       return RedirectToAction(nameof(AccessDenied));
@@ -113,7 +115,7 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return (View(accountPasswordEditVm));
 
-      if (!_accountService.IsAuthorizedForAccountAndPasswordEdit(username, User))
+      if (!_authorizationService.IsAuthorizedForAccountAndPasswordEdit(username, User))
         return RedirectToAction(nameof(AccessDenied));
 
       var result = await _accountService.UpdatePassword(accountPasswordEditVm, User);
@@ -130,7 +132,7 @@ namespace Forum.Controllers {
     [Route("Details/{username}")]
     [HttpGet]
     public async Task<IActionResult> Details(string username) {
-      if (_accountService.IsAuthorizedForAccountDetailsView(username, User))
+      if (_authorizationService.IsAuthorizedForAccountDetailsView(username, User))
         return View(await _accountService.GetAccountDetailsVm(username, User));
 
       return RedirectToAction(nameof(AccessDenied));

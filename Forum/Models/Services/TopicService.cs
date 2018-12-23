@@ -12,14 +12,11 @@ using Microsoft.EntityFrameworkCore;
 namespace Forum.Models.Services {
   public class TopicService {
     private readonly ForumDbContext _db;
-    private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
 
-    public TopicService(ForumDbContext db, UserManager<IdentityUser> userManager,
-      SignInManager<IdentityUser> signInManager) {
+    public TopicService(ForumDbContext db, UserManager<IdentityUser> userManager) {
       _db = db;
       _userManager = userManager;
-      _signInManager = signInManager;
     }
 
     public async Task Add(TopicCreateVm topicCreateVm, ClaimsPrincipal user) {
@@ -37,7 +34,7 @@ namespace Forum.Models.Services {
       await _db.SaveChangesAsync();
     }
 
-    public async Task<TopicsIndexVm> GetTopicsIndexVm() {
+    public TopicsIndexVm GetTopicsIndexVm() {
       var topicsIndexVm = new TopicsIndexVm {
         Topics = new List<TopicsIndexTopicVm>(),
         LatestThreads = new List<TopicsIndexThreadVm>(),

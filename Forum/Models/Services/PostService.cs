@@ -14,12 +14,14 @@ using Microsoft.EntityFrameworkCore;
 namespace Forum.Models.Services {
   public class PostService {
     private readonly ForumDbContext _db;
+    private readonly AuthorizationService _authorizationService;
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
 
-    public PostService(ForumDbContext db, UserManager<IdentityUser> userManager,
+    public PostService(ForumDbContext db, AuthorizationService authorizationService, UserManager<IdentityUser> userManager,
       SignInManager<IdentityUser> signInManager) {
       _db = db;
+      _authorizationService = authorizationService;
       _userManager = userManager;
       _signInManager = signInManager;
     }
@@ -55,7 +57,7 @@ namespace Forum.Models.Services {
         CreatedOn = p.CreatedOn,
         CreatedBy = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName,
         PostText = p.ContentText,
-        IsAuthorizedForPostEditAndDelete = IsAuthorizedForPostEditAndDelete(p, user),
+        IsAuthorizedForPostEditAndDelete = _authorizationService.IsAuthorizedForPostEditAndDelete(p, user),
         LockedBy = p.LockedBy != null ? _userManager.FindByIdAsync(p.LockedBy).Result.UserName : null
       }));
 
@@ -140,29 +142,6 @@ namespace Forum.Models.Services {
       postFromDb.LockedOn = null;
 
       await _db.SaveChangesAsync();
-    }
-
-    public bool IsAuthorizedForPostCreate(int id, ClaimsPrincipal user) {
-      if (user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator))
-        return true;
-
-      return !_db.Thread.Where(t => t.Id == id).Any(t => t.LockedBy != null);
-    }
-
-    // The user is authorized as long as the thread or post
-    // is not locked and the post is created by the user.
-    // Admins and Moderators have no restrictions.
-    public async Task<bool> IsAuthorizedForPostEditAndDelete(int id, ClaimsPrincipal user) {
-      var postFromDb = await _db.Post.Include(t => t.ThreadNavigation).FirstOrDefaultAsync(t => t.Id == id);
-      return postFromDb != null && IsAuthorizedForPostEditAndDelete(postFromDb, user);
-    }
-
-    private bool IsAuthorizedForPostEditAndDelete(Post postFromDb, ClaimsPrincipal user) {
-      if (user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator))
-        return true;
-
-      var userId = _userManager.GetUserId(user);
-      return postFromDb.LockedOn == null && postFromDb.CreatedBy == userId && postFromDb?.ThreadNavigation.LockedOn == null;
     }
 
     public bool IsPostLocked(int id) {

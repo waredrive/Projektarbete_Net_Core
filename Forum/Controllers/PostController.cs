@@ -11,9 +11,11 @@ namespace Forum.Controllers {
   [Route("Thread/{threadId}")]
   public class PostController : Controller {
     private readonly PostService _postService;
+    private readonly AuthorizationService _authorizationService;
 
-    public PostController(PostService postService) {
+    public PostController(PostService postService, AuthorizationService authorizationService) {
       _postService = postService;
+      _authorizationService = authorizationService;
     }
 
     [AllowAnonymous]
@@ -26,8 +28,8 @@ namespace Forum.Controllers {
 
     [Route("Create")]
     [HttpGet]
-    public async Task<IActionResult> Create(int threadId) {
-      if (_postService.IsAuthorizedForPostCreate(threadId, User))
+    public IActionResult Create(int threadId) {
+      if (_authorizationService.IsAuthorizedForPostCreate(threadId, User))
         return View(new PostCreateVm { ThreadId = threadId});
 
       return RedirectToAction("AccessDenied", "Account");
@@ -40,7 +42,7 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return (View(postCreateVm));
 
-      if (!_postService.IsAuthorizedForPostCreate(postCreateVm.ThreadId, User))
+      if (!_authorizationService.IsAuthorizedForPostCreate(postCreateVm.ThreadId, User))
         return RedirectToAction("AccessDenied", "Account");
 
       await _postService.Add(postCreateVm, User);
@@ -50,7 +52,7 @@ namespace Forum.Controllers {
     [Route("UpdateAccount/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id) {
-      if (await _postService.IsAuthorizedForPostEditAndDelete(id, User))
+      if (await _authorizationService.IsAuthorizedForPostEditAndDelete(id, User))
         return View(await _postService.GetPostEditVm(id));
 
       return RedirectToAction("AccessDenied", "Account");
@@ -63,7 +65,7 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return (View(postEditVm));
 
-      if (!await _postService.IsAuthorizedForPostEditAndDelete(postEditVm.PostId, User))
+      if (!await _authorizationService.IsAuthorizedForPostEditAndDelete(postEditVm.PostId, User))
         return RedirectToAction("AccessDenied", "Account");
 
       await _postService.Update(postEditVm, User);
@@ -73,7 +75,7 @@ namespace Forum.Controllers {
     [Route("Delete/{id}")]
     [HttpGet]
     public async Task<IActionResult> Delete(int id) {
-      if (await _postService.IsAuthorizedForPostEditAndDelete(id, User))
+      if (await _authorizationService.IsAuthorizedForPostEditAndDelete(id, User))
         return View(await _postService.GetPostDeleteVm(id));
 
       return RedirectToAction("AccessDenied", "Account");
@@ -86,7 +88,7 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return (View(postDeleteVm));
 
-      if (!await _postService.IsAuthorizedForPostEditAndDelete(postDeleteVm.PostId, User))
+      if (!await _authorizationService.IsAuthorizedForPostEditAndDelete(postDeleteVm.PostId, User))
         return RedirectToAction("AccessDenied", "Account");
 
       await _postService.Remove(postDeleteVm);
