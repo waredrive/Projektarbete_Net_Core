@@ -1,19 +1,14 @@
-﻿@model AccountRegisterVm
+﻿@model AccountEditVm
 @{
-  ViewBag.Title = "Register";
+  ViewBag.Title = "Edit Account";
 }
 
 <div class="container">
   <div class="col-12 rounded my-5 bg-secondary p-5 text-light">
-    <h1>Register new account</h1>
+    <h1>Edit Account</h1>
     <br />
-    <form asp-controller="Account" asp-action="Register">
+    <form asp-controller="Account" asp-action="EditAccount">
       <div asp-validation-summary="ModelOnly" class="text-danger bg-light"></div>
-      <div class="form-group">
-        <label asp-for="UserName" class="control-label"></label>
-        <input asp-for="UserName" class="form-control" />
-        <span asp-validation-for="UserName" class="text-danger bg-light"></span>
-      </div>
       <div class="form-group">
         <label asp-for="Email" class="control-label"></label>
         <input asp-for="Email" class="form-control" />
@@ -34,20 +29,13 @@
         <input asp-for="Birthdate" class="form-control" />
         <span asp-validation-for="Birthdate" class="text-danger bg-light"></span>
       </div>
-      <div class="form-group">
-        <label asp-for="Password" class="control-label"></label>
-        <input asp-for="Password" class="form-control" />
-        <span asp-validation-for="Password" class="text-danger bg-light"></span>
+      <div>
+        <a asp-controller="Account" asp-action="EditPassword" asp-route-username="@User.Identity.Name" class="btn btn-warning">Change Password</a>
       </div>
-      <div class="form-group">
-        <label asp-for="ConfirmPassword" class="control-label"></label>
-        <input asp-for="ConfirmPassword" class="form-control" />
-        <span asp-validation-for="ConfirmPassword" class="text-danger bg-light"></span>
+      <br />
+      <div class="btn-group float-right">
+        <button type="submit" class="btn btn-primary">Update</button>
       </div>
-        <br />
-        <div class="btn-group float-right">
-          <button type="submit" class="btn btn-primary">Register</button>
-        </div>
     </form>
   </div>
 </div>

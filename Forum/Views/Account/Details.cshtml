@@ -1,0 +1,42 @@
+﻿@model AccountDetailsVm
+@{
+  ViewBag.Title = "Account Details";
+}
+
+<div class="container">
+  <div class="col-12 rounded my-5 bg-secondary p-5 text-light">
+    <h1>Account Details</h1>
+    <br />
+    <fieldset disabled>
+      <div class="form-group">
+        <label asp-for="Email" class="control-label"></label>
+        <input asp-for="Email" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label asp-for="FirstName" class="control-label"></label>
+        <input asp-for="FirstName" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label asp-for="LastName" class="control-label"></label>
+        <input asp-for="LastName" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label asp-for="Birthdate" class="control-label"></label>
+        <input asp-for="Birthdate" class="form-control" />
+      </div>
+    </fieldset>
+    @if (Model.IsAuthorizedForAccountEdit) {
+      <div>
+        <a asp-controller="Account" asp-action="EditAccount" asp-route-username="@User.Identity.Name" class="btn btn-warning">Edit Account</a>
+      </div>
+    }
+    <br />
+    <div class="btn-group float-right">
+      <a asp-controller="" asp-action="" class="btn btn-primary">Back</a>
+    </div>
+  </div>
+</div>
+
+@section scripts {
+  <partial name="_ValidationScriptsPartial" />
+}

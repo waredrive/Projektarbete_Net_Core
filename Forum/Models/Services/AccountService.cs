@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Forum.Attributes;
 using Forum.Models.Context;
 using Forum.Models.Entities;
 using Forum.Models.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Models.Services {
   public class AccountService {
@@ -22,14 +25,14 @@ namespace Forum.Models.Services {
       _db = db;
     }
 
-    public async Task<IdentityResult> Add(RegisterVm registerVm) {
+    public async Task<IdentityResult> Add(AccountRegisterVm accountRegisterVm) {
       await CreateRoles();
       var user = new IdentityUser {
-        Email = registerVm.Email,
-        UserName = registerVm.UserName
+        Email = accountRegisterVm.Email,
+        UserName = accountRegisterVm.UserName
       };
 
-      var result = await _userManager.CreateAsync(user, registerVm.Password);
+      var result = await _userManager.CreateAsync(user, accountRegisterVm.Password);
 
       if (!result.Succeeded)
         return result;
@@ -39,9 +42,9 @@ namespace Forum.Models.Services {
 
         var member = new Member {
           Id = user.Id,
-          BirthDate = registerVm.Birthdate,
-          FirstName = registerVm.FirstName,
-          LastName = registerVm.LastName,
+          BirthDate = accountRegisterVm.Birthdate,
+          FirstName = accountRegisterVm.FirstName,
+          LastName = accountRegisterVm.LastName,
           CreatedOn = DateTime.UtcNow
         };
 
@@ -56,8 +59,8 @@ namespace Forum.Models.Services {
       return result;
     }
 
-    public async Task<SignInResult> Login(LoginVm loginVm) {
-      return await _signInManager.PasswordSignInAsync(loginVm.UserName, loginVm.Password, loginVm.RememberMe, false);
+    public async Task<SignInResult> Login(AccountLoginVm accountLoginVm) {
+      return await _signInManager.PasswordSignInAsync(accountLoginVm.UserName, accountLoginVm.Password, accountLoginVm.RememberMe, false);
     }
 
     public async Task SignOut() {
@@ -83,5 +86,67 @@ namespace Forum.Models.Services {
         await _roleManager.CreateAsync(role);
       }
     }
+
+    public async Task<AccountEditVm> GetAccountEditVm(ClaimsPrincipal user) {
+      var identityUser = await _userManager.FindByNameAsync(user.Identity.Name);
+      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
+
+      return new AccountEditVm {
+        Birthdate = memberFromDb.BirthDate,
+        Email = identityUser.Email,
+        FirstName = memberFromDb.FirstName,
+        LastName = memberFromDb.LastName
+      };
+    }
+
+    public async Task<IdentityResult> UpdateAccount(AccountEditVm accountEditVm, ClaimsPrincipal user) {
+      var identityUser = await _userManager.FindByNameAsync(user.Identity.Name);
+      var oldEmail = identityUser.Email;
+      var result = await _userManager.SetEmailAsync(identityUser, accountEditVm.Email);
+
+      if (!result.Succeeded)
+        return result;
+
+      try {
+        var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
+        memberFromDb.BirthDate = accountEditVm.Birthdate;
+        memberFromDb.FirstName = accountEditVm.FirstName;
+        memberFromDb.LastName = accountEditVm.LastName;
+        await _db.SaveChangesAsync();
+      } catch (Exception) {
+        await _userManager.SetEmailAsync(identityUser, oldEmail);
+        throw;
+      }
+
+      return result;
+    }
+
+    public async Task<IdentityResult> UpdatePassword(AccountPasswordEditVm accountPasswordEditVm, ClaimsPrincipal user) {
+      var identityUser = await _userManager.FindByNameAsync(user.Identity.Name);
+      return await _userManager.ChangePasswordAsync(identityUser, accountPasswordEditVm.OldPassword,
+        accountPasswordEditVm.NewPassword);
+    }
+
+    public async Task<AccountDetailsVm> GetAccountDetailsVm(string username, ClaimsPrincipal user) {
+      var identityUser = await _userManager.FindByNameAsync(username);
+      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
+
+      return new AccountDetailsVm {
+        Birthdate = memberFromDb.BirthDate,
+        Email = identityUser.Email,
+        FirstName = memberFromDb.FirstName,
+        LastName = memberFromDb.LastName,
+        IsAuthorizedForAccountEdit = IsAuthorizedForAccountAndPasswordEdit(identityUser.UserName, user)
+      };
+    }
+
+    public bool IsAuthorizedForAccountAndPasswordEdit(string username, ClaimsPrincipal user) {
+      return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase);
+    }
+
+    public bool IsAuthorizedForAccountDetailsView(string username, ClaimsPrincipal user) {
+      return user.IsInRole(Roles.Admin) || string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase);
+    }
+
   }
 }

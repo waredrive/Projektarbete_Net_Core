@@ -33,8 +33,8 @@
             <td>
               @if (User.IsInRole(Roles.Admin)) {
                 <div class="btn-group">
-                  @if (topic.LockedBy == null) {
                     <a asp-controller="Topic" asp-action="Edit" asp-route-id="@topic.TopicId" class="btn btn-primary btn-sm">Edit</a>
+                  @if (topic.LockedBy == null) {
                     <a asp-controller="Topic" asp-action="Lock" asp-route-id="@topic.TopicId" class="btn btn-warning btn-sm">Lock</a>
                   } else {
                     <a asp-controller="Topic" asp-action="Unlock" asp-route-id="@topic.TopicId" class="btn btn-warning btn-sm">Unlock</a>

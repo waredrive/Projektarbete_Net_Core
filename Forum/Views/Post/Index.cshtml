@@ -27,7 +27,7 @@
             <td>@post.CreatedOn</td>
             <td>
               <div class="btn-group">
-                @if (post.IsAuthorizedForPostEditAndDelete && post.LockedBy == null) {
+                @if (post.IsAuthorizedForPostEditAndDelete) {
                   <a asp-controller="Post" asp-action="Edit" asp-route-id="@post.PostId" class="btn btn-primary btn-sm">Edit</a>
                 }
                 @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Moderator)) {

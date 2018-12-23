@@ -46,7 +46,7 @@ namespace Forum.Controllers {
       return RedirectToAction(nameof(Index));
     }
 
-    [Route("Update/{id}")]
+    [Route("UpdateAccount/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id) {
       if (await _threadService.IsAuthorizedForThreadEdit(id, User))
@@ -55,7 +55,7 @@ namespace Forum.Controllers {
       return RedirectToAction("AccessDenied", "Account");
     }
 
-    [Route("Update/{id}")]
+    [Route("UpdateAccount/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(ThreadEditVm threadEditVm) {

@@ -6,7 +6,7 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 
 namespace Forum.Models.ViewModels.AccountViewModels {
-  public class LoginVm {
+  public class AccountLoginVm {
     [Required]
     [Display(Name = "Username")]
     public string UserName { get; set; }

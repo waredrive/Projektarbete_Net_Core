@@ -5,10 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Forum.Models.ViewModels.AccountViewModels {
-  public class RegisterVm {
+  public class AccountRegisterVm {
     [Required]
     [EmailAddress]
-    [Display(Name = "Email")]
+    [Display(Name = "E-mail")]
     public string Email { get; set; }
 
     [Required]

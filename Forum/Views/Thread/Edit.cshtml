@@ -11,11 +11,11 @@
     <form asp-controller="Thread" asp-action="Edit">
       @Html.HiddenFor(m => m.TopicId)
       @Html.HiddenFor(m => m.ThreadId)
-      <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+      <div asp-validation-summary="ModelOnly" class="text-danger bg-light"></div>
       <div class="form-group">
         <label asp-for="ThreadText" class="control-label"></label>
         <input asp-for="ThreadText" class="form-control" />
-        <span asp-validation-for="ThreadText" class="text-danger"></span>
+        <span asp-validation-for="ThreadText" class="text-danger bg-light"></span>
       </div>
       <br />
       <div class="btn-group float-right">

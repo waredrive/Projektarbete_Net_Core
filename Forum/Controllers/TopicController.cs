@@ -41,7 +41,7 @@ namespace Forum.Controllers {
     }
 
     [AuthorizeRoles(Roles.Admin)]
-    [Route("Update/{id}")]
+    [Route("UpdateAccount/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id) {
       if (_topicService.IsTopicLocked(id))
@@ -51,7 +51,7 @@ namespace Forum.Controllers {
     }
 
     [AuthorizeRoles(Roles.Admin)]
-    [Route("Update/{id}")]
+    [Route("UpdateAccount/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(TopicEditVm topicEditVm) {

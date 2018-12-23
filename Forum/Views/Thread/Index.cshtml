@@ -27,7 +27,7 @@
             <td><p>@thread.PostCount @if (thread.PostCount == 1) {<span>reply</span>} else {<span>replies</span>}</p></td>
             <td>
               <div class="btn-group">
-                @if (thread.IsAuthorizedForThreadEdit && thread.LockedBy == null) {
+                @if (thread.IsAuthorizedForThreadEdit) {
                   <a asp-controller="Thread" asp-action="Edit" asp-route-id="@thread.ThreadId" class="btn btn-primary btn-sm">Edit</a>
                 }
                 @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Moderator)) {
