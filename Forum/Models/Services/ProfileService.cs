@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Forum.Models.Context;
+using Forum.Models.ViewModels.ProfileViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Models.Services {
   public class ProfileService {
@@ -23,23 +26,22 @@ namespace Forum.Models.Services {
       _authorizationService = authorizationService;
     }
 
-    //<div class="form-group">
-    //  <img src = "data:image;base64,@Model.Image" />
-    //</ div >
+    public async Task<ProfileDetailsVm> GetProfileDetailsVm(string username, ClaimsPrincipal user) {
+      var identityUser = await _userManager.FindByNameAsync(username);
+      var memberFromDb = await _db.Member.Include(p => p.PostCreatedByNavigation).Include(p => p.ThreadCreatedByNavigation).FirstOrDefaultAsync(m => m.Id == identityUser.Id);
 
-
-    //public async Task<AccountDetailsVm> GetAccountDetailsVm(string username, ClaimsPrincipal user) {
-    //  var identityUser = await _userManager.FindByNameAsync(username);
-    //  var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
-
-    //  return new AccountDetailsVm {
-    //    Image = memberFromDb.ProfileImage,
-    //    Birthdate = memberFromDb.BirthDate,
-    //    Email = identityUser.Email,
-    //    FirstName = memberFromDb.FirstName,
-    //    LastName = memberFromDb.LastName,
-    //    IsAuthorizedForAccountEdit = _authorizationService.IsAuthorizedForAccountAndPasswordEdit(identityUser.UserName, user)
-    //  };
-    //}
+      return new ProfileDetailsVm {
+        ProfileImage = Convert.ToBase64String(memberFromDb.ProfileImage),
+        Username = identityUser.UserName,
+        Roles = _userManager.GetRolesAsync(identityUser).Result.ToArray(),
+        CreatedOn = memberFromDb.CreatedOn,
+        BlockedOn = memberFromDb.BlockedOn,
+        BlockedBy = _userManager.FindByIdAsync(memberFromDb.BlockedBy).Result?.UserName,
+        BlockedEnd = memberFromDb.BlockedEnd,
+        TotalThreads = memberFromDb.ThreadCreatedByNavigation.Count,
+        TotalPosts = memberFromDb.PostCreatedByNavigation.Count,
+        IsAuthorizedForProfileEdit = _authorizationService.IsAuthorizedForProfileEdit(identityUser.UserName, user)
+      };
+    }
   }
 }

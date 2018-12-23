@@ -1,0 +1,45 @@
+﻿@model ProfileDetailsVm
+@{
+  ViewBag.Title = "Profile Details";
+}
+
+<div class="container">
+  <div class="col-12 rounded my-5 bg-secondary p-5 text-light">
+    <h1>@Model.Username</h1>
+    <br />
+    <div class="row">
+      <div class="col-4">
+        <img class="rounded" src="data:image;base64,@Model.ProfileImage" alt="Profile picture" />
+      </div>
+      <div class="col-8">
+          <div>
+            <p>Joined: @Model.CreatedOn</p>
+            @if (Model.BlockedBy != null) {
+              <p>Blocked on: @Model.BlockedOn</p>
+              <p>Blocked by: @Model.BlockedBy</p>
+              <p>Blocked ending: @Model.BlockedEnd</p>
+            }
+            <p>Total threads: @Model.TotalThreads</p>
+            <p>Total posts: @Model.TotalPosts</p>
+            @if (Model.Roles.Length > 0) {
+              <p>Roles: @string.Join(", ", Model.Roles)</p>
+            }
+          </div>
+          @if (Model.IsAuthorizedForProfileEdit) {
+            <div class="mt-4 btn-group">
+              <a asp-controller="Profile" asp-action="Edit" asp-route-username="@User.Identity.Name" class="btn btn-warning">Edit Profile</a>
+            </div>
+          }
+        </div>
+    </div>
+    <div class="row py-3">
+      <div class="col-12">
+        <br />
+        <div class="btn-group float-right">
+          @*TODO: FIX PATH*@
+          <a asp-controller="" asp-action="" class="btn btn-primary">Back</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

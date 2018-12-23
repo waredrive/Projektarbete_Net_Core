@@ -87,11 +87,18 @@ namespace Forum.Models.Services {
     }
 
     public bool IsAuthorizedForAccountAndPasswordEdit(string username, ClaimsPrincipal user) {
-      return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase);
+      return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase) && !user.IsInRole(Roles.Blocked);
     }
 
     public bool IsAuthorizedForAccountDetailsView(string username, ClaimsPrincipal user) {
       return user.IsInRole(Roles.Admin) || string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase);
+    }
+
+    public bool IsAuthorizedForProfileEdit(string username, ClaimsPrincipal user) {
+      if (user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator))
+        return true;
+
+      return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase) && !user.IsInRole(Roles.Blocked);
     }
   }
 }

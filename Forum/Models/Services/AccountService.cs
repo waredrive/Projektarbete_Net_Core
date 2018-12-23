@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Net.Mime;
+using System.Reflection;
 using System.Security.Claims;
 using System.Security.Policy;
 using System.Threading.Tasks;
@@ -79,26 +80,6 @@ namespace Forum.Models.Services {
       await _signInManager.SignOutAsync();
     }
 
-    private async Task CreateRoles() {
-      var adminExist = await _roleManager.RoleExistsAsync(Roles.Admin);
-      if (!adminExist) {
-        var role = new IdentityRole {Name = Roles.Admin};
-        await _roleManager.CreateAsync(role);
-      }
-
-      var moderatorExist = await _roleManager.RoleExistsAsync(Roles.Moderator);
-      if (!moderatorExist) {
-        var role = new IdentityRole {Name = Roles.Moderator};
-        await _roleManager.CreateAsync(role);
-      }
-
-      var userExist = await _roleManager.RoleExistsAsync(Roles.User);
-      if (!userExist) {
-        var role = new IdentityRole {Name = Roles.User};
-        await _roleManager.CreateAsync(role);
-      }
-    }
-
     public async Task<AccountEditVm> GetAccountEditVm(ClaimsPrincipal user) {
       var identityUser = await _userManager.FindByNameAsync(user.Identity.Name);
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
@@ -150,6 +131,20 @@ namespace Forum.Models.Services {
         LastName = memberFromDb.LastName,
         IsAuthorizedForAccountEdit = _authorizationService.IsAuthorizedForAccountAndPasswordEdit(identityUser.UserName, user)
       };
+    }
+
+    private async Task CreateRoles() {
+      var roles = typeof(Roles).GetFields(BindingFlags.Static | BindingFlags.Public)
+        .Where(x => x.IsLiteral && !x.IsInitOnly)
+        .Select(x => x.GetValue(null)).Cast<string>();
+
+      foreach (var role in roles) {
+        if (await _roleManager.RoleExistsAsync(role))
+          continue;
+
+        var roleToAdd = new IdentityRole { Name = role };
+        await _roleManager.CreateAsync(roleToAdd);
+      }
     }
   }
 }
