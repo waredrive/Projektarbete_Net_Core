@@ -18,8 +18,6 @@ namespace Forum.Models.ViewModels.TopicViewModels {
     public int TopicId { get; set; }
     public string TopicText { get; set; }
     public string LockedBy { get; set; }
-    public string RemovedBy { get; set; }
-    public string EditedBy { get; set; }
     public int ThreadCount { get; set; }
     public int PostCount { get; set; }
     public TopicsIndexThreadVm LatestActiveThread { get; set; }

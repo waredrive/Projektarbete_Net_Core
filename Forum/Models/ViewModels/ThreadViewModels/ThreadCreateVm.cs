@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Policy;
 using System.Threading.Tasks;
-using Forum.Models.ViewModels.PostViewModel;
+using Forum.Models.ViewModels.PostViewModels;
 
 namespace Forum.Models.ViewModels.ThreadViewModels {
   public class ThreadCreateVm {

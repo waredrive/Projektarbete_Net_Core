@@ -27,6 +27,7 @@ namespace Forum.Models.Entities
         public DateTime? BlockedOn { get; set; }
         public string BlockedBy { get; set; }
         public DateTime? BlockedEnd { get; set; }
+        public byte[] ProfileImage { get; set; }
 
         public virtual Member BlockedByNavigation { get; set; }
         public virtual AspNetUsers IdNavigation { get; set; }

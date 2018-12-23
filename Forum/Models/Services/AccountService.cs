@@ -1,30 +1,38 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Security.Claims;
+using System.Security.Policy;
 using System.Threading.Tasks;
 using Forum.Attributes;
 using Forum.Models.Context;
 using Forum.Models.Entities;
 using Forum.Models.ViewModels.AccountViewModels;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Forum.Models.Services {
   public class AccountService {
     private readonly ForumDbContext _db;
     private readonly AuthorizationService _authorizationService;
+    private readonly IHostingEnvironment _env;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
 
     public AccountService(
       UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
-      RoleManager<IdentityRole> roleManager, ForumDbContext db, AuthorizationService authorizationService) {
+      RoleManager<IdentityRole> roleManager, ForumDbContext db, AuthorizationService authorizationService, IHostingEnvironment env) {
       _userManager = userManager;
       _signInManager = signInManager;
       _roleManager = roleManager;
       _db = db;
       _authorizationService = authorizationService;
+      _env = env;
     }
 
     public async Task<IdentityResult> Add(AccountRegisterVm accountRegisterVm) {
@@ -41,8 +49,10 @@ namespace Forum.Models.Services {
 
       try {
         await _userManager.AddToRoleAsync(user, Roles.User);
+        var profilePicture = File.ReadAllBytes(_env.WebRootFileProvider.GetFileInfo("img/profile/default_profile.jpg")?.PhysicalPath);
 
         var member = new Member {
+          ProfileImage = profilePicture,
           Id = user.Id,
           BirthDate = accountRegisterVm.Birthdate,
           FirstName = accountRegisterVm.FirstName,

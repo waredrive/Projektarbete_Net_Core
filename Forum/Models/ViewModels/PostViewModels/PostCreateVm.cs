@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Forum.Models.ViewModels.PostViewModel {
+namespace Forum.Models.ViewModels.PostViewModels {
   public class PostCreateVm {
     [Required]
     public int ThreadId { get; set; }

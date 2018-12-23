@@ -140,6 +140,10 @@ namespace Forum.Models.Context
                     .IsRequired()
                     .HasMaxLength(50);
 
+                entity.Property(e => e.ProfileImage)
+                    .IsRequired()
+                    .HasColumnType("image");
+
                 entity.HasOne(d => d.BlockedByNavigation)
                     .WithMany(p => p.InverseBlockedByNavigation)
                     .HasForeignKey(d => d.BlockedBy)
