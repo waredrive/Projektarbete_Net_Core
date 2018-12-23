@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -12,16 +11,11 @@ using Microsoft.EntityFrameworkCore;
 namespace Forum.Models.Services {
   public class AuthorizationService {
     private readonly ForumDbContext _db;
-    private readonly RoleManager<IdentityRole> _roleManager;
-    private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
 
     public AuthorizationService(
-      UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
-      RoleManager<IdentityRole> roleManager, ForumDbContext db) {
+      UserManager<IdentityUser> userManager, ForumDbContext db) {
       _userManager = userManager;
-      _signInManager = signInManager;
-      _roleManager = roleManager;
       _db = db;
     }
 
@@ -29,7 +23,8 @@ namespace Forum.Models.Services {
     // the thread or topic is not locked and the thread is created by the user.
     // Admins and Moderators have no restrictions.
     public async Task<bool> IsAuthorizedForThreadEdit(int threadId, ClaimsPrincipal user) {
-      var threadFromDb = await _db.Thread.Include(t => t.TopicNavigation).Include(t => t.Post).FirstOrDefaultAsync(t => t.Id == threadId);
+      var threadFromDb = await _db.Thread.Include(t => t.TopicNavigation).Include(t => t.Post)
+        .FirstOrDefaultAsync(t => t.Id == threadId);
       return threadFromDb != null && IsAuthorizedForThreadEdit(threadFromDb, user);
     }
 
@@ -38,7 +33,9 @@ namespace Forum.Models.Services {
         return true;
 
       var userId = _userManager.GetUserId(user);
-      return threadFromDb.LockedOn == null && threadFromDb.CreatedBy == userId && threadFromDb.Post.Where(p => p.Thread == threadFromDb.Id).All(p => p.CreatedBy == userId) && threadFromDb?.TopicNavigation.LockedOn == null;
+      return threadFromDb.LockedOn == null && threadFromDb.CreatedBy == userId &&
+             threadFromDb.Post.Where(p => p.Thread == threadFromDb.Id).All(p => p.CreatedBy == userId) &&
+             threadFromDb?.TopicNavigation.LockedOn == null;
     }
 
     // The user is authorized as long as he is the only one that posted on the thread,
@@ -47,7 +44,8 @@ namespace Forum.Models.Services {
     // creator).
     // Admins have no restrictions.
     public async Task<bool> IsAuthorizedForThreadDelete(int threadId, ClaimsPrincipal user) {
-      var threadFromDb = await _db.Thread.Include(t => t.TopicNavigation).Include(t => t.Post).FirstOrDefaultAsync(t => t.Id == threadId);
+      var threadFromDb = await _db.Thread.Include(t => t.TopicNavigation).Include(t => t.Post)
+        .FirstOrDefaultAsync(t => t.Id == threadId);
       return threadFromDb != null && IsAuthorizedForThreadDelete(threadFromDb, user);
     }
 
@@ -55,12 +53,14 @@ namespace Forum.Models.Services {
       if (user.IsInRole(Roles.Admin))
         return true;
 
-      if (user.IsInRole(Roles.Moderator)) {
-        return threadFromDb.Post.Where(p => p.Thread == threadFromDb.Id).All(p => p.CreatedBy == threadFromDb.CreatedBy);
-      }
+      if (user.IsInRole(Roles.Moderator))
+        return threadFromDb.Post.Where(p => p.Thread == threadFromDb.Id)
+          .All(p => p.CreatedBy == threadFromDb.CreatedBy);
 
       var userId = _userManager.GetUserId(user);
-      return threadFromDb.LockedOn == null && threadFromDb.CreatedBy == userId && threadFromDb.Post.Where(p => p.Thread == threadFromDb.Id).All(p => p.CreatedBy == userId) && threadFromDb?.TopicNavigation.LockedOn == null;
+      return threadFromDb.LockedOn == null && threadFromDb.CreatedBy == userId &&
+             threadFromDb.Post.Where(p => p.Thread == threadFromDb.Id).All(p => p.CreatedBy == userId) &&
+             threadFromDb?.TopicNavigation.LockedOn == null;
     }
 
     public bool IsAuthorizedForPostCreate(int threadId, ClaimsPrincipal user) {
@@ -83,22 +83,26 @@ namespace Forum.Models.Services {
         return true;
 
       var userId = _userManager.GetUserId(user);
-      return postFromDb.LockedOn == null && postFromDb.CreatedBy == userId && postFromDb?.ThreadNavigation.LockedOn == null;
+      return postFromDb.LockedOn == null && postFromDb.CreatedBy == userId &&
+             postFromDb?.ThreadNavigation.LockedOn == null;
     }
 
     public bool IsAuthorizedForAccountAndPasswordEdit(string username, ClaimsPrincipal user) {
-      return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase) && !user.IsInRole(Roles.Blocked);
+      return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase) &&
+             !user.IsInRole(Roles.Blocked);
     }
 
     public bool IsAuthorizedForAccountDetailsView(string username, ClaimsPrincipal user) {
-      return user.IsInRole(Roles.Admin) || string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase);
+      return user.IsInRole(Roles.Admin) ||
+             string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase);
     }
 
     public bool IsAuthorizedForProfileEdit(string username, ClaimsPrincipal user) {
       if (user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator))
         return true;
 
-      return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase) && !user.IsInRole(Roles.Blocked);
+      return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase) &&
+             !user.IsInRole(Roles.Blocked);
     }
   }
 }

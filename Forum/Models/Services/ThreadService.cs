@@ -2,29 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using Forum.Attributes;
 using Forum.Models.Context;
 using Forum.Models.Entities;
 using Forum.Models.ViewModels.ThreadViewModels;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Models.Services {
   public class ThreadService {
-    private readonly ForumDbContext _db;
     private readonly AuthorizationService _authorizationService;
-    private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly ForumDbContext _db;
     private readonly UserManager<IdentityUser> _userManager;
 
-    public ThreadService(ForumDbContext db, AuthorizationService authorizationService, UserManager<IdentityUser> userManager,
-      SignInManager<IdentityUser> signInManager) {
+    public ThreadService(ForumDbContext db, AuthorizationService authorizationService,
+      UserManager<IdentityUser> userManager) {
       _db = db;
       _authorizationService = authorizationService;
       _userManager = userManager;
-      _signInManager = signInManager;
     }
 
     public async Task Add(ThreadCreateVm threadCreateVm, ClaimsPrincipal user) {
@@ -53,7 +49,8 @@ namespace Forum.Models.Services {
           _db.Post.Add(post);
           await _db.SaveChangesAsync();
           transaction.Commit();
-        } catch (Exception) {
+        }
+        catch (Exception) {
           transaction.Rollback();
         }
       }
@@ -69,16 +66,17 @@ namespace Forum.Models.Services {
       };
 
       // Includes TopicNavigation and Post to be used in IsAuthorizedForThreadEdit method
-      threadsIndexVm.Threads.AddRange(_db.Thread.Include(t => t.TopicNavigation).Include(t => t.Post).Where(t => t.Topic == topicId).Select(t => new ThreadsIndexThreadVm() {
-        ThreadId = t.Id,
-        CreatedOn = t.CreatedOn,
-        CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
-        ThreadText = t.ContentText,
-        PostCount = t.Post.Count,
-        IsAuthorizedForThreadEdit = _authorizationService.IsAuthorizedForThreadEdit(t, user),
-        IsAuthorizedForThreadDelete = _authorizationService.IsAuthorizedForThreadDelete(t, user),
-        LockedBy = t.LockedBy != null ? _userManager.FindByIdAsync(t.LockedBy).Result.UserName : null
-      }));
+      threadsIndexVm.Threads.AddRange(_db.Thread.Include(t => t.TopicNavigation).Include(t => t.Post)
+        .Where(t => t.Topic == topicId).Select(t => new ThreadsIndexThreadVm {
+          ThreadId = t.Id,
+          CreatedOn = t.CreatedOn,
+          CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
+          ThreadText = t.ContentText,
+          PostCount = t.Post.Count,
+          IsAuthorizedForThreadEdit = _authorizationService.IsAuthorizedForThreadEdit(t, user),
+          IsAuthorizedForThreadDelete = _authorizationService.IsAuthorizedForThreadDelete(t, user),
+          LockedBy = t.LockedBy != null ? _userManager.FindByIdAsync(t.LockedBy).Result.UserName : null
+        }));
 
       return threadsIndexVm;
     }
@@ -110,7 +108,7 @@ namespace Forum.Models.Services {
         CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
         PostCount = _db.Post.Count(p => p.ThreadNavigation.Topic == t.Id),
         ThreadId = t.Id,
-        ThreadText= t.ContentText,
+        ThreadText = t.ContentText
       }).FirstOrDefaultAsync();
     }
 
@@ -122,7 +120,8 @@ namespace Forum.Models.Services {
           _db.Thread.Remove(threadFromDb);
           await _db.SaveChangesAsync();
           transaction.Commit();
-        } catch (Exception) {
+        }
+        catch (Exception) {
           transaction.Rollback();
         }
       }
@@ -157,7 +156,7 @@ namespace Forum.Models.Services {
         CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
         PostCount = _db.Post.Count(p => p.Thread == t.Id),
         LockedBy = _userManager.FindByIdAsync(t.LockedBy).Result.UserName,
-        LockedOn = (DateTime)t.LockedOn,
+        LockedOn = (DateTime) t.LockedOn,
         ThreadId = t.Id,
         ThreadText = t.ContentText
       }).FirstOrDefaultAsync();
@@ -186,6 +185,5 @@ namespace Forum.Models.Services {
     public bool IsThreadLocked(int id) {
       return _db.Thread.Where(t => t.Id == id).Any(t => t.LockedBy != null);
     }
-
   }
 }

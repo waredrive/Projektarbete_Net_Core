@@ -1,10 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Net.Mime;
 using System.Reflection;
 using System.Security.Claims;
-using System.Security.Policy;
 using System.Threading.Tasks;
 using Forum.Attributes;
 using Forum.Models.Context;
@@ -12,14 +10,12 @@ using Forum.Models.Entities;
 using Forum.Models.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Forum.Models.Services {
   public class AccountService {
-    private readonly ForumDbContext _db;
     private readonly AuthorizationService _authorizationService;
+    private readonly ForumDbContext _db;
     private readonly IHostingEnvironment _env;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly SignInManager<IdentityUser> _signInManager;
@@ -27,7 +23,8 @@ namespace Forum.Models.Services {
 
     public AccountService(
       UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
-      RoleManager<IdentityRole> roleManager, ForumDbContext db, AuthorizationService authorizationService, IHostingEnvironment env) {
+      RoleManager<IdentityRole> roleManager, ForumDbContext db, AuthorizationService authorizationService,
+      IHostingEnvironment env) {
       _userManager = userManager;
       _signInManager = signInManager;
       _roleManager = roleManager;
@@ -50,10 +47,10 @@ namespace Forum.Models.Services {
 
       try {
         await _userManager.AddToRoleAsync(user, Roles.User);
-        var profilePicture = File.ReadAllBytes(_env.WebRootFileProvider.GetFileInfo("img/profile/default_profile.jpg")?.PhysicalPath);
 
         var member = new Member {
-          ProfileImage = profilePicture,
+          ProfileImage =
+            File.ReadAllBytes(_env.WebRootFileProvider.GetFileInfo("img/profile/default_profile.jpg")?.PhysicalPath),
           Id = user.Id,
           BirthDate = accountRegisterVm.Birthdate,
           FirstName = accountRegisterVm.FirstName,
@@ -73,7 +70,8 @@ namespace Forum.Models.Services {
     }
 
     public async Task<SignInResult> Login(AccountLoginVm accountLoginVm) {
-      return await _signInManager.PasswordSignInAsync(accountLoginVm.UserName, accountLoginVm.Password, accountLoginVm.RememberMe, false);
+      return await _signInManager.PasswordSignInAsync(accountLoginVm.UserName, accountLoginVm.Password,
+        accountLoginVm.RememberMe, false);
     }
 
     public async Task SignOut() {
@@ -106,7 +104,8 @@ namespace Forum.Models.Services {
         memberFromDb.FirstName = accountEditVm.FirstName;
         memberFromDb.LastName = accountEditVm.LastName;
         await _db.SaveChangesAsync();
-      } catch (Exception) {
+      }
+      catch (Exception) {
         await _userManager.SetEmailAsync(identityUser, oldEmail);
         throw;
       }
@@ -114,7 +113,8 @@ namespace Forum.Models.Services {
       return result;
     }
 
-    public async Task<IdentityResult> UpdatePassword(AccountPasswordEditVm accountPasswordEditVm, ClaimsPrincipal user) {
+    public async Task<IdentityResult>
+      UpdatePassword(AccountPasswordEditVm accountPasswordEditVm, ClaimsPrincipal user) {
       var identityUser = await _userManager.FindByNameAsync(user.Identity.Name);
       return await _userManager.ChangePasswordAsync(identityUser, accountPasswordEditVm.OldPassword,
         accountPasswordEditVm.NewPassword);
@@ -129,7 +129,8 @@ namespace Forum.Models.Services {
         Email = identityUser.Email,
         FirstName = memberFromDb.FirstName,
         LastName = memberFromDb.LastName,
-        IsAuthorizedForAccountEdit = _authorizationService.IsAuthorizedForAccountAndPasswordEdit(identityUser.UserName, user)
+        IsAuthorizedForAccountEdit =
+          _authorizationService.IsAuthorizedForAccountAndPasswordEdit(identityUser.UserName, user)
       };
     }
 
@@ -142,7 +143,7 @@ namespace Forum.Models.Services {
         if (await _roleManager.RoleExistsAsync(role))
           continue;
 
-        var roleToAdd = new IdentityRole { Name = role };
+        var roleToAdd = new IdentityRole {Name = role};
         await _roleManager.CreateAsync(roleToAdd);
       }
     }

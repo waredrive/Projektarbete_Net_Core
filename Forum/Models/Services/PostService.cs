@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Forum.Attributes;
 using Forum.Models.Context;
 using Forum.Models.Entities;
 using Forum.Models.ViewModels.PostViewModels;
@@ -12,17 +11,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Models.Services {
   public class PostService {
-    private readonly ForumDbContext _db;
     private readonly AuthorizationService _authorizationService;
-    private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly ForumDbContext _db;
     private readonly UserManager<IdentityUser> _userManager;
 
-    public PostService(ForumDbContext db, AuthorizationService authorizationService, UserManager<IdentityUser> userManager,
-      SignInManager<IdentityUser> signInManager) {
+    public PostService(ForumDbContext db, AuthorizationService authorizationService,
+      UserManager<IdentityUser> userManager) {
       _db = db;
       _authorizationService = authorizationService;
       _userManager = userManager;
-      _signInManager = signInManager;
     }
 
     public async Task Add(PostCreateVm postCreateVm, ClaimsPrincipal user) {
@@ -51,14 +48,15 @@ namespace Forum.Models.Services {
       };
 
       //Included Threadnavigation to be used in IsAuthorizedForPostEditAndDelete method
-      postsIndexVm.Posts.AddRange(_db.Post.Include(p => p.ThreadNavigation).Where(p => p.Thread == threadId).Select(p => new PostsIndexPostVm {
-        PostId = p.Id,
-        CreatedOn = p.CreatedOn,
-        CreatedBy = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName,
-        PostText = p.ContentText,
-        IsAuthorizedForPostEditAndDelete = _authorizationService.IsAuthorizedForPostEditAndDelete(p, user),
-        LockedBy = p.LockedBy != null ? _userManager.FindByIdAsync(p.LockedBy).Result.UserName : null
-      }));
+      postsIndexVm.Posts.AddRange(_db.Post.Include(p => p.ThreadNavigation).Where(p => p.Thread == threadId).Select(p =>
+        new PostsIndexPostVm {
+          PostId = p.Id,
+          CreatedOn = p.CreatedOn,
+          CreatedBy = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName,
+          PostText = p.ContentText,
+          IsAuthorizedForPostEditAndDelete = _authorizationService.IsAuthorizedForPostEditAndDelete(p, user),
+          LockedBy = p.LockedBy != null ? _userManager.FindByIdAsync(p.LockedBy).Result.UserName : null
+        }));
 
       return postsIndexVm;
     }
@@ -89,7 +87,7 @@ namespace Forum.Models.Services {
         CreatedOn = p.CreatedOn,
         CreatedBy = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName,
         PostId = p.Id,
-        PostText = p.ContentText,
+        PostText = p.ContentText
       }).FirstOrDefaultAsync();
     }
 
@@ -104,7 +102,7 @@ namespace Forum.Models.Services {
         CreatedOn = p.CreatedOn,
         CreatedBy = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName,
         PostId = p.Id,
-        PostText = p.ContentText,
+        PostText = p.ContentText
       }).FirstOrDefaultAsync();
     }
 
@@ -125,7 +123,7 @@ namespace Forum.Models.Services {
         CreatedOn = p.CreatedOn,
         CreatedBy = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName,
         LockedBy = _userManager.FindByIdAsync(p.LockedBy).Result.UserName,
-        LockedOn = (DateTime)p.LockedOn,
+        LockedOn = (DateTime) p.LockedOn,
         PostId = p.Id,
         PostText = p.ContentText
       }).FirstOrDefaultAsync();

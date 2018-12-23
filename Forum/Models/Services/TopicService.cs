@@ -41,36 +41,40 @@ namespace Forum.Models.Services {
         LatestPosts = new List<TopicsIndexPostVm>(),
         TotalMembers = _userManager.Users.Count(),
         TotalPosts = _db.Post.Count(),
-        NewestMember = _userManager.FindByIdAsync(_db.Member.OrderByDescending(m => m.CreatedOn).First().Id).Result.UserName,
+        NewestMember = _userManager.FindByIdAsync(_db.Member.OrderByDescending(m => m.CreatedOn).First().Id).Result
+          .UserName
       };
 
       topicsIndexVm.Topics.AddRange(_db.Topic.Include(t => t.Thread).Select(t => new TopicsIndexTopicVm {
-        LatestActiveThread = _db.Post.Where(p => p.ThreadNavigation.Topic == t.Id).OrderByDescending(p => p.CreatedOn).Take(1).Select(p => new TopicsIndexThreadVm {
-          ThreadId = p.Thread,
-          ThreadText = p.ThreadNavigation.ContentText,
-          CreatedOn = p.CreatedOn,
-          CreatedBy = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName
-        }).FirstOrDefault(),
+        LatestActiveThread = _db.Post.Where(p => p.ThreadNavigation.Topic == t.Id).OrderByDescending(p => p.CreatedOn)
+          .Take(1).Select(p => new TopicsIndexThreadVm {
+            ThreadId = p.Thread,
+            ThreadText = p.ThreadNavigation.ContentText,
+            CreatedOn = p.CreatedOn,
+            CreatedBy = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName
+          }).FirstOrDefault(),
         TopicId = t.Id,
         TopicText = t.ContentText,
         ThreadCount = t.Thread.Count,
         PostCount = t.Thread.Select(tt => tt.Post.Count).Sum(),
-        LockedBy = t.LockedBy != null ?_userManager.FindByIdAsync(t.LockedBy).Result.UserName : null
+        LockedBy = t.LockedBy != null ? _userManager.FindByIdAsync(t.LockedBy).Result.UserName : null
       }));
 
-      topicsIndexVm.LatestThreads.AddRange(_db.Thread.OrderByDescending(t => t.CreatedOn).Take(10).Select(t => new TopicsIndexThreadVm {
-        ThreadId = t.Id,
-        CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
-        CreatedOn = t.CreatedOn,
-        ThreadText = t.ContentText
-      }));
+      topicsIndexVm.LatestThreads.AddRange(_db.Thread.OrderByDescending(t => t.CreatedOn).Take(10).Select(t =>
+        new TopicsIndexThreadVm {
+          ThreadId = t.Id,
+          CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
+          CreatedOn = t.CreatedOn,
+          ThreadText = t.ContentText
+        }));
 
-      topicsIndexVm.LatestPosts.AddRange(_db.Post.OrderByDescending(p => p.CreatedOn).Take(10).Select(p => new TopicsIndexPostVm {
-        ThreadId = p.Thread,
-        ThreadText = p.ThreadNavigation.ContentText,
-        LatestCommentTime = p.CreatedOn,
-        LatestCommenter = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName
-      }));
+      topicsIndexVm.LatestPosts.AddRange(_db.Post.OrderByDescending(p => p.CreatedOn).Take(10).Select(p =>
+        new TopicsIndexPostVm {
+          ThreadId = p.Thread,
+          ThreadText = p.ThreadNavigation.ContentText,
+          LatestCommentTime = p.CreatedOn,
+          LatestCommenter = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName
+        }));
 
       return topicsIndexVm;
     }
@@ -115,14 +119,15 @@ namespace Forum.Models.Services {
           _db.Topic.Remove(topicFromDb);
           await _db.SaveChangesAsync();
           transaction.Commit();
-        } catch (Exception) {
+        }
+        catch (Exception) {
           transaction.Rollback();
         }
       }
     }
 
     public async Task<TopicLockVm> GetTopicLockVm(int id) {
-      return await _db.Topic.Include(t => t.Thread).Where(t => t.Id == id).Select(t => new TopicLockVm { 
+      return await _db.Topic.Include(t => t.Thread).Where(t => t.Id == id).Select(t => new TopicLockVm {
         CreatedOn = t.CreatedOn,
         CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
         ThreadCount = t.Thread.Count,
@@ -151,7 +156,7 @@ namespace Forum.Models.Services {
         ThreadCount = t.Thread.Count,
         PostCount = _db.Post.Count(p => p.ThreadNavigation.Topic == t.Id),
         LockedBy = _userManager.FindByIdAsync(t.LockedBy).Result.UserName,
-        LockedOn = (DateTime)t.LockedOn,
+        LockedOn = (DateTime) t.LockedOn,
         TopicId = t.Id,
         TopicText = t.ContentText
       }).FirstOrDefaultAsync();
@@ -172,6 +177,5 @@ namespace Forum.Models.Services {
     public bool IsTopicLocked(int id) {
       return _db.Topic.Where(t => t.Id == id).Any(p => p.LockedBy != null);
     }
-
   }
 }
