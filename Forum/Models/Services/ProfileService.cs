@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -14,10 +15,12 @@ namespace Forum.Models.Services {
     private readonly AuthorizationService _authorizationService;
     private readonly ForumDbContext _db;
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
 
     public ProfileService(
-      UserManager<IdentityUser> userManager, ForumDbContext db, AuthorizationService authorizationService) {
+      UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, ForumDbContext db, AuthorizationService authorizationService) {
       _userManager = userManager;
+      _roleManager = roleManager;
       _db = db;
       _authorizationService = authorizationService;
     }
@@ -41,42 +44,43 @@ namespace Forum.Models.Services {
       };
     }
 
-    public async Task<ProfileEditVm> GetAccountEditVm(ClaimsPrincipal user) {
-      var identityUser = await _userManager.FindByNameAsync(user.Identity.Name);
+    public async Task<ProfileEditVm> GetProfileEditVm(string username) {
+      var identityUser = await _userManager.FindByNameAsync(username);
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
 
       return new ProfileEditVm {
-        Username = identityUser.UserName,
-        ProfileImage = Convert.ToBase64String(memberFromDb.ProfileImage),
-        Roles = _userManager.GetRolesAsync(identityUser).Result.Where(r => !r.Equals(Roles.Blocked)).Select(r =>
-          new SelectListItem
-            {Text = r, Value = r, Selected = r == _userManager.GetRolesAsync(identityUser).Result.First()}).ToArray()
+        OldUsername = identityUser.UserName,
+        NewUsername = identityUser.UserName,
+        Roles = _roleManager.Roles.Where(r => !r.Name.Equals(Roles.Blocked)).Select(r =>
+          new SelectListItem { Text = r.Name, Value = r.Name, Selected = r.Name == _userManager.GetRolesAsync(identityUser).Result.First() }).ToArray()
       };
     }
 
-    public async Task<IdentityResult> UpdateProfile(ProfileEditVm profileEditVm, ClaimsPrincipal user) {
-      var identityUser = await _userManager.FindByNameAsync(profileEditVm.Username);
+    public async Task<IdentityResult> UpdateProfile(string username, ProfileEditVm profileEditVm, ClaimsPrincipal user) {
+      var identityUser = await _userManager.FindByNameAsync(username);
       var oldUserName = identityUser.UserName;
       var oldRoles = await _userManager.GetRolesAsync(identityUser);
-      var result = await _userManager.SetUserNameAsync(identityUser, profileEditVm.Username);
+      var result = await _userManager.SetUserNameAsync(identityUser, profileEditVm.NewUsername);
 
       if (!result.Succeeded)
         return result;
 
       try {
         var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
-        if (user.IsInRole(Roles.Admin)) {
+        if (user.IsInRole(Roles.Admin) && !string.IsNullOrEmpty(profileEditVm.Role)) {
           await _userManager.RemoveFromRolesAsync(identityUser, oldRoles.ToArray());
           await _userManager.AddToRoleAsync(identityUser, profileEditVm.Role);
         }
 
-        if (!string.IsNullOrEmpty(profileEditVm.ProfileImage))
-          //TODO: Add Image Save To Db
-          //memberFromDb.ProfileImage 
+        if (profileEditVm.ProfileImage != null) {
+          using (var memoryStream = new MemoryStream()) {
+            await profileEditVm.ProfileImage.CopyToAsync(memoryStream);
+            memberFromDb.ProfileImage = memoryStream.ToArray();
+          }
+        }
 
-          await _db.SaveChangesAsync();
-      }
-      catch (Exception) {
+        await _db.SaveChangesAsync();
+      } catch (Exception) {
         var roles = await _userManager.GetRolesAsync(identityUser);
         await _userManager.RemoveFromRolesAsync(identityUser, roles.ToArray());
         await _userManager.AddToRolesAsync(identityUser, roles);

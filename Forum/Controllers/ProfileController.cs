@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Forum.Extensions;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.ProfileViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.Controllers {
@@ -25,9 +27,9 @@ namespace Forum.Controllers {
 
     [Route("Update/{username}")]
     [HttpGet]
-    public async Task<IActionResult> EditAccount(string username) {
+    public async Task<IActionResult> Edit(string username) {
       if (_authorizationService.IsAuthorizedForProfileEdit(username, User))
-        return View(await _profileService.GetAccountEditVm(User));
+        return View(await _profileService.GetProfileEditVm(username));
 
       return RedirectToAction("AccessDenied", "Account");
     }
@@ -35,19 +37,28 @@ namespace Forum.Controllers {
     [Route("Update/{username}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> EditAccount(string username, ProfileEditVm profileEditVm) {
+    public async Task<IActionResult> Edit(string username, ProfileEditVm profileEditVm) {
       if (!ModelState.IsValid)
-        return (View(profileEditVm));
+        return (View(await _profileService.GetProfileEditVm(username)));
 
       if (!_authorizationService.IsAuthorizedForProfileEdit(username, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      var result = await _profileService.UpdateProfile(profileEditVm, User);
+      if (profileEditVm.ProfileImage != null) {
+        var imageCheckResult = profileEditVm.ProfileImage.IsValidImage();
+        if (!imageCheckResult.Success) {
+          foreach (var error in imageCheckResult.Errors)
+            ModelState.AddModelError(string.Empty, error);
+          return View(await _profileService.GetProfileEditVm(username));
+        }
+      }
+
+      var result = await _profileService.UpdateProfile(username, profileEditVm, User);
 
       if (!result.Succeeded) {
         foreach (var error in result.Errors)
           ModelState.AddModelError(string.Empty, error.Description);
-        return View(profileEditVm);
+        return View(await _profileService.GetProfileEditVm(username));
       }
 
       return RedirectToAction(nameof(Details));
