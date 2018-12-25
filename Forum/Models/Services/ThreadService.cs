@@ -61,7 +61,8 @@ namespace Forum.Models.Services {
       var threadsIndexVm = new ThreadsIndexVm {
         Topic = topicFromDb.ContentText,
         IsTopicLocked = topicFromDb.LockedBy != null,
-        Threads = new List<ThreadsIndexThreadVm>()
+        Threads = new List<ThreadsIndexThreadVm>(),
+        IsAuthorizedForThreadCreate = await _authorizationService.IsAuthorizedForCreate(user),
       };
 
       //Included TopicNavigation  and Post to be used in IsAuthorizedForThreadEdit check within GetPostsIndexPostVmAsync method
@@ -182,13 +183,6 @@ namespace Forum.Models.Services {
       threadFromDb.LockedOn = null;
 
       await _db.SaveChangesAsync();
-    }
-
-    public bool IsAuthorizedForThreadCreate(int id, ClaimsPrincipal user) {
-      if (user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator))
-        return true;
-
-      return !_db.Topic.Where(t => t.Id == id).Any(t => t.LockedBy != null);
     }
 
     public bool IsThreadLocked(int id) {

@@ -9,23 +9,28 @@ namespace Forum.Controllers {
   [Route("")]
   public class TopicController : Controller {
     private readonly TopicService _topicService;
+    private readonly AuthorizationService _authorizationService;
 
-    public TopicController(TopicService topicService) {
+    public TopicController(TopicService topicService, AuthorizationService authorizationService) {
       _topicService = topicService;
+      _authorizationService = authorizationService;
     }
 
     [AllowAnonymous]
     [Route("")]
     [HttpGet]
-    public IActionResult Index() {
-      return View(_topicService.GetTopicsIndexVm());
+    public async Task<IActionResult> Index() {
+      return View(await _topicService.GetTopicsIndexVm(User));
     }
 
     [AuthorizeRoles(Roles.Admin)]
     [Route("Create")]
     [HttpGet]
-    public IActionResult Create() {
-      return View();
+    public async Task<IActionResult> Create() {
+      if (await _authorizationService.IsAuthorizedForCreate(User))
+        return View();
+
+      return RedirectToAction("AccessDenied", "Account");
     }
 
     [AuthorizeRoles(Roles.Admin)]
@@ -35,6 +40,9 @@ namespace Forum.Controllers {
     public async Task<IActionResult> Create(TopicCreateVm topicCreateVm) {
       if (!ModelState.IsValid)
         return (View(topicCreateVm));
+
+      if (!await _authorizationService.IsAuthorizedForCreate(User))
+        return RedirectToAction("AccessDenied", "Account");
 
       await _topicService.Add(topicCreateVm, User);
       return RedirectToAction(nameof(Index));

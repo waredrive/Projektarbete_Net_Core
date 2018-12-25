@@ -6,7 +6,8 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Forum.Attributes;
 using Forum.Models.Context;
-using Forum.Models.ViewModels.NavbarViewModels;
+using Forum.Models.ViewModels.ComponentViewModels.AdminProfileEditViewModels;
+using Forum.Models.ViewModels.ComponentViewModels.NavbarViewModels;
 using Forum.Models.ViewModels.ProfileViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -42,26 +43,23 @@ namespace Forum.Models.Services {
         BlockedEnd = memberFromDb.BlockedEnd,
         TotalThreads = memberFromDb.ThreadCreatedByNavigation.Count,
         TotalPosts = memberFromDb.PostCreatedByNavigation.Count,
-        IsAuthorizedForProfileEdit = await _authorizationService.IsAuthorizedForAccountEdit(identityUser.UserName, user)
+        IsAuthorizedForProfileEdit = await _authorizationService.IsAuthorizedForAccountAndProfileEdit(identityUser.UserName, user),
+        UserIsOwner = UserIsOwner(username, user)
       };
     }
 
     public async Task<ProfileEditVm> GetProfileEditVm(string username) {
       var identityUser = await _userManager.FindByNameAsync(username);
-      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
 
       return new ProfileEditVm {
         OldUsername = identityUser.UserName,
-        NewUsername = identityUser.UserName,
-        Roles = _roleManager.Roles.Select(r =>
-          new SelectListItem { Text = r.Name, Value = r.Name, Selected = r.Name == _userManager.GetRolesAsync(identityUser).Result.First() }).ToArray()
+        NewUsername = identityUser.UserName
       };
     }
 
-    public async Task<IdentityResult> UpdateProfile(string username, ProfileEditVm profileEditVm, ClaimsPrincipal user) {
+    public async Task<IdentityResult> UpdateProfile(string username, ProfileEditVm profileEditVm) {
       var identityUser = await _userManager.FindByNameAsync(username);
       var oldUserName = identityUser.UserName;
-      var oldRoles = await _userManager.GetRolesAsync(identityUser);
       var result = await _userManager.SetUserNameAsync(identityUser, profileEditVm.NewUsername);
 
       if (!result.Succeeded)
@@ -69,10 +67,6 @@ namespace Forum.Models.Services {
 
       try {
         var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
-        if (user.IsInRole(Roles.Admin) && !string.IsNullOrEmpty(profileEditVm.Role)) {
-          await _userManager.RemoveFromRolesAsync(identityUser, oldRoles.ToArray());
-          await _userManager.AddToRoleAsync(identityUser, profileEditVm.Role);
-        }
 
         if (profileEditVm.ProfileImage != null) {
           using (var memoryStream = new MemoryStream()) {
@@ -83,9 +77,6 @@ namespace Forum.Models.Services {
 
         await _db.SaveChangesAsync();
       } catch (Exception) {
-        var roles = await _userManager.GetRolesAsync(identityUser);
-        await _userManager.RemoveFromRolesAsync(identityUser, roles.ToArray());
-        await _userManager.AddToRolesAsync(identityUser, roles);
         await _userManager.SetUserNameAsync(identityUser, oldUserName);
         throw;
       }
@@ -99,8 +90,64 @@ namespace Forum.Models.Services {
       return new NavbarVm {ProfileImage = Convert.ToBase64String(memberFromDb.ProfileImage)};
     }
 
-  public bool DoesProfileExist(string username) {
+    public async Task<AdminProfileEditVm> GetAdminProfileEditVm(string username) {
+      var identityUser = await _userManager.FindByNameAsync(username);
+      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
+
+      return new AdminProfileEditVm {
+        ProfileRoleEditVm = new ProfileRoleEditVm {
+          Username = identityUser.UserName,
+          Roles = _roleManager.Roles.Select(r =>
+            new SelectListItem { Text = r.Name, Value = r.Name, Selected = r.Name == _userManager.GetRolesAsync(identityUser).Result.First() }).ToArray()
+        },
+        ProfileBlockVm = new ProfileBlockVm {
+          Username = identityUser.UserName,
+          BlockedEnd = memberFromDb.BlockedEnd,
+          BlockedBy = _userManager.FindByIdAsync(memberFromDb.BlockedBy).Result?.UserName,
+        }
+      };
+    }
+
+    public async Task UpdateProfileRole(string username, AdminProfileEditVm adminProfileEditVm) {
+      var identityUser = await _userManager.FindByNameAsync(username);
+      var oldRoles = await _userManager.GetRolesAsync(identityUser);
+
+      try {
+        if (!string.IsNullOrEmpty(adminProfileEditVm.ProfileRoleEditVm.Role)) {
+          await _userManager.RemoveFromRolesAsync(identityUser, oldRoles.ToArray());
+          await _userManager.AddToRoleAsync(identityUser, adminProfileEditVm.ProfileRoleEditVm.Role);
+        }
+        await _db.SaveChangesAsync();
+      } catch (Exception) {
+        var roles = await _userManager.GetRolesAsync(identityUser);
+        await _userManager.RemoveFromRolesAsync(identityUser, roles.ToArray());
+        await _userManager.AddToRolesAsync(identityUser, roles);
+        throw;
+      }
+    }
+
+    public async Task<bool> Block(string username, AdminProfileEditVm adminProfileEditVm, ClaimsPrincipal user) {
+      var identityUser = await _userManager.FindByNameAsync(username);
+      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
+
+      if (adminProfileEditVm.ProfileBlockVm.BlockedEnd == null) {
+        return false;
+      }
+
+      memberFromDb.BlockedEnd = adminProfileEditVm.ProfileBlockVm.BlockedEnd;
+      memberFromDb.BlockedOn = DateTime.UtcNow;
+      memberFromDb.BlockedBy = _userManager.FindByNameAsync(user.Identity.Name).Result.Id;
+
+      await _db.SaveChangesAsync();
+      return true;
+    }
+
+    public bool DoesProfileExist(string username) {
     return _userManager.FindByNameAsync(username).Result != null;
   }
-}
+
+    public bool UserIsOwner(string username, ClaimsPrincipal user) {
+      return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase);
+    }
+  }
 }

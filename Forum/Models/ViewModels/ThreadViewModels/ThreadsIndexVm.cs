@@ -7,6 +7,7 @@ namespace Forum.Models.ViewModels.ThreadViewModels {
   public class ThreadsIndexVm {
     public string Topic { get; set; }
     public bool IsTopicLocked { get; set; }
+    public bool IsAuthorizedForThreadCreate { get; set; }
     public List<ThreadsIndexThreadVm> Threads { get; set; }
   }
 

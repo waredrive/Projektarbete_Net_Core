@@ -29,6 +29,8 @@
             <div class="mt-4 btn-group">
               <a asp-controller="Profile" asp-action="Edit" asp-route-username="@User.Identity.Name" class="btn btn-warning">Edit Profile</a>
             </div>
+          } else if (User.IsInRole(Roles.Admin) && !Model.UserIsOwner) {
+            @await Component.InvokeAsync("AdminProfileEdit", @Model.Username)
           }
         </div>
     </div>

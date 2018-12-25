@@ -12,6 +12,7 @@ namespace Forum.Models.ViewModels.TopicViewModels {
     public int TotalPosts { get; set; }
     public int TotalMembers { get; set; }
     public string NewestMember { get; set; }
+    public bool IsAuthorizedForTopicCreate { get; set; }
   }
 
   public class TopicsIndexTopicVm {

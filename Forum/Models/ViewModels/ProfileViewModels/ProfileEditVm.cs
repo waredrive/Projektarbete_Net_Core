@@ -14,8 +14,6 @@ namespace Forum.Models.ViewModels.ProfileViewModels {
     public string NewUsername { get; set; }
     [Display(Name = "Profile Image")]
     public IFormFile ProfileImage { get; set; }
-    public string Role { get; set; }
     public SelectListItem[] Roles { get; set; }
-    public bool userIsOwner { get; set; }
   }
 }

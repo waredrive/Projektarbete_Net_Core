@@ -9,7 +9,7 @@
       <h1 class="text-light">The Best Forum Ever!</h1>
     </div>
   </div>
-  @if (User.IsInRole(Roles.Admin)) {
+  @if (Model.IsAuthorizedForTopicCreate) {
     <div class="col-md-12 py-3">
       <div class="row">
         <a asp-controller="Topic" asp-action="Create" class="btn btn-primary">Add new topic</a>

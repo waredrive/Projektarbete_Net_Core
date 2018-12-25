@@ -19,19 +19,43 @@ namespace Forum.Models.Services {
       _db = db;
     }
 
+    public async Task<bool> IsAuthorizedForCreate(ClaimsPrincipal user) {
+      if (!user.Identity.IsAuthenticated) return false;
+
+      var identityFromDb = await _userManager.FindByNameAsync(user.Identity.Name);
+      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityFromDb.Id);
+
+      return memberFromDb.BlockedBy == null;
+    }
+
+    public async Task<bool> IsAuthorizedForThreadCreateInTopic(int id, ClaimsPrincipal user) {
+      if (!user.Identity.IsAuthenticated) return false;
+
+      var identityFromDb = await _userManager.FindByNameAsync(user.Identity.Name);
+      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityFromDb.Id);
+
+      if (memberFromDb.BlockedBy != null)
+        return false;
+
+      if (user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator))
+        return true;
+
+      return !_db.Topic.Where(t => t.Id == id).Any(t => t.LockedBy != null);
+    }
+
     // The user is authorized as long as he is the only one that posted on the thread,
     // the thread or topic is not locked and the thread is created by the user.
     // Admins and Moderators have no restrictions.
     public async Task<bool> IsAuthorizedForThreadEdit(int threadId, ClaimsPrincipal user) {
+      if (!user.Identity.IsAuthenticated) return false;
+
       var threadFromDb = await _db.Thread.Include(t => t.TopicNavigation).Include(t => t.Post)
         .FirstOrDefaultAsync(t => t.Id == threadId);
       return threadFromDb != null && await IsAuthorizedForThreadEdit(threadFromDb, user);
     }
 
     public async Task<bool> IsAuthorizedForThreadEdit(Thread threadFromDb, ClaimsPrincipal user) {
-      if (!user.Identity.IsAuthenticated) {
-        return false;
-      }
+      if (!user.Identity.IsAuthenticated) return false;
 
       var identityFromDb = await _userManager.FindByNameAsync(user.Identity.Name);
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityFromDb.Id);
@@ -51,15 +75,15 @@ namespace Forum.Models.Services {
     // creator).
     // Admins have no restrictions.
     public async Task<bool> IsAuthorizedForThreadDelete(int threadId, ClaimsPrincipal user) {
+      if (!user.Identity.IsAuthenticated) return false;
+
       var threadFromDb = await _db.Thread.Include(t => t.TopicNavigation).Include(t => t.Post)
         .FirstOrDefaultAsync(t => t.Id == threadId);
       return threadFromDb != null && await IsAuthorizedForThreadDelete(threadFromDb, user);
     }
 
     public async Task<bool> IsAuthorizedForThreadDelete(Thread threadFromDb, ClaimsPrincipal user) {
-      if (!user.Identity.IsAuthenticated) {
-        return false;
-      }
+      if (!user.Identity.IsAuthenticated) return false;
 
       var identityFromDb = await _userManager.FindByNameAsync(user.Identity.Name);
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityFromDb.Id);
@@ -77,7 +101,15 @@ namespace Forum.Models.Services {
              threadFromDb?.TopicNavigation.LockedOn == null && memberFromDb.BlockedBy == null;
     }
 
-    public bool IsAuthorizedForPostCreate(int threadId, ClaimsPrincipal user) {
+    public async Task<bool> IsAuthorizedForPostCreateInThread(int threadId, ClaimsPrincipal user) {
+      if (!user.Identity.IsAuthenticated) return false;
+
+      var identityFromDb = await _userManager.FindByNameAsync(user.Identity.Name);
+      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityFromDb.Id);
+
+      if (memberFromDb.BlockedBy != null)
+        return false;
+
       if (user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator))
         return true;
 
@@ -93,6 +125,8 @@ namespace Forum.Models.Services {
     }
 
     public async Task<bool> IsAuthorizedForPostEditAndDelete(Post postFromDb, ClaimsPrincipal user) {
+      if (!user.Identity.IsAuthenticated) return false;
+
       var identityFromDb = await _userManager.FindByNameAsync(user.Identity.Name);
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityFromDb.Id);
 
@@ -104,15 +138,11 @@ namespace Forum.Models.Services {
              postFromDb?.ThreadNavigation.LockedOn == null && memberFromDb.BlockedBy == null;
     }
 
-    public async Task<bool> IsAuthorizedForAccountEdit(string username, ClaimsPrincipal user) {
-      if (!user.Identity.IsAuthenticated) {
-        return false;
-      }
+    public async Task<bool> IsAuthorizedForAccountAndProfileEdit(string username, ClaimsPrincipal user) {
+      if (!user.Identity.IsAuthenticated) return false;
 
       var identityFromDb = await _userManager.FindByNameAsync(user.Identity.Name);
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityFromDb.Id);
-      var t = string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase);
-      var t2 = memberFromDb.BlockedBy == null;
       return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase) &&
              memberFromDb.BlockedBy == null;
     }

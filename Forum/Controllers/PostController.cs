@@ -13,9 +13,9 @@ namespace Forum.Controllers {
     private readonly ThreadService _threadService;
     private readonly AuthorizationService _authorizationService;
 
-    public PostController(PostService postService, ThreadService _threadService, AuthorizationService authorizationService) {
+    public PostController(PostService postService, ThreadService threadService, AuthorizationService authorizationService) {
       _postService = postService;
-      this._threadService = _threadService;
+      _threadService = threadService;
       _authorizationService = authorizationService;
     }
 
@@ -33,12 +33,12 @@ namespace Forum.Controllers {
 
     [Route("Create")]
     [HttpGet]
-    public IActionResult Create(int threadId) {
+    public async Task<IActionResult> Create(int threadId) {
       if (!_threadService.DoesThreadExist(threadId)) {
         return NotFound();
       }
 
-      if (_authorizationService.IsAuthorizedForPostCreate(threadId, User))
+      if (!await _authorizationService.IsAuthorizedForPostCreateInThread(threadId, User))
         return View(new PostCreateVm { ThreadId = threadId});
 
       return RedirectToAction("AccessDenied", "Account");
@@ -51,7 +51,7 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return (View(postCreateVm));
 
-      if (!_authorizationService.IsAuthorizedForPostCreate(postCreateVm.ThreadId, User))
+      if (!await _authorizationService.IsAuthorizedForPostCreateInThread(postCreateVm.ThreadId, User))
         return RedirectToAction("AccessDenied", "Account");
 
       await _postService.Add(postCreateVm, User);

@@ -13,10 +13,12 @@ namespace Forum.Models.Services {
   public class TopicService {
     private readonly ForumDbContext _db;
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly AuthorizationService _authorizationService;
 
-    public TopicService(ForumDbContext db, UserManager<IdentityUser> userManager) {
+    public TopicService(ForumDbContext db, UserManager<IdentityUser> userManager, AuthorizationService authorizationService) {
       _db = db;
       _userManager = userManager;
+      _authorizationService = authorizationService;
     }
 
     public async Task Add(TopicCreateVm topicCreateVm, ClaimsPrincipal user) {
@@ -34,7 +36,7 @@ namespace Forum.Models.Services {
       await _db.SaveChangesAsync();
     }
 
-    public TopicsIndexVm GetTopicsIndexVm() {
+    public async Task<TopicsIndexVm> GetTopicsIndexVm(ClaimsPrincipal user) {
       var topicsIndexVm = new TopicsIndexVm {
         Topics = new List<TopicsIndexTopicVm>(),
         LatestThreads = new List<TopicsIndexThreadVm>(),
@@ -42,7 +44,8 @@ namespace Forum.Models.Services {
         TotalMembers = _userManager.Users.Count(),
         TotalPosts = _db.Post.Count(),
         NewestMember = _userManager.FindByIdAsync(_db.Member.OrderByDescending(m => m.CreatedOn).First().Id).Result
-          .UserName
+          .UserName,
+        IsAuthorizedForTopicCreate = await _authorizationService.IsAuthorizedForCreate(user)
       };
 
       topicsIndexVm.Topics.AddRange(_db.Topic.Include(t => t.Thread).Select(t => new TopicsIndexTopicVm {

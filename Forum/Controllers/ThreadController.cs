@@ -32,12 +32,12 @@ namespace Forum.Controllers {
 
     [Route("Create")]
     [HttpGet]
-    public IActionResult Create(int topicId) {
+    public async Task<IActionResult> Create(int topicId) {
       if (!_topicService.DoesTopicExist(topicId)) {
         return NotFound();
       }
 
-      if (_threadService.IsAuthorizedForThreadCreate(topicId, User))
+      if (await _authorizationService.IsAuthorizedForThreadCreateInTopic(topicId, User))
         return View(new ThreadCreateVm { TopicId = topicId });
 
       return RedirectToAction("AccessDenied", "Account");
@@ -50,7 +50,7 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return (View(threadCreateVm));
 
-      if (!_threadService.IsAuthorizedForThreadCreate(threadCreateVm.TopicId, User))
+      if (!await _authorizationService.IsAuthorizedForThreadCreateInTopic(threadCreateVm.TopicId, User))
         return RedirectToAction("AccessDenied", "Account");
 
       await _threadService.Add(threadCreateVm, User);

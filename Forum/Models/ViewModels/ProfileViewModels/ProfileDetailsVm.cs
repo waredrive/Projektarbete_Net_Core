@@ -15,5 +15,6 @@ namespace Forum.Models.ViewModels.ProfileViewModels {
     public int TotalThreads { get; set; }
     public int TotalPosts { get; set; }
     public bool IsAuthorizedForProfileEdit { get; set; }
+    public bool UserIsOwner { get; set; }
   }
 }

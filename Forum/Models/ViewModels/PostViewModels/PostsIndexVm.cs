@@ -8,6 +8,7 @@ namespace Forum.Models.ViewModels.PostViewModels {
     public string Thread { get; set; }
     public bool IsThreadLocked { get; set; }
     public List<PostsIndexPostVm> Posts { get; set; }
+    public bool IsAuthorizedForPostCreate { get; set; }
   }
 
   public class PostsIndexPostVm {

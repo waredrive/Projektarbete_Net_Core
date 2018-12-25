@@ -76,7 +76,7 @@ namespace Forum.Controllers {
         return NotFound();
       }
 
-      if (await _authorizationService.IsAuthorizedForAccountEdit(username, User))
+      if (await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
         return View(await _accountService.GetAccountEditVm(User));
 
       return RedirectToAction(nameof(AccessDenied));
@@ -93,7 +93,7 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return (View(accountEditVm));
 
-      if (!await _authorizationService.IsAuthorizedForAccountEdit(username, User))
+      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
         return RedirectToAction(nameof(AccessDenied));
 
       var result = await _accountService.UpdateAccount(accountEditVm, User);
@@ -114,7 +114,7 @@ namespace Forum.Controllers {
         return NotFound();
       }
 
-      if (await _authorizationService.IsAuthorizedForAccountEdit(username, User))
+      if (await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
         return View();
 
       return RedirectToAction(nameof(AccessDenied));
@@ -131,7 +131,7 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return (View(accountPasswordEditVm));
 
-      if (!await _authorizationService.IsAuthorizedForAccountEdit(username, User))
+      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
         return RedirectToAction(nameof(AccessDenied));
 
       var result = await _accountService.UpdatePassword(accountPasswordEditVm, User);

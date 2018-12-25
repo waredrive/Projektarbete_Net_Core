@@ -142,7 +142,7 @@ namespace Forum.Models.Services {
         FirstName = memberFromDb.FirstName,
         LastName = memberFromDb.LastName,
         IsAuthorizedForAccountEdit =
-          await _authorizationService.IsAuthorizedForAccountEdit(identityUser.UserName, user)
+          await _authorizationService.IsAuthorizedForAccountAndProfileEdit(identityUser.UserName, user)
       };
     }
 

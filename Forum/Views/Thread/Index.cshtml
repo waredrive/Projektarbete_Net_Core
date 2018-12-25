@@ -8,7 +8,7 @@
       <h1 class="text-light">@Model.Topic</h1>
     </div>
   </div>
-  @if (User.Identity.IsAuthenticated && !Model.IsTopicLocked || User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Moderator)) {
+  @if (@Model.IsAuthorizedForThreadCreate) {
     <div class="col-md-12 py-3">
       <div class="row">
         <a asp-controller="Thread" asp-action="Create" class="btn btn-primary">Add new thread</a>

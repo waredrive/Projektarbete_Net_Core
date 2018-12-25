@@ -4,7 +4,7 @@ using System.Linq;
 using System.Security.Policy;
 using System.Threading.Tasks;
 
-namespace Forum.Models.ViewModels.NavbarViewModels {
+namespace Forum.Models.ViewModels.ComponentViewModels.NavbarViewModels {
   public class NavbarVm {
     public string ProfileImage { get; set; }
   }
