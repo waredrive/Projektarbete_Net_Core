@@ -29,6 +29,10 @@ namespace Forum.Models.Services {
     }
 
     public async Task<bool> IsAuthorizedForThreadEdit(Thread threadFromDb, ClaimsPrincipal user) {
+      if (!user.Identity.IsAuthenticated) {
+        return false;
+      }
+
       var identityFromDb = await _userManager.FindByNameAsync(user.Identity.Name);
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityFromDb.Id);
 
@@ -53,6 +57,10 @@ namespace Forum.Models.Services {
     }
 
     public async Task<bool> IsAuthorizedForThreadDelete(Thread threadFromDb, ClaimsPrincipal user) {
+      if (!user.Identity.IsAuthenticated) {
+        return false;
+      }
+
       var identityFromDb = await _userManager.FindByNameAsync(user.Identity.Name);
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityFromDb.Id);
 
@@ -97,6 +105,10 @@ namespace Forum.Models.Services {
     }
 
     public async Task<bool> IsAuthorizedForAccountEdit(string username, ClaimsPrincipal user) {
+      if (!user.Identity.IsAuthenticated) {
+        return false;
+      }
+
       var identityFromDb = await _userManager.FindByNameAsync(user.Identity.Name);
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityFromDb.Id);
       var t = string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase);

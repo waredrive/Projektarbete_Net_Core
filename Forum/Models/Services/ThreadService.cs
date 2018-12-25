@@ -49,8 +49,7 @@ namespace Forum.Models.Services {
           _db.Post.Add(post);
           await _db.SaveChangesAsync();
           transaction.Commit();
-        }
-        catch (Exception) {
+        } catch (Exception) {
           transaction.Rollback();
         }
       }
@@ -65,20 +64,32 @@ namespace Forum.Models.Services {
         Threads = new List<ThreadsIndexThreadVm>()
       };
 
-      // Includes TopicNavigation and Post to be used in IsAuthorizedForThreadEdit method
-      threadsIndexVm.Threads.AddRange(_db.Thread.Include(t => t.TopicNavigation).Include(t => t.Post)
-        .Where(t => t.Topic == topicId).Select(t => new ThreadsIndexThreadVm {
-          ThreadId = t.Id,
-          CreatedOn = t.CreatedOn,
-          CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
-          ThreadText = t.ContentText,
-          PostCount = t.Post.Count,
-          IsAuthorizedForThreadEdit = _authorizationService.IsAuthorizedForThreadEdit(t, user).Result,
-          IsAuthorizedForThreadDelete = _authorizationService.IsAuthorizedForThreadDelete(t, user).Result,
-          LockedBy = t.LockedBy != null ? _userManager.FindByIdAsync(t.LockedBy).Result.UserName : null
-        }));
+      //Included TopicNavigation  and Post to be used in IsAuthorizedForThreadEdit check within GetPostsIndexPostVmAsync method
+      var threads = _db.Thread.Include(t => t.TopicNavigation).Include(t => t.Post)
+      .Where(t => t.Topic == topicId);
+
+      foreach (var thread in threads) {
+        threadsIndexVm.Threads.Add(await GetThreadsIndexThreadVmAsync(thread, user));
+      }
 
       return threadsIndexVm;
+    }
+
+    private async Task<ThreadsIndexThreadVm> GetThreadsIndexThreadVmAsync(Thread thread, ClaimsPrincipal user) {
+      var isAuthorizedForThreadEdit = await _authorizationService.IsAuthorizedForThreadEdit(thread, user);
+      var isAuthorizedForThreadDelete = await _authorizationService.IsAuthorizedForThreadDelete(thread, user);
+      var createdBy = await _userManager.FindByIdAsync(thread.CreatedBy);
+
+      return new ThreadsIndexThreadVm {
+        ThreadId = thread.Id,
+        CreatedOn = thread.CreatedOn,
+        CreatedBy = createdBy.UserName,
+        ThreadText = thread.ContentText,
+        PostCount = thread.Post.Count,
+        IsAuthorizedForThreadEdit = isAuthorizedForThreadEdit,
+        IsAuthorizedForThreadDelete = isAuthorizedForThreadDelete,
+        LockedBy = thread.LockedBy != null ? _userManager.FindByIdAsync(thread.LockedBy).Result.UserName : null
+      };
     }
 
     public async Task<ThreadEditVm> GetThreadEditVm(int id) {
@@ -120,8 +131,7 @@ namespace Forum.Models.Services {
           _db.Thread.Remove(threadFromDb);
           await _db.SaveChangesAsync();
           transaction.Commit();
-        }
-        catch (Exception) {
+        } catch (Exception) {
           transaction.Rollback();
         }
       }
@@ -156,7 +166,7 @@ namespace Forum.Models.Services {
         CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
         PostCount = _db.Post.Count(p => p.Thread == t.Id),
         LockedBy = _userManager.FindByIdAsync(t.LockedBy).Result.UserName,
-        LockedOn = (DateTime) t.LockedOn,
+        LockedOn = (DateTime)t.LockedOn,
         ThreadId = t.Id,
         ThreadText = t.ContentText
       }).FirstOrDefaultAsync();

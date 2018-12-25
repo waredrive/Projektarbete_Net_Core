@@ -47,18 +47,26 @@ namespace Forum.Models.Services {
         IsThreadLocked = threadFromDb.LockedBy != null
       };
 
-      //Included Threadnavigation to be used in IsAuthorizedForPostEditAndDelete method
-      postsIndexVm.Posts.AddRange(_db.Post.Include(p => p.ThreadNavigation).Where(p => p.Thread == threadId).Select(p =>
-        new PostsIndexPostVm {
-          PostId = p.Id,
-          CreatedOn = p.CreatedOn,
-          CreatedBy = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName,
-          PostText = p.ContentText,
-          IsAuthorizedForPostEditAndDelete = _authorizationService.IsAuthorizedForPostEditAndDelete(p, user).Result,
-          LockedBy = p.LockedBy != null ? _userManager.FindByIdAsync(p.LockedBy).Result.UserName : null
-        }));
+      //Included Threadnavigation to be used in authorization check within GetPostsIndexPostVmAsync method
+      var posts = _db.Post.Include(p => p.ThreadNavigation).Where(p => p.Thread == threadId);
 
+      foreach (var post in posts) {
+        postsIndexVm.Posts.Add(await GetPostsIndexPostVmAsync(post, user));
+      }
       return postsIndexVm;
+    }
+
+    private async Task<PostsIndexPostVm> GetPostsIndexPostVmAsync(Post post, ClaimsPrincipal user) {
+      var isAuthorizedForPostEditAndDelete = await _authorizationService.IsAuthorizedForPostEditAndDelete(post, user);
+
+      return new PostsIndexPostVm {
+        PostId = post.Id,
+        CreatedOn = post.CreatedOn,
+        CreatedBy = _userManager.FindByIdAsync(post.CreatedBy).Result.UserName,
+        PostText = post.ContentText,
+        IsAuthorizedForPostEditAndDelete = isAuthorizedForPostEditAndDelete,
+        LockedBy = post.LockedBy != null ? _userManager.FindByIdAsync(post.LockedBy).Result.UserName : null
+      };
     }
 
     public async Task<PostEditVm> GetPostEditVm(int id) {
