@@ -203,12 +203,9 @@ namespace Forum.Models.Context
 
                 entity.Property(e => e.ContentText).HasMaxLength(80);
 
-                entity.Property(e => e.CreatedBy).IsRequired();
-
                 entity.HasOne(d => d.CreatedByNavigation)
                     .WithMany(p => p.ThreadCreatedByNavigation)
                     .HasForeignKey(d => d.CreatedBy)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Thread__CreatedB__3F115E1A");
 
                 entity.HasOne(d => d.EditedByNavigation)

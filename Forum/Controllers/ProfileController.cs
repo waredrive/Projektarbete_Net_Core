@@ -22,13 +22,21 @@ namespace Forum.Controllers {
     [Route("Details/{username}")]
     [HttpGet]
     public async Task<IActionResult> Details(string username) {
+      if (!_profileService.DoesProfileExist(username)) {
+        return NotFound();
+      }
+
         return View(await _profileService.GetProfileDetailsVm(username, User));
     }
 
     [Route("Update/{username}")]
     [HttpGet]
     public async Task<IActionResult> Edit(string username) {
-      if (_authorizationService.IsAuthorizedForProfileEdit(username, User))
+      if (!_profileService.DoesProfileExist(username)) {
+        return NotFound();
+      }
+
+      if (await _authorizationService.IsAuthorizedForAccountEdit(username, User))
         return View(await _profileService.GetProfileEditVm(username));
 
       return RedirectToAction("AccessDenied", "Account");
@@ -38,10 +46,14 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(string username, ProfileEditVm profileEditVm) {
+      if (!_profileService.DoesProfileExist(username)) {
+        return NotFound();
+      }
+
       if (!ModelState.IsValid)
         return (View(await _profileService.GetProfileEditVm(username)));
 
-      if (!_authorizationService.IsAuthorizedForProfileEdit(username, User))
+      if (!await _authorizationService.IsAuthorizedForAccountEdit(username, User))
         return RedirectToAction("AccessDenied", "Account");
 
       if (profileEditVm.ProfileImage != null) {

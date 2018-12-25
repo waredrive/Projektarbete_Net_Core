@@ -11,10 +11,12 @@ namespace Forum.Controllers {
   [Route("Forum/{topicId}")]
   public class ThreadController : Controller {
     private readonly ThreadService _threadService;
+    private readonly TopicService _topicService;
     private readonly AuthorizationService _authorizationService;
 
-    public ThreadController(ThreadService threadService, AuthorizationService authorizationService) {
+    public ThreadController(ThreadService threadService, TopicService _topicService, AuthorizationService authorizationService) {
       _threadService = threadService;
+      this._topicService = _topicService;
       _authorizationService = authorizationService;
     }
 
@@ -22,12 +24,19 @@ namespace Forum.Controllers {
     [Route("")]
     [HttpGet]
     public async Task<IActionResult> Index(int topicId) {
+      if (!_topicService.DoesTopicExist(topicId)) {
+        return NotFound();
+      }
       return View(await _threadService.GetThreadsIndexVm(topicId, User));
     }
 
     [Route("Create")]
     [HttpGet]
     public IActionResult Create(int topicId) {
+      if (!_topicService.DoesTopicExist(topicId)) {
+        return NotFound();
+      }
+
       if (_threadService.IsAuthorizedForThreadCreate(topicId, User))
         return View(new ThreadCreateVm { TopicId = topicId });
 
@@ -48,19 +57,27 @@ namespace Forum.Controllers {
       return RedirectToAction(nameof(Index));
     }
 
-    [Route("UpdateAccount/{id}")]
+    [Route("Update/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id) {
+      if (!_threadService.DoesThreadExist(id)) {
+        return NotFound();
+      }
+
       if (await _authorizationService.IsAuthorizedForThreadEdit(id, User))
         return View(await _threadService.GetThreadEditVm(id));
 
       return RedirectToAction("AccessDenied", "Account");
     }
 
-    [Route("UpdateAccount/{id}")]
+    [Route("Update/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(ThreadEditVm threadEditVm) {
+    public async Task<IActionResult> Edit(int id, ThreadEditVm threadEditVm) {
+      if (!_threadService.DoesThreadExist(id)) {
+        return NotFound();
+      }
+
       if (!ModelState.IsValid)
         return (View(threadEditVm));
 
@@ -75,6 +92,11 @@ namespace Forum.Controllers {
     [Route("Delete/{id}")]
     [HttpGet]
     public async Task<IActionResult> Delete(int id) {
+      if (!_threadService.DoesThreadExist(id)) {
+        return NotFound();
+      }
+
+
       if (await _authorizationService.IsAuthorizedForThreadDelete(id, User))
         return View(await _threadService.GetThreadDeleteVm(id));
 
@@ -84,7 +106,11 @@ namespace Forum.Controllers {
     [Route("Delete/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(ThreadDeleteVm threadDeleteVm) {
+    public async Task<IActionResult> Delete(int id, ThreadDeleteVm threadDeleteVm) {
+      if (!_threadService.DoesThreadExist(id)) {
+        return NotFound();
+      }
+
       if (!ModelState.IsValid)
         return (View(threadDeleteVm));
 
@@ -99,6 +125,11 @@ namespace Forum.Controllers {
     [Route("Lock/{id}")]
     [HttpGet]
     public async Task<IActionResult> Lock(int id) {
+      if (!_threadService.DoesThreadExist(id)) {
+        return NotFound();
+      }
+
+
       if (_threadService.IsThreadLocked(id))
         return RedirectToAction(nameof(Unlock));
 
@@ -109,7 +140,11 @@ namespace Forum.Controllers {
     [Route("Lock/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Lock(ThreadLockVm threadLockVm) {
+    public async Task<IActionResult> Lock(int id, ThreadLockVm threadLockVm) {
+      if (!_threadService.DoesThreadExist(id)) {
+        return NotFound();
+      }
+
       if (!ModelState.IsValid)
         return (View(threadLockVm));
 
@@ -124,6 +159,10 @@ namespace Forum.Controllers {
     [Route("Unlock/{id}")]
     [HttpGet]
     public async Task<IActionResult> Unlock(int id) {
+      if (!_threadService.DoesThreadExist(id)) {
+        return NotFound();
+      }
+
       if (!_threadService.IsThreadLocked(id))
         return RedirectToAction(nameof(Lock));
 
@@ -134,7 +173,11 @@ namespace Forum.Controllers {
     [Route("Unlock/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Unlock(ThreadUnlockVm threadUnlockVm) {
+    public async Task<IActionResult> Unlock(int id, ThreadUnlockVm threadUnlockVm) {
+      if (!_threadService.DoesThreadExist(id)) {
+        return NotFound();
+      }
+
       if (!ModelState.IsValid)
         return (View(threadUnlockVm));
 

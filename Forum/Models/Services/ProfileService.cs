@@ -2,9 +2,11 @@
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using Forum.Attributes;
 using Forum.Models.Context;
+using Forum.Models.ViewModels.NavbarViewModels;
 using Forum.Models.ViewModels.ProfileViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -40,7 +42,7 @@ namespace Forum.Models.Services {
         BlockedEnd = memberFromDb.BlockedEnd,
         TotalThreads = memberFromDb.ThreadCreatedByNavigation.Count,
         TotalPosts = memberFromDb.PostCreatedByNavigation.Count,
-        IsAuthorizedForProfileEdit = _authorizationService.IsAuthorizedForProfileEdit(identityUser.UserName, user)
+        IsAuthorizedForProfileEdit = await _authorizationService.IsAuthorizedForAccountEdit(identityUser.UserName, user)
       };
     }
 
@@ -51,7 +53,7 @@ namespace Forum.Models.Services {
       return new ProfileEditVm {
         OldUsername = identityUser.UserName,
         NewUsername = identityUser.UserName,
-        Roles = _roleManager.Roles.Where(r => !r.Name.Equals(Roles.Blocked)).Select(r =>
+        Roles = _roleManager.Roles.Select(r =>
           new SelectListItem { Text = r.Name, Value = r.Name, Selected = r.Name == _userManager.GetRolesAsync(identityUser).Result.First() }).ToArray()
       };
     }
@@ -90,5 +92,15 @@ namespace Forum.Models.Services {
 
       return result;
     }
+
+    public async Task<NavbarVm> GetNavbarVm(IPrincipal user) {
+      var identityUser = await _userManager.FindByNameAsync(user.Identity.Name);
+      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
+      return new NavbarVm {ProfileImage = Convert.ToBase64String(memberFromDb.ProfileImage)};
+    }
+
+  public bool DoesProfileExist(string username) {
+    return _userManager.FindByNameAsync(username).Result != null;
   }
+}
 }

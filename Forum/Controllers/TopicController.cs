@@ -24,7 +24,7 @@ namespace Forum.Controllers {
     [AuthorizeRoles(Roles.Admin)]
     [Route("Create")]
     [HttpGet]
-    public IActionResult Create(int id) {
+    public IActionResult Create() {
       return View();
     }
 
@@ -41,25 +41,27 @@ namespace Forum.Controllers {
     }
 
     [AuthorizeRoles(Roles.Admin)]
-    [Route("UpdateAccount/{id}")]
+    [Route("Update/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id) {
-      if (_topicService.IsTopicLocked(id))
-        return RedirectToAction(nameof(Unlock));
+      if (!_topicService.DoesTopicExist(id)) {
+        return NotFound();
+      }
 
       return View(await _topicService.GetTopicCreateVm(id));
     }
 
     [AuthorizeRoles(Roles.Admin)]
-    [Route("UpdateAccount/{id}")]
+    [Route("Update/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(TopicEditVm topicEditVm) {
+    public async Task<IActionResult> Edit(int id, TopicEditVm topicEditVm) {
+      if (!_topicService.DoesTopicExist(id)) {
+        return NotFound();
+      }
+
       if (!ModelState.IsValid)
         return (View(topicEditVm));
-
-      if (_topicService.IsTopicLocked(topicEditVm.TopicId))
-        return RedirectToAction(nameof(Index));
 
       await _topicService.Update(topicEditVm, User);
       return RedirectToAction(nameof(Index));
@@ -69,6 +71,9 @@ namespace Forum.Controllers {
     [Route("Delete/{id}")]
     [HttpGet]
     public async Task<IActionResult> Delete(int id) {
+      if (!_topicService.DoesTopicExist(id)) {
+        return NotFound();
+      }
       return View(await _topicService.GetTopicDeleteVm(id));
     }
 
@@ -76,7 +81,11 @@ namespace Forum.Controllers {
     [Route("Delete/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(TopicDeleteVm topicDeleteVm) {
+    public async Task<IActionResult> Delete(int id, TopicDeleteVm topicDeleteVm) {
+      if (!_topicService.DoesTopicExist(id)) {
+        return NotFound();
+      }
+
       if (!ModelState.IsValid)
         return (View(topicDeleteVm));
 
@@ -88,6 +97,10 @@ namespace Forum.Controllers {
     [Route("Lock/{id}")]
     [HttpGet]
     public async Task<IActionResult> Lock(int id) {
+      if (!_topicService.DoesTopicExist(id)) {
+        return NotFound();
+      }
+
       if (_topicService.IsTopicLocked(id))
         return RedirectToAction(nameof(Unlock));
 
@@ -98,7 +111,11 @@ namespace Forum.Controllers {
     [Route("Lock/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Lock(TopicLockVm topicLockVm) {
+    public async Task<IActionResult> Lock(int id, TopicLockVm topicLockVm) {
+      if (!_topicService.DoesTopicExist(id)) {
+        return NotFound();
+      }
+
       if (!ModelState.IsValid)
         return (View(topicLockVm));
 
@@ -113,6 +130,10 @@ namespace Forum.Controllers {
     [Route("Unlock/{id}")]
     [HttpGet]
     public async Task<IActionResult> Unlock(int id) {
+      if (!_topicService.DoesTopicExist(id)) {
+        return NotFound();
+      }
+
       if (!_topicService.IsTopicLocked(id))
         return RedirectToAction(nameof(Lock));
 
@@ -123,7 +144,11 @@ namespace Forum.Controllers {
     [Route("Unlock/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Unlock(TopicUnlockVm topicUnlockVm) {
+    public async Task<IActionResult> Unlock(int id, TopicUnlockVm topicUnlockVm) {
+      if (!_topicService.DoesTopicExist(id)) {
+        return NotFound();
+      }
+
       if (!ModelState.IsValid)
         return (View(topicUnlockVm));
 

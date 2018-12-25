@@ -10,10 +10,12 @@ namespace Forum.Controllers {
   [Route("Thread/{threadId}")]
   public class PostController : Controller {
     private readonly PostService _postService;
+    private readonly ThreadService _threadService;
     private readonly AuthorizationService _authorizationService;
 
-    public PostController(PostService postService, AuthorizationService authorizationService) {
+    public PostController(PostService postService, ThreadService _threadService, AuthorizationService authorizationService) {
       _postService = postService;
+      this._threadService = _threadService;
       _authorizationService = authorizationService;
     }
 
@@ -21,6 +23,10 @@ namespace Forum.Controllers {
     [Route("")]
     [HttpGet]
     public async Task<IActionResult> Index(int threadId) {
+      if (!_threadService.DoesThreadExist(threadId)) {
+        return NotFound();
+      }
+
       return View(await _postService.GetPostsIndexVm(threadId, User));
     }
 
@@ -28,6 +34,10 @@ namespace Forum.Controllers {
     [Route("Create")]
     [HttpGet]
     public IActionResult Create(int threadId) {
+      if (!_threadService.DoesThreadExist(threadId)) {
+        return NotFound();
+      }
+
       if (_authorizationService.IsAuthorizedForPostCreate(threadId, User))
         return View(new PostCreateVm { ThreadId = threadId});
 
@@ -48,19 +58,27 @@ namespace Forum.Controllers {
       return RedirectToAction(nameof(Index));
     }
 
-    [Route("UpdateAccount/{id}")]
+    [Route("Update/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id) {
+      if (!_postService.DoesPostExist(id)) {
+        return NotFound();
+      }
+
       if (await _authorizationService.IsAuthorizedForPostEditAndDelete(id, User))
         return View(await _postService.GetPostEditVm(id));
 
       return RedirectToAction("AccessDenied", "Account");
     }
 
-    [Route("UpdateAccount/{id}")]
+    [Route("Update/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(PostEditVm postEditVm) {
+    public async Task<IActionResult> Edit(int id, PostEditVm postEditVm) {
+      if (!_postService.DoesPostExist(id)) {
+        return NotFound();
+      }
+
       if (!ModelState.IsValid)
         return (View(postEditVm));
 
@@ -83,7 +101,11 @@ namespace Forum.Controllers {
     [Route("Delete/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(PostDeleteVm postDeleteVm) {
+    public async Task<IActionResult> Delete(int id, PostDeleteVm postDeleteVm) {
+      if (!_postService.DoesPostExist(id)) {
+        return NotFound();
+      }
+
       if (!ModelState.IsValid)
         return (View(postDeleteVm));
 
@@ -98,6 +120,10 @@ namespace Forum.Controllers {
     [Route("Lock/{id}")]
     [HttpGet]
     public async Task<IActionResult> Lock(int id) {
+      if (!_postService.DoesPostExist(id)) {
+        return NotFound();
+      }
+
       if (_postService.IsPostLocked(id))
         return RedirectToAction(nameof(Unlock));
 
@@ -108,7 +134,11 @@ namespace Forum.Controllers {
     [Route("Lock/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Lock(PostLockVm postLockVm) {
+    public async Task<IActionResult> Lock(int id, PostLockVm postLockVm) {
+      if (!_postService.DoesPostExist(id)) {
+        return NotFound();
+      }
+
       if (!ModelState.IsValid)
         return (View(postLockVm));
 
@@ -123,6 +153,10 @@ namespace Forum.Controllers {
     [Route("Unlock/{id}")]
     [HttpGet]
     public async Task<IActionResult> Unlock(int id) {
+      if (!_postService.DoesPostExist(id)) {
+        return NotFound();
+      }
+
       if (!_postService.IsPostLocked(id))
         return RedirectToAction(nameof(Lock));
 
@@ -133,7 +167,11 @@ namespace Forum.Controllers {
     [Route("Unlock/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Unlock(PostUnlockVm postUnlockVm) {
+    public async Task<IActionResult> Unlock(int id, PostUnlockVm postUnlockVm) {
+      if (!_postService.DoesPostExist(id)) {
+        return NotFound();
+      }
+
       if (!ModelState.IsValid)
         return (View(postUnlockVm));
 

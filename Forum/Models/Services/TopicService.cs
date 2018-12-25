@@ -177,5 +177,9 @@ namespace Forum.Models.Services {
     public bool IsTopicLocked(int id) {
       return _db.Topic.Where(t => t.Id == id).Any(p => p.LockedBy != null);
     }
+
+    public bool DoesTopicExist(int id) {
+      return _db.Topic.Any(t => t.Id == id);
+    }
   }
 }

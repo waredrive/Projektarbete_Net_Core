@@ -60,8 +60,7 @@ namespace Forum.Models.Services {
 
         _db.Member.Add(member);
         await _db.SaveChangesAsync();
-      }
-      catch (Exception) {
+      } catch (Exception) {
         await _userManager.DeleteAsync(user);
         throw;
       }
@@ -70,8 +69,22 @@ namespace Forum.Models.Services {
     }
 
     public async Task<SignInResult> Login(AccountLoginVm accountLoginVm) {
-      return await _signInManager.PasswordSignInAsync(accountLoginVm.UserName, accountLoginVm.Password,
+      var result =  await _signInManager.PasswordSignInAsync(accountLoginVm.UserName, accountLoginVm.Password,
         accountLoginVm.RememberMe, false);
+      if (result.Succeeded)
+        await ResetOldBlockStatus(accountLoginVm.UserName);
+      return result;
+    }
+
+    private async Task ResetOldBlockStatus(string username) {
+      var identityUser = await _userManager.FindByNameAsync(username);
+      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
+      if (memberFromDb.BlockedEnd != null && memberFromDb.BlockedEnd < DateTime.UtcNow) {
+        memberFromDb.BlockedBy = null;
+        memberFromDb.BlockedOn = null;
+        memberFromDb.BlockedEnd = null;
+        await _db.SaveChangesAsync();
+      }
     }
 
     public async Task SignOut() {
@@ -104,8 +117,7 @@ namespace Forum.Models.Services {
         memberFromDb.FirstName = accountEditVm.FirstName;
         memberFromDb.LastName = accountEditVm.LastName;
         await _db.SaveChangesAsync();
-      }
-      catch (Exception) {
+      } catch (Exception) {
         await _userManager.SetEmailAsync(identityUser, oldEmail);
         throw;
       }
@@ -130,7 +142,7 @@ namespace Forum.Models.Services {
         FirstName = memberFromDb.FirstName,
         LastName = memberFromDb.LastName,
         IsAuthorizedForAccountEdit =
-          _authorizationService.IsAuthorizedForAccountAndPasswordEdit(identityUser.UserName, user)
+          await _authorizationService.IsAuthorizedForAccountEdit(identityUser.UserName, user)
       };
     }
 
@@ -143,9 +155,13 @@ namespace Forum.Models.Services {
         if (await _roleManager.RoleExistsAsync(role))
           continue;
 
-        var roleToAdd = new IdentityRole {Name = role};
+        var roleToAdd = new IdentityRole { Name = role };
         await _roleManager.CreateAsync(roleToAdd);
       }
+    }
+
+    public bool DoesAccountExist(string username) {
+      return _userManager.FindByNameAsync(username).Result != null;
     }
   }
 }

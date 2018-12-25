@@ -54,7 +54,7 @@ namespace Forum.Models.Services {
           CreatedOn = p.CreatedOn,
           CreatedBy = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName,
           PostText = p.ContentText,
-          IsAuthorizedForPostEditAndDelete = _authorizationService.IsAuthorizedForPostEditAndDelete(p, user),
+          IsAuthorizedForPostEditAndDelete = _authorizationService.IsAuthorizedForPostEditAndDelete(p, user).Result,
           LockedBy = p.LockedBy != null ? _userManager.FindByIdAsync(p.LockedBy).Result.UserName : null
         }));
 
@@ -143,6 +143,10 @@ namespace Forum.Models.Services {
 
     public bool IsPostLocked(int id) {
       return _db.Post.Where(p => p.Id == id).Any(p => p.LockedBy != null);
+    }
+
+    public bool DoesPostExist(int id) {
+      return _db.Post.Any(p => p.Id == id);
     }
   }
 }

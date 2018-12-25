@@ -73,8 +73,8 @@ namespace Forum.Models.Services {
           CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
           ThreadText = t.ContentText,
           PostCount = t.Post.Count,
-          IsAuthorizedForThreadEdit = _authorizationService.IsAuthorizedForThreadEdit(t, user),
-          IsAuthorizedForThreadDelete = _authorizationService.IsAuthorizedForThreadDelete(t, user),
+          IsAuthorizedForThreadEdit = _authorizationService.IsAuthorizedForThreadEdit(t, user).Result,
+          IsAuthorizedForThreadDelete = _authorizationService.IsAuthorizedForThreadDelete(t, user).Result,
           LockedBy = t.LockedBy != null ? _userManager.FindByIdAsync(t.LockedBy).Result.UserName : null
         }));
 
@@ -181,9 +181,12 @@ namespace Forum.Models.Services {
       return !_db.Topic.Where(t => t.Id == id).Any(t => t.LockedBy != null);
     }
 
-
     public bool IsThreadLocked(int id) {
       return _db.Thread.Where(t => t.Id == id).Any(t => t.LockedBy != null);
+    }
+
+    public bool DoesThreadExist(int id) {
+      return _db.Thread.Any(t => t.Id == id);
     }
   }
 }

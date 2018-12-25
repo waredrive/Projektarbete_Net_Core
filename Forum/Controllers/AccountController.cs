@@ -60,9 +60,9 @@ namespace Forum.Controllers {
         return View(accountLoginVm);
 
       var result = await _accountService.Login(accountLoginVm);
-
-      if (result.Succeeded)
+      if (result.Succeeded) {
         return Redirect(Url.IsLocalUrl(accountLoginVm.ReturnUrl) ? accountLoginVm.ReturnUrl : "/");
+      }
 
       ModelState.AddModelError(string.Empty, "Invalid login attempt.");
 
@@ -72,7 +72,11 @@ namespace Forum.Controllers {
     [Route("Update/{username}")]
     [HttpGet]
     public async Task<IActionResult> EditAccount(string username) {
-      if (_authorizationService.IsAuthorizedForAccountAndPasswordEdit(username, User))
+      if (!_accountService.DoesAccountExist(username)) {
+        return NotFound();
+      }
+
+      if (await _authorizationService.IsAuthorizedForAccountEdit(username, User))
         return View(await _accountService.GetAccountEditVm(User));
 
       return RedirectToAction(nameof(AccessDenied));
@@ -82,10 +86,14 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditAccount(string username, AccountEditVm accountEditVm) {
+      if (!_accountService.DoesAccountExist(username)) {
+        return NotFound();
+      }
+
       if (!ModelState.IsValid)
         return (View(accountEditVm));
 
-      if (!_authorizationService.IsAuthorizedForAccountAndPasswordEdit(username, User))
+      if (!await _authorizationService.IsAuthorizedForAccountEdit(username, User))
         return RedirectToAction(nameof(AccessDenied));
 
       var result = await _accountService.UpdateAccount(accountEditVm, User);
@@ -101,8 +109,12 @@ namespace Forum.Controllers {
 
     [Route("Update/Password/{username}")]
     [HttpGet]
-    public IActionResult EditPassword(string username) {
-      if (_authorizationService.IsAuthorizedForAccountAndPasswordEdit(username, User))
+    public async Task<IActionResult> EditPassword(string username) {
+      if (!_accountService.DoesAccountExist(username)) {
+        return NotFound();
+      }
+
+      if (await _authorizationService.IsAuthorizedForAccountEdit(username, User))
         return View();
 
       return RedirectToAction(nameof(AccessDenied));
@@ -112,10 +124,14 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditPassword(string username, AccountPasswordEditVm accountPasswordEditVm) {
+      if (!_accountService.DoesAccountExist(username)) {
+        return NotFound();
+      }
+
       if (!ModelState.IsValid)
         return (View(accountPasswordEditVm));
 
-      if (!_authorizationService.IsAuthorizedForAccountAndPasswordEdit(username, User))
+      if (!await _authorizationService.IsAuthorizedForAccountEdit(username, User))
         return RedirectToAction(nameof(AccessDenied));
 
       var result = await _accountService.UpdatePassword(accountPasswordEditVm, User);
@@ -132,6 +148,10 @@ namespace Forum.Controllers {
     [Route("Details/{username}")]
     [HttpGet]
     public async Task<IActionResult> Details(string username) {
+      if (!_accountService.DoesAccountExist(username)) {
+        return NotFound();
+      }
+
       if (_authorizationService.IsAuthorizedForAccountDetailsView(username, User))
         return View(await _accountService.GetAccountDetailsVm(username, User));
 
