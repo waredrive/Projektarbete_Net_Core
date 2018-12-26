@@ -61,7 +61,7 @@ namespace Forum.Models.Services {
       var isAuthorizedForPostEditAndDelete = await _authorizationService.IsAuthorizedForPostEditAndDelete(post, user);
       var isAuthorizedForPostLock = await _authorizationService.IsAuthorizedForPostLock(post, user);
       var createdBy = await _userManager.FindByIdAsync(post.CreatedBy);
-      var lockedBy = await _userManager.FindByIdAsync(post.CreatedBy);
+      var lockedBy = await _userManager.FindByIdAsync(post.LockedBy);
 
       return new PostsIndexPostVm {
         PostId = post.Id,

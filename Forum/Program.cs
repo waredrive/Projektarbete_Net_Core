@@ -7,7 +7,6 @@ namespace Forum {
       CreateWebHostBuilder(args).Build().Run();
     }
 
-    //TODO: Add deletion timeout for posts and threads.
     //TODO: Add custom messages to AccessDenied
     //TODO: Add returnurl to access denied and other relevant pages.
     //TODO: Add admin management page with list of blocked users/topics/threads/posts.
@@ -16,6 +15,7 @@ namespace Forum {
     //TODO: Add Typeahead with ajax call for searching.
     //TODO: Styling
     //TODO: Add seed of Default deleted user
+    //TODO: Add deletion timeout for posts and threads?
     //TODO: Add SuperAdmin?
     //TODO: Add areas?
     //TODO: REFACTORING!!!

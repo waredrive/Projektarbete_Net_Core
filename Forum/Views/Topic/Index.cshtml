@@ -80,7 +80,7 @@
               <a asp-controller="Post" asp-action="index" asp-route-threadId="@post.ThreadId" class="light">@post.ThreadText</a>
             </td>
             <td>
-              <a asp-controller="Profile" asp-action="Details" asp-route-username="@post.LatestCommenter" class="light">@post.LatestCommenter</a>
+              <a asp-controller="Profile" asp-action="Details" asp-route-username="@post.LatestCommenter" asp-route-returnUrl="@ViewBag.ReturnUrl" class="light">@post.LatestCommenter</a>
             </td>
             <td>@post.LatestCommentTime</td>
           </tr>

@@ -3,7 +3,9 @@ using System.Threading.Tasks;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace Forum.Controllers {
   [RequireHttps]
@@ -160,7 +162,9 @@ namespace Forum.Controllers {
 
     [Route("Details/{username}")]
     [HttpGet]
-    public async Task<IActionResult> Details(string username) {
+    public async Task<IActionResult> Details(string username, string returnUrl = null) {
+      ViewBag.ReturnUrl = returnUrl ?? "/";
+
       if (!_accountService.DoesAccountExist(username))
         return NotFound();
 
@@ -175,7 +179,9 @@ namespace Forum.Controllers {
     [HttpGet]
     [Route("AccessDenied")]
     public IActionResult AccessDenied(string returnUrl = null) {
-      return View();
+
+      var accountAccessDeniedVm = new AccountAccessDeniedVm {ReturnUrl = returnUrl};
+      return View(accountAccessDeniedVm);
     }
 
     [Route("Logout")]

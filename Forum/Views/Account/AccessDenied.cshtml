@@ -1,4 +1,5 @@
-﻿@{
+﻿@model AccountAccessDeniedVm
+@{
   ViewBag.Title = "Access Denied";
 }
 
@@ -6,5 +7,9 @@
   <div class="col-12 rounded my-5 bg-light p-5">
     <h1 class="text-danger">Access Denied.</h1>
     <p class="text-danger">You do not have access to this resource.</p>
+    <br />
+    <div class="btn-group float-right">
+      <a href="@Model.ReturnUrl" class="btn btn-warning">Edit Account</a>
+    </div>
   </div>
 </div>

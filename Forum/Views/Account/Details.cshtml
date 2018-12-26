@@ -27,13 +27,12 @@
     </fieldset>
     @if (Model.IsAuthorizedForAccountEdit) {
       <div>
-        <a asp-controller="Account" asp-action="EditAccount" asp-route-username="@User.Identity.Name" class="btn btn-warning">Edit Account</a>
+        <a asp-controller="Account" asp-action="EditAccount"  class="btn btn-warning">Edit Account</a>
       </div>
     }
     <br />
     <div class="btn-group float-right">
-      @*TODO: FIX PATH*@
-      <a asp-controller="" asp-action="" class="btn btn-primary">Back</a>
+      <a href="@ViewBag.ReturnUrl" class="btn btn-primary">Back</a>
     </div>
   </div>
 </div>

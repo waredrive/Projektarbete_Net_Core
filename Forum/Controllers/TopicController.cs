@@ -3,6 +3,7 @@ using Forum.Attributes;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.TopicViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.Controllers {
@@ -20,6 +21,7 @@ namespace Forum.Controllers {
     [Route("")]
     [HttpGet]
     public async Task<IActionResult> Index() {
+      ViewBag.ReturnUrl = Request.GetDisplayUrl();
       return View(await _topicService.GetTopicsIndexVm(User));
     }
 

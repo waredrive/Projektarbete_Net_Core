@@ -239,6 +239,9 @@ namespace Forum.Models.Services {
       if (await IsProfileInternal(username))
         return false;
 
+      if (await ProfileIsInRole(username, Roles.Admin) && !string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase))
+        return false;
+
       if (string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase))
         return true;
 
@@ -255,7 +258,7 @@ namespace Forum.Models.Services {
       if (await ProfileIsInRole(username, Roles.Admin) && !string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase))
         return false;
 
-      return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase) || user.IsInRole(Roles.Admin);
+      return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase);
     }
 
     public async Task<bool> IsAuthorizedForProfileDelete(string username, ClaimsPrincipal user) {

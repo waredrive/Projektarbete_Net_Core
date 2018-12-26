@@ -22,7 +22,9 @@ namespace Forum.Controllers {
 
     [Route("Details/{username}")]
     [HttpGet]
-    public async Task<IActionResult> Details(string username) {
+    public async Task<IActionResult> Details(string username, string returnUrl = null) {
+      ViewBag.ReturnUrl = returnUrl ?? "/";
+
       if (!_profileService.DoesProfileExist(username))
         return NotFound();
 
