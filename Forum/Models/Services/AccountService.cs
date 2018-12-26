@@ -69,6 +69,16 @@ namespace Forum.Models.Services {
     }
 
     public async Task<SignInResult> Login(AccountLoginVm accountLoginVm) {
+      var user = new IdentityUser {
+        UserName = "[Test]",
+        Email = "[Test]"
+      };
+
+      var test = _userManager.CreateAsync(user);
+
+      if(await _authorizationService.IsProfileInternal(accountLoginVm.UserName))
+        return SignInResult.Failed;
+
       var result =  await _signInManager.PasswordSignInAsync(accountLoginVm.UserName, accountLoginVm.Password,
         accountLoginVm.RememberMe, false);
       if (result.Succeeded)
@@ -79,7 +89,7 @@ namespace Forum.Models.Services {
     private async Task ResetOldBlockStatus(string username) {
       var identityUser = await _userManager.FindByNameAsync(username);
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
-      if (memberFromDb.BlockedEnd != null && memberFromDb.BlockedEnd < DateTime.UtcNow) {
+      if (memberFromDb.BlockedEnd < DateTime.UtcNow) {
         memberFromDb.BlockedBy = null;
         memberFromDb.BlockedOn = null;
         memberFromDb.BlockedEnd = null;
@@ -142,7 +152,7 @@ namespace Forum.Models.Services {
         FirstName = memberFromDb.FirstName,
         LastName = memberFromDb.LastName,
         IsAuthorizedForAccountEdit =
-          await _authorizationService.IsAuthorizedForAccountAndProfileEdit(identityUser.UserName, user)
+          await _authorizationService.IsAuthorizedForAccountAndProfileEditAndDelete(identityUser.UserName, user)
       };
     }
 

@@ -1,0 +1,28 @@
+﻿@model ProfileBlockVm
+
+@{
+  ViewBag.Title = "Block Profile";
+}
+
+<div class="container">
+  <div class="col-12 rounded my-5 bg-secondary p-5 text-light">
+    <h1>Block @Model.Username</h1>
+    <form asp-controller="Profile" asp-action="Block" asp-route-username="@Model.Username" class="mt-5">
+      <div asp-validation-summary="ModelOnly" class="text-danger bg-light"></div>
+      <div class="form-group">
+        <label asp-for="BlockedEnd" class="control-label"></label>
+        <input asp-for="BlockedEnd" class="form-control" />
+        <span asp-validation-for="BlockedEnd" class="text-danger bg-light"></span>
+      </div>
+      <br />
+      <div class="btn-group float-right">
+        <button type="submit" class="btn btn-warning">Block User</button>
+        <a asp-controller="Profile" asp-action="Details" asp-route-username="@Model.Username" class="btn btn-primary">Back</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+@section scripts {
+  <partial name="_ValidationScriptsPartial" />
+}

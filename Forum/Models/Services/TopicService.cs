@@ -45,7 +45,7 @@ namespace Forum.Models.Services {
         TotalPosts = _db.Post.Count(),
         NewestMember = _userManager.FindByIdAsync(_db.Member.OrderByDescending(m => m.CreatedOn).First().Id).Result
           .UserName,
-        IsAuthorizedForTopicCreate = await _authorizationService.IsAuthorizedForCreate(user)
+        IsAuthorizedForTopicCreate = await _authorizationService.IsAuthorizedForCreateTopic(user)
       };
 
       topicsIndexVm.Topics.AddRange(_db.Topic.Include(t => t.Thread).Select(t => new TopicsIndexTopicVm {
@@ -66,7 +66,8 @@ namespace Forum.Models.Services {
       topicsIndexVm.LatestThreads.AddRange(_db.Thread.OrderByDescending(t => t.CreatedOn).Take(10).Select(t =>
         new TopicsIndexThreadVm {
           ThreadId = t.Id,
-          CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
+          //TODO: Change to something nicer = separate method
+          CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result != null ? _userManager.FindByIdAsync(t.CreatedBy).Result.UserName : "",
           CreatedOn = t.CreatedOn,
           ThreadText = t.ContentText
         }));

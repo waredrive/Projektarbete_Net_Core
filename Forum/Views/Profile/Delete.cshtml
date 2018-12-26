@@ -1,0 +1,47 @@
+﻿@model ProfileDeleteVm
+@{
+  ViewBag.Title = "Delete Profile";
+}
+
+<div class="container">
+  <div class="col-12 rounded my-5 bg-secondary p-5 text-light">
+    <h1>Delete @Model.Username</h1>
+    <br/>
+    <div class="row bg-light text-danger py-2 rounded">
+      <div class="col-12">
+        <h4>Warning!</h4>
+        <h5>This profile will be permanently removed, including all its posts!</h5>
+      </div>
+    </div>
+    <br/>
+    <div class="row">
+      <div class="col-6">
+        <p>Joined: @Model.CreatedOn</p>
+        <p>Total threads: @Model.TotalThreads</p>
+        <p>Total posts: @Model.TotalPosts</p>
+        @if (Model.Roles.Length > 0) {
+          <p>Roles: @string.Join(", ", Model.Roles)</p>
+        }
+      </div>
+      <div class="col-6">
+        @if (Model.BlockedBy != null) {
+          <p>Blocked on: @Model.BlockedOn</p>
+          <p>Blocked by: @Model.BlockedBy</p>
+          <p>Blocked ending: @Model.BlockedEnd</p>
+        }
+      </div>
+      <br />
+    </div>
+    <div class="row py-3">
+      <div class="col-12">
+        <form asp-controller="Profile" asp-action="Delete" asp-route-username="@Model.Username">
+          @Html.HiddenFor(m => m.Username)
+          <div class="btn-group float-right">
+            <input type="submit" class="btn btn-danger rounded-left" value="Delete User"/>
+            <a asp-controller="Profile" asp-action="Details" asp-route-username="@Model.Username" class="btn btn-primary">Back</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

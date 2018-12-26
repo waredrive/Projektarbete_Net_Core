@@ -8,12 +8,10 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Forum.Models.ViewModels.ProfileViewModels {
   public class ProfileEditVm {
-    public string OldUsername { get; set; }
     [Required]
     [Display(Name = "Username")]
     public string NewUsername { get; set; }
     [Display(Name = "Profile Image")]
     public IFormFile ProfileImage { get; set; }
-    public SelectListItem[] Roles { get; set; }
   }
 }

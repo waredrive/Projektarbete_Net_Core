@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Forum.Validations;
 using Microsoft.AspNetCore.Http;
 
 namespace Forum.Extensions {
@@ -86,17 +87,6 @@ namespace Forum.Extensions {
       } finally {
         postedFile.OpenReadStream().Dispose();
       }
-    }
-  }
-
-  public class ImageValidationResult {
-
-    public bool Success => Errors.Count == 0;
-    public List<string> Errors { get; } = new List<string>();
-
-    public ImageValidationResult DefaultError() {
-      Errors.Add("Invalid Image file.");
-      return this;
     }
   }
 }

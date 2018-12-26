@@ -7,7 +7,10 @@ namespace Forum {
       CreateWebHostBuilder(args).Build().Run();
     }
 
-    //TODO: Remove block on signup if blockend (check if works).
+    //TODO: Prevent going back to create pages when back button is clicked.
+    //TODO: Add deletion timeout for posts and threads.
+    //TODO: Validate if birthdate set wrongly
+    //TODO: Revisit the can create methods and check if blocked admin can make changes (make it consistant).
     //TODO: Add returnurl to access denied and other relevant pages.
     //TODO: Add admin management page with list of blocked users/topics/threads/posts.
     //TODO: Add pagination.

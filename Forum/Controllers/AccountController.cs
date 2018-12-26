@@ -76,10 +76,10 @@ namespace Forum.Controllers {
         return NotFound();
       }
 
-      if (await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
-        return View(await _accountService.GetAccountEditVm(User));
+      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAndDelete(username, User))
+        return RedirectToAction(nameof(AccessDenied));
 
-      return RedirectToAction(nameof(AccessDenied));
+      return View(await _accountService.GetAccountEditVm(User));
     }
 
     [Route("Update/{username}")]
@@ -93,7 +93,7 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return (View(accountEditVm));
 
-      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
+      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAndDelete(username, User))
         return RedirectToAction(nameof(AccessDenied));
 
       var result = await _accountService.UpdateAccount(accountEditVm, User);
@@ -114,10 +114,10 @@ namespace Forum.Controllers {
         return NotFound();
       }
 
-      if (await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
-        return View();
+      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAndDelete(username, User))
+        return RedirectToAction(nameof(AccessDenied));
 
-      return RedirectToAction(nameof(AccessDenied));
+      return View();
     }
 
     [Route("Update/Password/{username}")]
@@ -131,7 +131,7 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return (View(accountPasswordEditVm));
 
-      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
+      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAndDelete(username, User))
         return RedirectToAction(nameof(AccessDenied));
 
       var result = await _accountService.UpdatePassword(accountPasswordEditVm, User);
@@ -148,14 +148,14 @@ namespace Forum.Controllers {
     [Route("Details/{username}")]
     [HttpGet]
     public async Task<IActionResult> Details(string username) {
-      if (!_accountService.DoesAccountExist(username)) {
+      if (!_accountService.DoesAccountExist(username))
         return NotFound();
-      }
 
-      if (_authorizationService.IsAuthorizedForAccountDetailsView(username, User))
-        return View(await _accountService.GetAccountDetailsVm(username, User));
+      if (!await _authorizationService.IsAuthorizedForAccountDetailsView(username, User))
+        return RedirectToAction(nameof(AccessDenied));
 
-      return RedirectToAction(nameof(AccessDenied));
+      return View(await _accountService.GetAccountDetailsVm(username, User));
+
     }
 
     [AllowAnonymous]

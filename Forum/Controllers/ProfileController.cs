@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Forum.Attributes;
 using Forum.Extensions;
 using Forum.Models.Services;
-using Forum.Models.ViewModels.ComponentViewModels.AdminProfileEditViewModels;
 using Forum.Models.ViewModels.ProfileViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,9 +23,11 @@ namespace Forum.Controllers {
     [Route("Details/{username}")]
     [HttpGet]
     public async Task<IActionResult> Details(string username) {
-      if (!_profileService.DoesProfileExist(username)) {
+      if (!_profileService.DoesProfileExist(username))
         return NotFound();
-      }
+
+      if(await _authorizationService.IsProfileInternal(username))
+        return RedirectToAction("AccessDenied", "Account");
 
       return View(await _profileService.GetProfileDetailsVm(username, User));
     }
@@ -34,28 +35,27 @@ namespace Forum.Controllers {
     [Route("Update/{username}")]
     [HttpGet]
     public async Task<IActionResult> Edit(string username) {
-      if (!_profileService.DoesProfileExist(username)) {
+      if (!_profileService.DoesProfileExist(username))
         return NotFound();
-      }
 
-      if (await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
-        return View(await _profileService.GetProfileEditVm(username));
+      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAndDelete(username, User))
+        return RedirectToAction("AccessDenied", "Account");
 
-      return RedirectToAction("AccessDenied", "Account");
+      return View(await _profileService.GetProfileEditVm(username));
+
     }
 
     [Route("Update/{username}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(string username, ProfileEditVm profileEditVm) {
-      if (!_profileService.DoesProfileExist(username)) {
+      if (!_profileService.DoesProfileExist(username))
         return NotFound();
-      }
 
       if (!ModelState.IsValid)
         return (View(await _profileService.GetProfileEditVm(username)));
 
-      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
+      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAndDelete(username, User))
         return RedirectToAction("AccessDenied", "Account");
 
       if (profileEditVm.ProfileImage != null) {
@@ -75,39 +75,153 @@ namespace Forum.Controllers {
         return View(await _profileService.GetProfileEditVm(username));
       }
 
-      return RedirectToAction(nameof(Details));
+      return RedirectToAction(nameof(Details), new { username = profileEditVm.NewUsername });
     }
 
-    [Route("Update/Role/{username}")]
+    [Route("Role/{username}")]
+    [AuthorizeRoles(Roles.Admin)]
+    [HttpGet]
+    public async Task<IActionResult> EditRole(string username) {
+      if (!_profileService.DoesProfileExist(username))
+        return NotFound();
+
+      if (!await _authorizationService.IsAuthorizedProfileChangeRoleAndBlock(username, User))
+        return RedirectToAction("AccessDenied", "Account");
+
+      return View(await _profileService.GetProfileRoleEditVm(username));
+
+
+    }
+
+    [Route("Role/{username}")]
     [AuthorizeRoles(Roles.Admin)]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> EditRole(string username, AdminProfileEditVm adminProfileEditVm) {
-      if (!_profileService.DoesProfileExist(username)) {
+    public async Task<IActionResult> EditRole(string username, ProfileRoleEditVm profileRoleEditVm) {
+      if (!_profileService.DoesProfileExist(username))
         return NotFound();
-      }
 
-        await _profileService.UpdateProfileRole(username, adminProfileEditVm);
+      if (!ModelState.IsValid)
+        return View(profileRoleEditVm);
+
+      if (!await _authorizationService.IsAuthorizedProfileChangeRoleAndBlock(username, User))
+        return RedirectToAction("AccessDenied", "Account");
+
+      await _profileService.UpdateProfileRole(username, profileRoleEditVm);
+
+      return RedirectToAction(nameof(Details), new { username });
+    }
+
+    [Route("Block/{username}")]
+    [AuthorizeRoles(Roles.Admin)]
+    [HttpGet]
+    public async Task<IActionResult> Block(string username) {
+      if (!_profileService.DoesProfileExist(username))
+        return NotFound();
+
+      if (!await _authorizationService.IsAuthorizedProfileChangeRoleAndBlock(username, User))
+        return RedirectToAction("AccessDenied", "Account");
+
+      if (await _profileService.IsProfileBlocked(username))
+        return RedirectToAction(nameof(Unblock));
+
+      return View(await _profileService.GetProfileBlockVm(username));
+    }
+
+    [Route("Block/{username}")]
+    [AuthorizeRoles(Roles.Admin)]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Block(string username, ProfileBlockVm profileBlockVm) {
+      if (!_profileService.DoesProfileExist(username))
+        return NotFound();
+
+      if (!ModelState.IsValid)
+        return View(profileBlockVm);
+
+      if (!await _authorizationService.IsAuthorizedProfileChangeRoleAndBlock(username, User))
+        return RedirectToAction("AccessDenied", "Account");
+
+      if (await _profileService.IsProfileBlocked(username))
+        return RedirectToAction(nameof(Details), new { username });
+
+      var result = await _profileService.Block(username, profileBlockVm, User);
+
+      if (!result.Success) {
+        foreach (var error in result.Errors)
+          ModelState.AddModelError(string.Empty, error);
+        return View(await _profileService.GetProfileBlockVm(username));
+      }
 
       return RedirectToAction(nameof(Details));
     }
 
-    [Route("Update/Block/{username}")]
+    [Route("Unblock/{username}")]
+    [AuthorizeRoles(Roles.Admin)]
+    [HttpGet]
+    public async Task<IActionResult> Unblock(string username) {
+      if (!_profileService.DoesProfileExist(username))
+        return NotFound();
+
+      if (!await _authorizationService.IsAuthorizedProfileChangeRoleAndBlock(username, User))
+        return RedirectToAction("AccessDenied", "Account");
+
+
+      if (!await _profileService.IsProfileBlocked(username))
+        return RedirectToAction(nameof(Unblock));
+
+      return View(await _profileService.GetProfileUnblockVm(username));
+    }
+
+    [Route("Unblock/{username}")]
     [AuthorizeRoles(Roles.Admin)]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Block(string username, AdminProfileEditVm adminProfileEditVm) {
-      if (!_profileService.DoesProfileExist(username)) {
+    public async Task<IActionResult> Unblock(string username, ProfileUnblockVm profileUnblockVm) {
+      if (!_profileService.DoesProfileExist(username))
         return NotFound();
-      }
-      ModelState.AddModelError(string.Empty, "test");
-      if (!ModelState.IsValid) {
-        RedirectToAction(nameof(Details));
-      }
 
-      await _profileService.Block(username, adminProfileEditVm, User);
+      if (!ModelState.IsValid)
+        return View(profileUnblockVm);
+
+      if (!await _authorizationService.IsAuthorizedProfileChangeRoleAndBlock(username, User))
+        return RedirectToAction("AccessDenied", "Account");
+
+      if (!await _profileService.IsProfileBlocked(username))
+        return RedirectToAction(nameof(Details), new { username });
+
+      await _profileService.Unblock(username, profileUnblockVm, User);
 
       return RedirectToAction(nameof(Details));
+    }
+
+    [Route("Delete/{username}")]
+    [HttpGet]
+    public async Task<IActionResult> Delete(string username) {
+      if (!_profileService.DoesProfileExist(username))
+        return NotFound();
+
+      if (await _authorizationService.IsAuthorizedForAccountAndProfileEditAndDelete(username, User))
+        return View(await _profileService.GetProfileDeleteVm(username));
+
+      return RedirectToAction("AccessDenied", "Account");
+    }
+
+    [Route("Delete/{username}")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(string username, ProfileDeleteVm profileDeleteVm) {
+      if (!_profileService.DoesProfileExist(username))
+        return NotFound();
+
+      if (!ModelState.IsValid)
+        return (View(profileDeleteVm));
+
+      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAndDelete(profileDeleteVm.Username, User))
+        return RedirectToAction("AccessDenied", "Account");
+
+      await _profileService.Remove(profileDeleteVm);
+      return RedirectToAction("Index", "Topic");
     }
   }
 }

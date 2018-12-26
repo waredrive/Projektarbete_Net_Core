@@ -45,7 +45,7 @@ namespace Forum.Models.Services {
         Thread = threadFromDb.ContentText,
         Posts = new List<PostsIndexPostVm>(),
         IsThreadLocked = threadFromDb.LockedBy != null,
-        IsAuthorizedForPostCreate =await _authorizationService.IsAuthorizedForCreate(user)
+        IsAuthorizedForPostCreate =await _authorizationService.IsAuthorizedForCreatePost(threadId, user)
       };
 
       //Included Threadnavigation to be used in authorization check within GetPostsIndexPostVmAsync method
