@@ -31,7 +31,7 @@
               <a asp-controller="Post" asp-action="index" asp-route-threadId="@thread.ThreadId" class="light">
                 <p class="pb-0 mb-0">@thread.ThreadText</p>
               </a>
-              <small>Started by @thread.CreatedBy, @thread.CreatedOn</small>
+              <small>Started by <a asp-controller="Profile" asp-action="Details" asp-route-username="@thread.CreatedBy" class="light">@thread.CreatedBy</a>, @thread.CreatedOn</small>
             </td>
             <td>
               <p>
@@ -44,7 +44,7 @@
                 @if (thread.IsAuthorizedForThreadEdit) {
                   <a asp-controller="Thread" asp-action="Edit" asp-route-id="@thread.ThreadId" class="btn btn-primary btn-sm">Edit</a>
                 }
-                @if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Moderator)) {
+                @if (thread.IsAuthorizedForThreadLock) {
                   if (thread.LockedBy == null) {
                     <a asp-controller="Thread" asp-action="Lock" asp-route-id="@thread.ThreadId" class="btn btn-warning btn-sm">Lock</a>
                   } else {

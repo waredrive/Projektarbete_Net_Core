@@ -12,6 +12,7 @@ namespace Forum.Models.ViewModels.TopicViewModels {
     public int TotalPosts { get; set; }
     public int TotalMembers { get; set; }
     public string NewestMember { get; set; }
+    public string MostActiveMember { get; set; }
     public bool IsAuthorizedForTopicCreate { get; set; }
   }
 
@@ -22,6 +23,7 @@ namespace Forum.Models.ViewModels.TopicViewModels {
     public int ThreadCount { get; set; }
     public int PostCount { get; set; }
     public TopicsIndexThreadVm LatestActiveThread { get; set; }
+    public bool IsAuthorizedForTopicEditBlockAndDelete { get; set; }
   }
 
   public class TopicsIndexPostVm {

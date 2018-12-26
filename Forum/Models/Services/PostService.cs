@@ -59,14 +59,18 @@ namespace Forum.Models.Services {
 
     private async Task<PostsIndexPostVm> GetPostsIndexPostVmAsync(Post post, ClaimsPrincipal user) {
       var isAuthorizedForPostEditAndDelete = await _authorizationService.IsAuthorizedForPostEditAndDelete(post, user);
+      var isAuthorizedForPostLock = await _authorizationService.IsAuthorizedForPostLock(post, user);
+      var createdBy = await _userManager.FindByIdAsync(post.CreatedBy);
+      var lockedBy = await _userManager.FindByIdAsync(post.CreatedBy);
 
       return new PostsIndexPostVm {
         PostId = post.Id,
         CreatedOn = post.CreatedOn,
-        CreatedBy = _userManager.FindByIdAsync(post.CreatedBy).Result.UserName,
+        CreatedBy = createdBy.UserName,
         PostText = post.ContentText,
         IsAuthorizedForPostEditAndDelete = isAuthorizedForPostEditAndDelete,
-        LockedBy = post.LockedBy != null ? _userManager.FindByIdAsync(post.LockedBy).Result.UserName : null
+        IsAuthorizedForPostLock = isAuthorizedForPostLock,
+        LockedBy = lockedBy?.UserName
       };
     }
 

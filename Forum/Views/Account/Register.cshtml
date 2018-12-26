@@ -7,42 +7,42 @@
   <div class="col-12 rounded my-5 bg-secondary p-5 text-light">
     <h1>Register new account</h1>
     <br />
-    <form asp-controller="Account" asp-action="Register">
-      <div asp-validation-summary="ModelOnly" class="text-danger bg-light"></div>
+    <form asp-controller="Account" asp-action="Register"  autocomplete="off">
+      <div asp-validation-summary="ModelOnly"  class="text-danger bg-white rounded py-1"></div>
       <div class="form-group">
         <label asp-for="UserName" class="control-label"></label>
         <input asp-for="UserName" class="form-control" />
-        <span asp-validation-for="UserName" class="text-danger bg-light"></span>
+        <span asp-validation-for="UserName" class="text-danger bg-white rounded-bottom py-1"></span>
       </div>
       <div class="form-group">
         <label asp-for="Email" class="control-label"></label>
         <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger bg-light"></span>
+        <span asp-validation-for="Email" class="text-danger bg-white rounded-bottom py-1"></span>
       </div>
       <div class="form-group">
         <label asp-for="FirstName" class="control-label"></label>
         <input asp-for="FirstName" class="form-control" />
-        <span asp-validation-for="FirstName" class="text-danger bg-light"></span>
+        <span asp-validation-for="FirstName" class="text-danger bg-white rounded-bottom py-1"></span>
       </div>
       <div class="form-group">
         <label asp-for="LastName" class="control-label"></label>
         <input asp-for="LastName" class="form-control" />
-        <span asp-validation-for="LastName" class="text-danger bg-light"></span>
+        <span asp-validation-for="LastName" class="text-danger bg-white rounded-bottom py-1"></span>
       </div>
       <div class="form-group">
         <label asp-for="Birthdate" class="control-label"></label>
         <input asp-for="Birthdate" class="form-control" />
-        <span asp-validation-for="Birthdate" class="text-danger bg-light"></span>
+        <span asp-validation-for="Birthdate" class="text-danger bg-white rounded-bottom py-1"></span>
       </div>
       <div class="form-group">
         <label asp-for="Password" class="control-label"></label>
         <input asp-for="Password" class="form-control" />
-        <span asp-validation-for="Password" class="text-danger bg-light"></span>
+        <span asp-validation-for="Password" class="text-danger bg-white rounded-bottom py-1"></span>
       </div>
       <div class="form-group">
         <label asp-for="ConfirmPassword" class="control-label"></label>
         <input asp-for="ConfirmPassword" class="form-control" />
-        <span asp-validation-for="ConfirmPassword" class="text-danger bg-light"></span>
+        <span asp-validation-for="ConfirmPassword" class="text-danger bg-white rounded-bottom py-1"></span>
       </div>
         <br />
         <div class="btn-group float-right">

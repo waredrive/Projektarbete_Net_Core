@@ -20,43 +20,58 @@ namespace Forum.Models.Services {
     }
 
     public async Task<bool> IsAuthorizedForCreatePost(int threadId, ClaimsPrincipal user) {
-      if (!user.Identity.IsAuthenticated)
+      if (!user.Identity.IsAuthenticated || await IsProfileBlocked(user.Identity.Name))
         return false;
 
-      var identityFromDb = await _userManager.FindByNameAsync(user.Identity.Name);
-      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityFromDb.Id);
+      if (user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator))
+        return true;
 
-      return _db.Thread.Where(t => t.Id == threadId).Any(t => t.LockedBy == null) && memberFromDb.BlockedBy == null;
+      return _db.Thread.Where(t => t.Id == threadId).Any(t => t.LockedBy == null);
     }
 
     public async Task<bool> IsAuthorizedForCreateThread(int topicId, ClaimsPrincipal user) {
-      if (!user.Identity.IsAuthenticated)
+      if (!user.Identity.IsAuthenticated || await IsProfileBlocked(user.Identity.Name))
         return false;
 
-      var identityFromDb = await _userManager.FindByNameAsync(user.Identity.Name);
-      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityFromDb.Id);
+      if (user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator))
+        return true;
 
-      return _db.Topic.Where(t => t.Id == topicId).Any(t => t.LockedBy == null) && memberFromDb.BlockedBy == null;
+      return _db.Topic.Where(t => t.Id == topicId).Any(t => t.LockedBy == null);
     }
 
     public async Task<bool> IsAuthorizedForCreateTopic(ClaimsPrincipal user) {
+      if (!user.Identity.IsAuthenticated || await IsProfileBlocked(user.Identity.Name))
+        return false;
+
+      return  user.IsInRole(Roles.Admin);
+    }
+
+    public async Task<bool> IsAuthorizedForTopicEditBlockAndDelete(int topicId, ClaimsPrincipal user) {
       if (!user.Identity.IsAuthenticated)
         return false;
 
-      var identityFromDb = await _userManager.FindByNameAsync(user.Identity.Name);
-      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityFromDb.Id);
+      var topicFromDb = await _db.Topic.FirstOrDefaultAsync(t => t.Id == topicId);
+      return topicFromDb != null && await IsAuthorizedForTopicEditBlockAndDelete(topicFromDb, user);
+    }
 
-      return memberFromDb.BlockedBy == null && user.IsInRole(Roles.Admin);
+    public async Task<bool> IsAuthorizedForTopicEditBlockAndDelete(Topic threadFromDb, ClaimsPrincipal user) {
+      if (!user.Identity.IsAuthenticated || await IsProfileBlocked(user.Identity.Name))
+        return false;
+
+      var userId = _userManager.GetUserId(user);
+      var profileUser = await _userManager.FindByIdAsync(threadFromDb.CreatedBy);
+
+      if (await ProfileIsInRole(profileUser.UserName, Roles.Admin) && threadFromDb.CreatedBy != userId)
+        return false;
+
+      return user.IsInRole(Roles.Admin);
     }
 
     public async Task<bool> IsAuthorizedForThreadCreateInTopic(int id, ClaimsPrincipal user) {
       if (!user.Identity.IsAuthenticated)
         return false;
 
-      var identityFromDb = await _userManager.FindByNameAsync(user.Identity.Name);
-      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityFromDb.Id);
-
-      if (memberFromDb.BlockedBy != null)
+      if (await IsProfileBlocked(user.Identity.Name))
         return false;
 
       if (user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator))
@@ -78,20 +93,24 @@ namespace Forum.Models.Services {
     }
 
     public async Task<bool> IsAuthorizedForThreadEdit(Thread threadFromDb, ClaimsPrincipal user) {
-      if (!user.Identity.IsAuthenticated)
+      if (!user.Identity.IsAuthenticated || await IsProfileBlocked(user.Identity.Name))
         return false;
 
-      var identityFromDb = await _userManager.FindByNameAsync(user.Identity.Name);
-      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityFromDb.Id);
+      var userId = _userManager.GetUserId(user);
+      var profileUser = await _userManager.FindByIdAsync(threadFromDb.CreatedBy);
+
+      if (await ProfileIsInRole(profileUser.UserName, Roles.Admin) && threadFromDb.CreatedBy != userId)
+        return false;
+
+      if (await ProfileIsInRole(profileUser.UserName, Roles.Moderator) && user.IsInRole(Roles.Moderator) && threadFromDb.CreatedBy != userId)
+        return false;
 
       if (user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator))
         return true;
 
-      var userId = _userManager.GetUserId(user);
-
       return threadFromDb.LockedOn == null && threadFromDb.CreatedBy == userId &&
              threadFromDb.Post.Where(p => p.Thread == threadFromDb.Id).All(p => p.CreatedBy == userId) &&
-             threadFromDb?.TopicNavigation.LockedOn == null && memberFromDb.BlockedBy == null;
+             threadFromDb?.TopicNavigation.LockedOn == null;
     }
 
     // The user is authorized as long as he is the only one that posted on the thread,
@@ -109,11 +128,17 @@ namespace Forum.Models.Services {
     }
 
     public async Task<bool> IsAuthorizedForThreadDelete(Thread threadFromDb, ClaimsPrincipal user) {
-      if (!user.Identity.IsAuthenticated)
+      if (!user.Identity.IsAuthenticated || await IsProfileBlocked(user.Identity.Name))
         return false;
 
-      var identityFromDb = await _userManager.FindByNameAsync(user.Identity.Name);
-      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityFromDb.Id);
+      var userId = _userManager.GetUserId(user);
+      var profileUser = await _userManager.FindByIdAsync(threadFromDb.CreatedBy);
+
+      if (await ProfileIsInRole(profileUser.UserName, Roles.Admin) && threadFromDb.CreatedBy != userId)
+        return false;
+
+      if (await ProfileIsInRole(profileUser.UserName, Roles.Moderator) && user.IsInRole(Roles.Moderator) && threadFromDb.CreatedBy != userId)
+        return false;
 
       if (user.IsInRole(Roles.Admin))
         return true;
@@ -122,26 +147,43 @@ namespace Forum.Models.Services {
         return threadFromDb.Post.Where(p => p.Thread == threadFromDb.Id)
           .All(p => p.CreatedBy == threadFromDb.CreatedBy);
 
-      var userId = _userManager.GetUserId(user);
       return threadFromDb.LockedOn == null && threadFromDb.CreatedBy == userId &&
              threadFromDb.Post.Where(p => p.Thread == threadFromDb.Id).All(p => p.CreatedBy == userId) &&
-             threadFromDb?.TopicNavigation.LockedOn == null && memberFromDb.BlockedBy == null;
+             threadFromDb?.TopicNavigation.LockedOn == null;
     }
 
     public async Task<bool> IsAuthorizedForPostCreateInThread(int threadId, ClaimsPrincipal user) {
-      if (!user.Identity.IsAuthenticated)
-        return false;
-
-      var identityFromDb = await _userManager.FindByNameAsync(user.Identity.Name);
-      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityFromDb.Id);
-
-      if (memberFromDb.BlockedBy != null)
+      if (!user.Identity.IsAuthenticated || await IsProfileBlocked(user.Identity.Name))
         return false;
 
       if (user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator))
         return true;
 
       return !_db.Thread.Where(t => t.Id == threadId).Any(t => t.LockedBy != null);
+    }
+
+    public async Task<bool> IsAuthorizedForThreadLock(int threadId, ClaimsPrincipal user) {
+      var threadFromDb = await _db.Thread.FirstOrDefaultAsync(t => t.Id == threadId);
+      return threadFromDb != null && await IsAuthorizedForThreadLock(threadFromDb, user);
+    }
+
+    public async Task<bool> IsAuthorizedForThreadLock(Thread threadFromDb, ClaimsPrincipal user) {
+      if (!user.Identity.IsAuthenticated || await IsProfileBlocked(user.Identity.Name))
+        return false;
+
+      var userId = _userManager.GetUserId(user);
+      var profileUser = await _userManager.FindByIdAsync(threadFromDb.CreatedBy);
+
+      if (await ProfileIsInRole(profileUser.UserName, Roles.Admin) && threadFromDb.CreatedBy != userId)
+        return false;
+
+      if (await ProfileIsInRole(profileUser.UserName, Roles.Moderator) && user.IsInRole(Roles.Moderator) && threadFromDb.CreatedBy != userId)
+        return false;
+
+      if (user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator))
+        return true;
+
+      return false;
     }
 
     // The user is authorized as long as the thread or post
@@ -153,55 +195,95 @@ namespace Forum.Models.Services {
     }
 
     public async Task<bool> IsAuthorizedForPostEditAndDelete(Post postFromDb, ClaimsPrincipal user) {
-      if (!user.Identity.IsAuthenticated)
+      if (!user.Identity.IsAuthenticated && await IsProfileBlocked(user.Identity.Name))
         return false;
 
-      var identityFromDb = await _userManager.FindByNameAsync(user.Identity.Name);
-      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityFromDb.Id);
+      var userId = _userManager.GetUserId(user);
+      var profileUser = await _userManager.FindByIdAsync(postFromDb.CreatedBy);
+
+      if (await ProfileIsInRole(profileUser.UserName, Roles.Admin) && postFromDb.CreatedBy != userId)
+        return false;
+
+      if (await ProfileIsInRole(profileUser.UserName, Roles.Moderator) && user.IsInRole(Roles.Moderator) && postFromDb.CreatedBy != userId)
+        return false;
 
       if (user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator))
         return true;
 
-      var userId = _userManager.GetUserId(user);
       return postFromDb.LockedOn == null && postFromDb.CreatedBy == userId &&
-             postFromDb?.ThreadNavigation.LockedOn == null && memberFromDb.BlockedBy == null;
+             postFromDb?.ThreadNavigation.LockedOn == null;
+    }
+
+    public async Task<bool> IsAuthorizedForPostLock(int postId, ClaimsPrincipal user) {
+      var postFromDb = await _db.Post.FirstOrDefaultAsync(t => t.Id == postId);
+      return postFromDb != null && await IsAuthorizedForPostLock(postFromDb, user);
+    }
+
+    public async Task<bool> IsAuthorizedForPostLock(Post postFromDb, ClaimsPrincipal user) {
+      if (!user.Identity.IsAuthenticated && await IsProfileBlocked(user.Identity.Name))
+        return false;
+
+      var userId = _userManager.GetUserId(user);
+      var profileUser = await _userManager.FindByIdAsync(postFromDb.CreatedBy);
+
+      if (await ProfileIsInRole(profileUser.UserName, Roles.Admin) && postFromDb.CreatedBy != userId)
+        return false;
+
+      if (await ProfileIsInRole(profileUser.UserName, Roles.Moderator) && user.IsInRole(Roles.Moderator) && postFromDb.CreatedBy != userId)
+        return false;
+
+      return user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator);
     }
 
     public async Task<bool> IsAuthorizedForAccountDetailsView(string username, ClaimsPrincipal user) {
       if (await IsProfileInternal(username))
         return false;
 
-      return user.IsInRole(Roles.Admin) ||
-             string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase);
+      if (string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase))
+        return true;
+
+      if (await IsProfileBlocked(user.Identity.Name))
+        return false;
+
+      return user.IsInRole(Roles.Admin);
     }
 
-    public async Task<bool> IsAuthorizedForAccountAndProfileEditAndDelete(string username, ClaimsPrincipal user) {
-      if (!user.Identity.IsAuthenticated)
+    public async Task<bool> IsAuthorizedForAccountAndProfileEdit(string username, ClaimsPrincipal user) {
+      if (!user.Identity.IsAuthenticated || await IsProfileInternal(username) || await IsProfileBlocked(user.Identity.Name))
         return false;
 
-      if (await IsProfileInternal(username))
+      if (await ProfileIsInRole(username, Roles.Admin) && !string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase))
         return false;
 
-      var userIdentityFromDb = await _userManager.FindByNameAsync(user.Identity.Name);
-      var userMemberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == userIdentityFromDb.Id);
-
-      return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase) &&
-             userMemberFromDb.BlockedBy == null || user.IsInRole(Roles.Admin) &&
-             userMemberFromDb.BlockedBy == null;
+      return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase) || user.IsInRole(Roles.Admin);
     }
 
-    public async Task<bool> IsAuthorizedProfileChangeRoleAndBlock(string username, ClaimsPrincipal user) {
-      if (!user.Identity.IsAuthenticated)
+    public async Task<bool> IsAuthorizedForProfileDelete(string username, ClaimsPrincipal user) {
+      if (await ProfileIsInRole(username, Roles.Admin) && !string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase))
         return false;
 
-      if (await IsProfileInternal(username))
+      return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase) || user.IsInRole(Roles.Admin);
+    }
+
+    public async Task<bool> IsAuthorizedProfileChangeRole(string username, ClaimsPrincipal user) {
+      if (!user.Identity.IsAuthenticated || await IsProfileInternal(username) || await IsProfileBlocked(user.Identity.Name))
+        return false;;
+
+      return !await ProfileIsInRole(username, Roles.Admin) && user.IsInRole(Roles.Admin);
+    }
+
+
+    public async Task<bool> IsAuthorizedProfileBlock(string username, ClaimsPrincipal user) {
+      if (!user.Identity.IsAuthenticated || await IsProfileInternal(username) || await IsProfileBlocked(user.Identity.Name))
         return false;
 
-      var userIdentityFromDb = await _userManager.FindByNameAsync(user.Identity.Name);
-      var userMemberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == userIdentityFromDb.Id);
+      if (await ProfileIsInRole(username, Roles.Admin))
+        return false;
 
-      return user.IsInRole(Roles.Admin) &&
-             userMemberFromDb.BlockedBy == null;
+      if (await ProfileIsInRole(username, Roles.Moderator) && user.IsInRole(Roles.Moderator))
+        return false;
+
+      return user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator);
     }
 
     public async Task<bool> IsProfileInternal(string username) {
@@ -209,6 +291,18 @@ namespace Forum.Models.Services {
       var profilMemberMemberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == profileIdentityFromDb.Id);
 
       return profilMemberMemberFromDb.IsInternal;
+    }
+
+    public async Task<bool> IsProfileBlocked(string username) {
+      var identityUser = await _userManager.FindByNameAsync(username);
+      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
+      return memberFromDb.BlockedBy != null;
+    }
+
+    public async Task<bool> ProfileIsInRole(string username, string role) {
+      var identityUser = await _userManager.FindByNameAsync(username);
+      var profileRoles = await _userManager.GetRolesAsync(identityUser);
+      return profileRoles.Contains(role);
     }
   }
 }

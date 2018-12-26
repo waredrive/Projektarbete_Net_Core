@@ -8,12 +8,12 @@
   <div class="col-12 rounded my-5 bg-secondary p-5 text-light">
     <h1>Create Topic</h1>
     <br />
-    <form asp-controller="Topic" asp-action="Create">
-      <div asp-validation-summary="ModelOnly" class="text-danger bg-light"></div>
+    <form asp-controller="Topic" asp-action="Create"  autocomplete="off">
+      <div asp-validation-summary="ModelOnly"  class="text-danger bg-white rounded py-1"></div>
       <div class="form-group">
         <label asp-for="TopicText" class="control-label"></label>
         <input asp-for="TopicText" class="form-control" />
-        <span asp-validation-for="TopicText" class="text-danger bg-light"></span>
+        <span asp-validation-for="TopicText"  class="text-danger bg-white rounded-bottom py-1"></span>
       </div>
       <br />
       <div class="btn-group float-right">

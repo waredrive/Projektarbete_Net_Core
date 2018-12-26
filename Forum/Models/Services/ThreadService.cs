@@ -79,6 +79,7 @@ namespace Forum.Models.Services {
     private async Task<ThreadsIndexThreadVm> GetThreadsIndexThreadVmAsync(Thread thread, ClaimsPrincipal user) {
       var isAuthorizedForThreadEdit = await _authorizationService.IsAuthorizedForThreadEdit(thread, user);
       var isAuthorizedForThreadDelete = await _authorizationService.IsAuthorizedForThreadDelete(thread, user);
+      var isAuthorizedForThreadLock = await _authorizationService.IsAuthorizedForThreadLock(thread, user);
       var createdBy = await _userManager.FindByIdAsync(thread.CreatedBy);
 
       return new ThreadsIndexThreadVm {
@@ -89,6 +90,7 @@ namespace Forum.Models.Services {
         PostCount = thread.Post.Count,
         IsAuthorizedForThreadEdit = isAuthorizedForThreadEdit,
         IsAuthorizedForThreadDelete = isAuthorizedForThreadDelete,
+        IsAuthorizedForThreadLock = isAuthorizedForThreadLock,
         LockedBy = thread.LockedBy != null ? _userManager.FindByIdAsync(thread.LockedBy).Result.UserName : null
       };
     }

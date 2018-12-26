@@ -21,7 +21,7 @@ namespace Forum.Controllers {
     [Route("Register")]
     [HttpGet]
     public IActionResult Register() {
-      return View();
+      return View(_accountService.GetAccountRegisterVm());
     }
 
     [AllowAnonymous]
@@ -31,6 +31,15 @@ namespace Forum.Controllers {
     public async Task<IActionResult> Register(AccountRegisterVm accountRegisterVm) {
       if (!ModelState.IsValid)
         return View(accountRegisterVm);
+
+      var ageValidationResult = _accountService.HasMinimumAllowedAge(accountRegisterVm.Birthdate);
+
+      if (!ageValidationResult.Success) {
+        foreach (var error in ageValidationResult.Errors)
+          ModelState.AddModelError(nameof(accountRegisterVm.Birthdate), error);
+        return View(accountRegisterVm);
+      }
+
       var result = await _accountService.Add(accountRegisterVm);
 
 
@@ -72,11 +81,10 @@ namespace Forum.Controllers {
     [Route("Update/{username}")]
     [HttpGet]
     public async Task<IActionResult> EditAccount(string username) {
-      if (!_accountService.DoesAccountExist(username)) {
+      if (!_accountService.DoesAccountExist(username))
         return NotFound();
-      }
 
-      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAndDelete(username, User))
+      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
         return RedirectToAction(nameof(AccessDenied));
 
       return View(await _accountService.GetAccountEditVm(User));
@@ -86,15 +94,22 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditAccount(string username, AccountEditVm accountEditVm) {
-      if (!_accountService.DoesAccountExist(username)) {
+      if (!_accountService.DoesAccountExist(username))
         return NotFound();
-      }
 
       if (!ModelState.IsValid)
         return (View(accountEditVm));
 
-      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAndDelete(username, User))
+      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
         return RedirectToAction(nameof(AccessDenied));
+
+      var ageValidationResult = _accountService.HasMinimumAllowedAge(accountEditVm.Birthdate);
+
+      if (!ageValidationResult.Success) {
+        foreach (var error in ageValidationResult.Errors)
+          ModelState.AddModelError(nameof(accountEditVm.Birthdate), error);
+        return View(accountEditVm);
+      }
 
       var result = await _accountService.UpdateAccount(accountEditVm, User);
 
@@ -110,11 +125,10 @@ namespace Forum.Controllers {
     [Route("Update/Password/{username}")]
     [HttpGet]
     public async Task<IActionResult> EditPassword(string username) {
-      if (!_accountService.DoesAccountExist(username)) {
+      if (!_accountService.DoesAccountExist(username))
         return NotFound();
-      }
 
-      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAndDelete(username, User))
+      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
         return RedirectToAction(nameof(AccessDenied));
 
       return View();
@@ -124,14 +138,13 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditPassword(string username, AccountPasswordEditVm accountPasswordEditVm) {
-      if (!_accountService.DoesAccountExist(username)) {
+      if (!_accountService.DoesAccountExist(username))
         return NotFound();
-      }
 
       if (!ModelState.IsValid)
         return (View(accountPasswordEditVm));
 
-      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAndDelete(username, User))
+      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
         return RedirectToAction(nameof(AccessDenied));
 
       var result = await _accountService.UpdatePassword(accountPasswordEditVm, User);

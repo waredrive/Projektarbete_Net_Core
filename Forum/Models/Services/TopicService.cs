@@ -37,37 +37,33 @@ namespace Forum.Models.Services {
     }
 
     public async Task<TopicsIndexVm> GetTopicsIndexVm(ClaimsPrincipal user) {
+      var mostActiveMemberId = _db.Member.Where(m => !m.IsInternal).OrderByDescending(m =>
+          m.PostCreatedByNavigation.Count + m.ThreadCreatedByNavigation.Count + m.TopicCreatedByNavigation.Count)
+        .Select(m => m.Id).First();
+      var newestMemberId = _db.Member.OrderByDescending(m => m.CreatedOn).First().Id;
+
       var topicsIndexVm = new TopicsIndexVm {
         Topics = new List<TopicsIndexTopicVm>(),
         LatestThreads = new List<TopicsIndexThreadVm>(),
         LatestPosts = new List<TopicsIndexPostVm>(),
         TotalMembers = _userManager.Users.Count(),
         TotalPosts = _db.Post.Count(),
-        NewestMember = _userManager.FindByIdAsync(_db.Member.OrderByDescending(m => m.CreatedOn).First().Id).Result
+        MostActiveMember = _userManager.FindByIdAsync(mostActiveMemberId).Result.UserName,
+        NewestMember = _userManager.FindByIdAsync(newestMemberId).Result
           .UserName,
         IsAuthorizedForTopicCreate = await _authorizationService.IsAuthorizedForCreateTopic(user)
       };
 
-      topicsIndexVm.Topics.AddRange(_db.Topic.Include(t => t.Thread).Select(t => new TopicsIndexTopicVm {
-        LatestActiveThread = _db.Post.Where(p => p.ThreadNavigation.Topic == t.Id).OrderByDescending(p => p.CreatedOn)
-          .Take(1).Select(p => new TopicsIndexThreadVm {
-            ThreadId = p.Thread,
-            ThreadText = p.ThreadNavigation.ContentText,
-            CreatedOn = p.CreatedOn,
-            CreatedBy = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName
-          }).FirstOrDefault(),
-        TopicId = t.Id,
-        TopicText = t.ContentText,
-        ThreadCount = t.Thread.Count,
-        PostCount = t.Thread.Select(tt => tt.Post.Count).Sum(),
-        LockedBy = t.LockedBy != null ? _userManager.FindByIdAsync(t.LockedBy).Result.UserName : null
-      }));
+      var topics = await _db.Topic.Include(t => t.Thread).ToListAsync();
+
+      foreach (var topic in topics) {
+        topicsIndexVm.Topics.Add(await GetThreadsIndexThreadVmAsync(topic, user));
+      }
 
       topicsIndexVm.LatestThreads.AddRange(_db.Thread.OrderByDescending(t => t.CreatedOn).Take(10).Select(t =>
         new TopicsIndexThreadVm {
           ThreadId = t.Id,
-          //TODO: Change to something nicer = separate method
-          CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result != null ? _userManager.FindByIdAsync(t.CreatedBy).Result.UserName : "",
+          CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
           CreatedOn = t.CreatedOn,
           ThreadText = t.ContentText
         }));
@@ -81,6 +77,27 @@ namespace Forum.Models.Services {
         }));
 
       return topicsIndexVm;
+    }
+
+    private async Task<TopicsIndexTopicVm> GetThreadsIndexThreadVmAsync(Topic topic, ClaimsPrincipal user) {
+      var isAuthorizedForTopicEditBlockAndDelete = await _authorizationService.IsAuthorizedForTopicEditBlockAndDelete(topic, user);
+      var lockedBy = await _userManager.FindByIdAsync(topic.LockedBy);
+
+      return new TopicsIndexTopicVm {
+        LatestActiveThread = _db.Post.Where(p => p.ThreadNavigation.Topic == topic.Id).OrderByDescending(p => p.CreatedOn)
+          .Take(1).Select(p => new TopicsIndexThreadVm {
+            ThreadId = p.Thread,
+            ThreadText = p.ThreadNavigation.ContentText,
+            CreatedOn = p.CreatedOn,
+            CreatedBy = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName
+          }).FirstOrDefault(),
+        TopicId = topic.Id,
+        TopicText = topic.ContentText,
+        ThreadCount = topic.Thread.Count,
+        PostCount = topic.Thread.Select(tt => tt.Post.Count).Sum(),
+        LockedBy = lockedBy?.UserName,
+        IsAuthorizedForTopicEditBlockAndDelete = isAuthorizedForTopicEditBlockAndDelete
+      };
     }
 
     public async Task<TopicEditVm> GetTopicCreateVm(int id) {

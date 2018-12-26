@@ -23,26 +23,29 @@
           <tr>
             <td style="width: 80px;">
               @if (topic.LockedBy != null) {
-                  <i class="fas fa-ban fa-3x text-danger"></i>
+                <i class="fas fa-ban fa-3x text-danger"></i>
               } else {
-                  <i class="fas fa-comments fa-3x"></i>
+                <i class="fas fa-comments fa-3x"></i>
               }
             </td>
             <td>
               <a asp-controller="Thread" asp-action="index" asp-route-topicId="@topic.TopicId" class="light">
-                <p>@topic.TopicText</p></a>
+                <p>@topic.TopicText</p>
+              </a>
             </td>
             <td>
             <td>
-              <p class="pb-0 mb-0"><span class="font-weight-bold">@topic.ThreadCount </span>
+              <p class="pb-0 mb-0">
+                <span class="font-weight-bold">@topic.ThreadCount </span>
                 @if (topic.ThreadCount == 1) {<span>thread</span>} else {<span>threads</span>}
               </p>
-              <p><span class="font-weight-bold">@topic.PostCount</span>
+              <p>
+                <span class="font-weight-bold">@topic.PostCount</span>
                 @if (topic.PostCount == 1) {<span>reply</span>} else {<span>replies</span>}
               </p>
             </td>
             <td>
-              @if (User.IsInRole(Roles.Admin)) {
+              @if (@topic.IsAuthorizedForTopicEditBlockAndDelete) {
                 <div class="btn-group">
                   <a asp-controller="Topic" asp-action="Edit" asp-route-id="@topic.TopicId" class="btn btn-primary btn-sm">Edit</a>
                   @if (topic.LockedBy == null) {
@@ -58,7 +61,7 @@
               <div>
                 @if (topic.LatestActiveThread != null) {
                   <a asp-controller="Post" asp-action="index" asp-route-threadId="@topic.LatestActiveThread.ThreadId" class="light">@topic.LatestActiveThread.ThreadText</a>
-                  <p>By @topic.LatestActiveThread.CreatedBy</p>
+                  <p>By <a asp-controller="Profile" asp-action="Details" asp-route-username="@topic.LatestActiveThread.CreatedBy" class="light">@topic.LatestActiveThread.CreatedBy</a></p>
                   <p>@topic.LatestActiveThread.CreatedOn</p>
                 }
               </div>
@@ -76,7 +79,9 @@
             <td>
               <a asp-controller="Post" asp-action="index" asp-route-threadId="@post.ThreadId" class="light">@post.ThreadText</a>
             </td>
-            <td>@post.LatestCommenter</td>
+            <td>
+              <a asp-controller="Profile" asp-action="Details" asp-route-username="@post.LatestCommenter" class="light">@post.LatestCommenter</a>
+            </td>
             <td>@post.LatestCommentTime</td>
           </tr>
         }
@@ -88,8 +93,12 @@
             <td>
               <a asp-controller="Post" asp-action="index" asp-route-threadId="@thread.ThreadId" class="light">@thread.ThreadText</a>
             </td>
-            <td>@thread.CreatedBy</td>
-            <td>@thread.CreatedOn</td>
+            <td>
+              <a asp-controller="Profile" asp-action="Details" asp-route-username="@thread.CreatedBy" class="light">@thread.CreatedBy</a>
+            </td>
+            <td>
+              <a asp-controller="Profile" asp-action="Details" asp-route-username="@thread.CreatedOn" class="light">@thread.CreatedOn</a>
+            </td>
           </tr>
         }
       </table>
@@ -98,14 +107,17 @@
   <div class="row bg-secondary mt-3">
     <div class="col-md-12 text-light">
       <div class="row pt-3">
-        <div class="col-md-4">
-          <p class="text-right">Total members: @Model.TotalMembers</p>
+        <div class="col-md-3">
+          <p class="text-center">Total members: @Model.TotalMembers</p>
         </div>
-        <div class="col-md-4 text-center">
-          <p class="text-center">Newest member: @Model.NewestMember</p>
+        <div class="col-md-3 text-center">
+          <p class="text-center">Newest member: <a asp-controller="Profile" asp-action="Details" asp-route-username="@Model.NewestMember" class="light">@Model.NewestMember</a> </p>
         </div>
-        <div class="col-md-4 text-center">
-          <p class="text-left">Total posts: @Model.TotalPosts</p>
+        <div class="col-md-3 text-center">
+          <p class="text-center">Most active member: <a asp-controller="Profile" asp-action="Details" asp-route-username="@Model.MostActiveMember" class="light">@Model.MostActiveMember</a></p>
+        </div>
+        <div class="col-md-3 text-center">
+          <p class="text-center">Total posts: @Model.TotalPosts</p>
         </div>
       </div>
     </div>

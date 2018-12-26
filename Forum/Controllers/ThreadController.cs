@@ -122,6 +122,9 @@ namespace Forum.Controllers {
       if (!_threadService.DoesThreadExist(id))
         return NotFound();
 
+      if(!await _authorizationService.IsAuthorizedForThreadLock(id, User))
+        return RedirectToAction("AccessDenied", "Account");
+
       if (_threadService.IsThreadLocked(id))
         return RedirectToAction(nameof(Unlock));
 
@@ -137,7 +140,10 @@ namespace Forum.Controllers {
         return NotFound();
 
       if (!ModelState.IsValid)
-        return (View(threadLockVm));
+        return View(threadLockVm);
+
+      if (!await _authorizationService.IsAuthorizedForThreadLock(id, User))
+        return RedirectToAction("AccessDenied", "Account");
 
       if (_threadService.IsThreadLocked(threadLockVm.ThreadId))
         return RedirectToAction(nameof(Index));
@@ -152,6 +158,9 @@ namespace Forum.Controllers {
     public async Task<IActionResult> Unlock(int id) {
       if (!_threadService.DoesThreadExist(id))
         return NotFound();
+
+      if (!await _authorizationService.IsAuthorizedForThreadLock(id, User))
+        return RedirectToAction("AccessDenied", "Account");
 
       if (!_threadService.IsThreadLocked(id))
         return RedirectToAction(nameof(Lock));
@@ -168,7 +177,10 @@ namespace Forum.Controllers {
         return NotFound();
 
       if (!ModelState.IsValid)
-        return (View(threadUnlockVm));
+        return View(threadUnlockVm);
+
+      if (!await _authorizationService.IsAuthorizedForThreadLock(id, User))
+        return RedirectToAction("AccessDenied", "Account");
 
       if (!_threadService.IsThreadLocked(threadUnlockVm.ThreadId))
         return RedirectToAction(nameof(Index));

@@ -8,6 +8,7 @@ using Forum.Attributes;
 using Forum.Models.Context;
 using Forum.Models.Entities;
 using Forum.Models.ViewModels.AccountViewModels;
+using Forum.Validations;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -33,8 +34,17 @@ namespace Forum.Models.Services {
       _env = env;
     }
 
+    public AccountRegisterVm GetAccountRegisterVm() {
+      return new AccountRegisterVm {
+        Birthdate = DateTime.UtcNow
+      };
+    }
+
     public async Task<IdentityResult> Add(AccountRegisterVm accountRegisterVm) {
       await CreateRoles();
+
+      var identityError = new IdentityError().Description = "You must be older than 13 to use this Forum.";
+
       var user = new IdentityUser {
         Email = accountRegisterVm.Email,
         UserName = accountRegisterVm.UserName
@@ -69,17 +79,13 @@ namespace Forum.Models.Services {
     }
 
     public async Task<SignInResult> Login(AccountLoginVm accountLoginVm) {
-      var user = new IdentityUser {
-        UserName = "[Test]",
-        Email = "[Test]"
-      };
-
-      var test = _userManager.CreateAsync(user);
-
-      if(await _authorizationService.IsProfileInternal(accountLoginVm.UserName))
+      if (!DoesAccountExist(accountLoginVm.UserName))
         return SignInResult.Failed;
 
-      var result =  await _signInManager.PasswordSignInAsync(accountLoginVm.UserName, accountLoginVm.Password,
+        if (await _authorizationService.IsProfileInternal(accountLoginVm.UserName))
+        return SignInResult.Failed;
+
+      var result = await _signInManager.PasswordSignInAsync(accountLoginVm.UserName, accountLoginVm.Password,
         accountLoginVm.RememberMe, false);
       if (result.Succeeded)
         await ResetOldBlockStatus(accountLoginVm.UserName);
@@ -152,7 +158,7 @@ namespace Forum.Models.Services {
         FirstName = memberFromDb.FirstName,
         LastName = memberFromDb.LastName,
         IsAuthorizedForAccountEdit =
-          await _authorizationService.IsAuthorizedForAccountAndProfileEditAndDelete(identityUser.UserName, user)
+          await _authorizationService.IsAuthorizedForAccountAndProfileEdit(identityUser.UserName, user)
       };
     }
 
@@ -168,6 +174,14 @@ namespace Forum.Models.Services {
         var roleToAdd = new IdentityRole { Name = role };
         await _roleManager.CreateAsync(roleToAdd);
       }
+    }
+
+    public ValidationResult HasMinimumAllowedAge(DateTime birthdate) {
+      var result = new ValidationResult();
+      if (birthdate > DateTime.UtcNow.AddYears(-13))
+        result.Errors.Add("You must be at least 13 years old to use this forum.");
+
+      return result;
     }
 
     public bool DoesAccountExist(string username) {

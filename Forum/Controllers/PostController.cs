@@ -121,6 +121,9 @@ namespace Forum.Controllers {
       if (!_postService.DoesPostExist(id))
         return NotFound();
 
+      if (!await _authorizationService.IsAuthorizedForPostLock(id, User))
+        return RedirectToAction("AccessDenied", "Account");
+
       if (_postService.IsPostLocked(id))
         return RedirectToAction(nameof(Unlock));
 
@@ -138,6 +141,9 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return View(postLockVm);
 
+      if (!await _authorizationService.IsAuthorizedForPostLock(id, User))
+        return RedirectToAction("AccessDenied", "Account");
+
       if (_postService.IsPostLocked(postLockVm.PostId))
         return RedirectToAction(nameof(Index));
 
@@ -151,6 +157,9 @@ namespace Forum.Controllers {
     public async Task<IActionResult> Unlock(int id) {
       if (!_postService.DoesPostExist(id))
         return NotFound();
+
+      if (!await _authorizationService.IsAuthorizedForPostLock(id, User))
+        return RedirectToAction("AccessDenied", "Account");
 
       if (!_postService.IsPostLocked(id))
         return RedirectToAction(nameof(Lock));
@@ -168,6 +177,9 @@ namespace Forum.Controllers {
 
       if (!ModelState.IsValid)
         return View(postUnlockVm);
+
+      if (!await _authorizationService.IsAuthorizedForPostLock(id, User))
+        return RedirectToAction("AccessDenied", "Account");
 
       if (!_postService.IsPostLocked(postUnlockVm.PostId))
         return RedirectToAction(nameof(Index));

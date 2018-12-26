@@ -19,5 +19,6 @@ namespace Forum.Models.ViewModels.PostViewModels {
     public string LockedBy { get; set; }
     public string EditedBy { get; set; }
     public bool IsAuthorizedForPostEditAndDelete { get; set; }
+    public bool IsAuthorizedForPostLock { get; set; }
   }
 }
