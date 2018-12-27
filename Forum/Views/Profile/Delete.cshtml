@@ -38,7 +38,7 @@
           @Html.HiddenFor(m => m.Username)
           <div class="btn-group float-right">
             <input type="submit" class="btn btn-danger rounded-left" value="Delete User"/>
-            <a asp-controller="Profile" asp-action="Details" class="btn btn-primary">Back</a>
+            <a href="javascript:history.back()" class="btn btn-warning">Back</a>
           </div>
         </form>
       </div>

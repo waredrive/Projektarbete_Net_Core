@@ -19,11 +19,11 @@
     <div class="col-md-12">
       <table class="table table-striped table-dark">
         @foreach (var post in Model.Posts) {
-          <tr>
+          <tr id="@post.PostId">
             <td>
               <p>@post.PostText</p>
             </td>
-            <td>@post.CreatedBy</td>
+            <td><a asp-controller="Profile" asp-action="Details" asp-route-username="@post.CreatedBy" class="light">@post.CreatedBy</a></td>
             <td>@post.CreatedOn</td>
             <td>
               <div class="btn-group">

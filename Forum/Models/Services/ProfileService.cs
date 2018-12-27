@@ -35,11 +35,12 @@ namespace Forum.Models.Services {
       var memberFromDb = await _db.Member.Include(p => p.PostCreatedByNavigation)
         .Include(p => p.ThreadCreatedByNavigation).FirstOrDefaultAsync(m => m.Id == identityUser.Id);
       var blockedBy = await _userManager.FindByIdAsync(memberFromDb.BlockedBy);
+      var roles = await _userManager.GetRolesAsync(identityUser);
 
       return new ProfileDetailsVm {
         ProfileImage = Convert.ToBase64String(memberFromDb.ProfileImage),
         Username = identityUser.UserName,
-        Roles = _userManager.GetRolesAsync(identityUser).Result.ToArray(),
+        Roles = roles.ToArray(),
         CreatedOn = memberFromDb.CreatedOn,
         BlockedOn = memberFromDb.BlockedOn,
         BlockedBy = blockedBy?.UserName,
@@ -278,7 +279,10 @@ namespace Forum.Models.Services {
     public async Task<NavbarVm> GetNavbarVm(IPrincipal user) {
       var identityUser = await _userManager.FindByNameAsync(user.Identity.Name);
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
-      return new NavbarVm { ProfileImage = Convert.ToBase64String(memberFromDb.ProfileImage) };
+      return new NavbarVm {
+        ProfileImage = Convert.ToBase64String(memberFromDb.ProfileImage),
+        IsAuthorizedForForumManagement = await _authorizationService.IsAuthorizedForForumManagement(user as ClaimsPrincipal)
+      };
     }
   }
 }

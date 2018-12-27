@@ -7,8 +7,11 @@ namespace Forum {
       CreateWebHostBuilder(args).Build().Run();
     }
 
-    //TODO: Add custom messages to AccessDenied
-    //TODO: Add returnurl to access denied and other relevant pages.
+    //TODO: Add custom messages to AccessDenied (Use TempData)
+    //TODO: Add Unblock/Block in when in thread/topic.
+    //TODO: Add back buttons in threads and topics.
+    //TODO: Add returnurl to access denied and other relevant pages. (don't forget from details to delete, edit, etc.)
+    //TODO: Change Block to lock for consistency.
     //TODO: Add admin management page with list of blocked users/topics/threads/posts.
     //TODO: Add pagination.
     //TODO: Add id to posts so users can go to them from ex. latest posts.

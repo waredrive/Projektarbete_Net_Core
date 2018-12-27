@@ -32,7 +32,7 @@
           <div class="btn-group float-right">
             @Html.HiddenFor(m => m.PostId)
             <input type="submit" class="btn btn-danger rounded-left" value="Unlock Post" />
-            <a asp-controller="Post" asp-action="Index" class="btn btn-warning">Back</a>
+            <a href="javascript:history.back()" class="btn btn-warning">Back</a>
           </div>
         </form>
       </div>

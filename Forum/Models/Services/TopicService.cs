@@ -70,6 +70,7 @@ namespace Forum.Models.Services {
 
       topicsIndexVm.LatestPosts.AddRange(_db.Post.OrderByDescending(p => p.CreatedOn).Take(10).Select(p =>
         new TopicsIndexPostVm {
+          PostId = p.Id,
           ThreadId = p.Thread,
           ThreadText = p.ThreadNavigation.ContentText,
           LatestCommentTime = p.CreatedOn,
@@ -80,7 +81,7 @@ namespace Forum.Models.Services {
     }
 
     private async Task<TopicsIndexTopicVm> GetThreadsIndexThreadVmAsync(Topic topic, ClaimsPrincipal user) {
-      var isAuthorizedForTopicEditBlockAndDelete = await _authorizationService.IsAuthorizedForTopicEditBlockAndDelete(topic, user);
+      var isAuthorizedForTopicEditBlockAndDelete = await _authorizationService.IsAuthorizedForTopicEditLockAndDelete(topic, user);
       var lockedBy = await _userManager.FindByIdAsync(topic.LockedBy);
 
       return new TopicsIndexTopicVm {

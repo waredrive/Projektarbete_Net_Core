@@ -6,10 +6,10 @@
 <div class="container">
   <div class="col-12 rounded my-5 bg-light p-5">
     <h1 class="text-danger">Access Denied.</h1>
-    <p class="text-danger">You do not have access to this resource.</p>
+    <p class="text-danger">@Model.Message</p>
     <br />
     <div class="btn-group float-right">
-      <a href="@Model.ReturnUrl" class="btn btn-warning">Edit Account</a>
+      <a href="javascript:history.back()" class="btn btn-primary">Back</a>
     </div>
   </div>
 </div>

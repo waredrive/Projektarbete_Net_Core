@@ -1,0 +1,201 @@
+﻿@using Microsoft.AspNetCore.Identity.EntityFrameworkCore
+@model ForumManagementIndexVm
+@{
+  ViewBag.Title = "Forum Management";
+}
+<div class="container-fluid">
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <h4 class="text-center text-light mb-3">Ten Latest Locked Topics</h4>
+      <table class="table table-striped table-dark">
+        @foreach (var topic in Model.LatestLockedTopics) {
+          <tr>
+            <td style="width: 30%">
+              <a asp-controller="Thread" asp-action="index" asp-route-topicId="@topic.TopicId" class="light">
+                <p>@topic.TopicText</p>
+              </a>
+            </td>
+            <td style="width: 20%">
+              <p class="pb-0 mb-0">
+                <span>Created by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@topic.CreatedBy" class="light">@topic.CreatedBy</a></span>
+              </p>
+              <p>
+                <span>Created on: @topic.CreatedOn</span>
+              </p>
+            </td>
+            <td style="width: 20%">
+              <p class="pb-0 mb-0">
+                <span>Locked by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@topic.LockedBy" class="light">@topic.LockedBy</a></span>
+              </p>
+              <p>
+                <span>Locked on: @topic.LockedOn</span>
+              </p>
+            </td>
+            <td style="width: 20%">
+              <div class="btn-group">
+                @if (@topic.IsAuthorizedForTopicEditLockAndDelete) {
+                  <a asp-controller="Topic" asp-action="Edit" asp-route-id="@topic.TopicId" class="btn btn-primary btn-sm">Edit</a>
+                  if (topic.LockedBy == null) {
+                    <a asp-controller="Topic" asp-action="Lock" asp-route-id="@topic.TopicId" class="btn btn-warning btn-sm">Lock</a>
+                  } else {
+                    <a asp-controller="Topic" asp-action="Unlock" asp-route-id="@topic.TopicId" class="btn btn-warning btn-sm">Unlock</a>
+                  }
+                  <a asp-controller="Topic" asp-action="Delete" asp-route-id="@topic.TopicId" class="btn btn-danger btn-sm">Delete</a>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+      </table>
+    </div>
+  </div>
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <h4 class="text-center text-light mb-3">Ten Latest Locked Threads</h4>
+      <table class="table table-striped table-dark">
+        @foreach (var thread in Model.LatestLockedThreads) {
+          <tr>
+            <td style="width: 30%">
+              <a asp-controller="Post" asp-action="index" asp-route-threadId="@thread.ThreadId" class="light">
+                <p>@thread.ThreadText</p>
+              </a>
+            </td>
+            <td style="width: 20%">
+              <p class="pb-0 mb-0">
+                <span>Created by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@thread.CreatedBy" class="light">@thread.CreatedBy</a></span>
+              </p>
+              <p>
+                <span>Created on: @thread.CreatedOn</span>
+              </p>
+            </td>
+            <td style="width: 20%">
+              <p class="pb-0 mb-0">
+                <span>Locked by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@thread.LockedBy" class="light">@thread.LockedBy</a></span>
+              </p>
+              <p>
+                <span>Locked on: @thread.LockedOn</span>
+              </p>
+            </td>
+            <td style="width: 20%">
+              <div class="btn-group">
+                @if (thread.IsAuthorizedForThreadEdit) {
+                  <a asp-controller="Thread" asp-action="Edit" asp-route-topicId="@thread.TopicId" asp-route-id="@thread.ThreadId" class="btn btn-primary btn-sm">Edit</a>
+                }
+                @if (thread.IsAuthorizedForThreadLock) {
+                  if (thread.LockedBy == null) {
+                    <a asp-controller="Thread" asp-action="Lock" asp-route-topicId="@thread.TopicId" asp-route-id="@thread.ThreadId" class="btn btn-warning btn-sm">Lock</a>
+                  } else {
+                    <a asp-controller="Thread" asp-action="Unlock" asp-route-topicId="@thread.TopicId" asp-route-id="@thread.ThreadId" class="btn btn-warning btn-sm">Unlock</a>
+                  }
+                }
+                @if (thread.IsAuthorizedForThreadDelete) {
+                  <a asp-controller="Thread" asp-action="Delete" asp-route-topicId="@thread.TopicId" asp-route-id="@thread.ThreadId" class="btn btn-danger btn-sm">Delete</a>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+      </table>
+    </div>
+  </div>
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <h4 class="text-center text-light mb-3">Ten Latest Locked Posts</h4>
+      <table class="table table-striped table-dark">
+        @foreach (var post in Model.LatestLockedPosts) {
+          <tr>
+            <td style="width: 30%">
+              <p>@post.PostText</p>
+            </td>
+            <td style="width: 20%">
+              <p class="pb-0 mb-0">
+                <span>Created by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@post.CreatedBy" class="light">@post.CreatedBy</a></span>
+              </p>
+              <p>
+                <span>Created on: @post.CreatedOn</span>
+              </p>
+            </td>
+            <td style="width: 20%">
+              <p class="pb-0 mb-0">
+                <span>Locked by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@post.LockedBy" class="light">@post.LockedBy</a></span>
+              </p>
+              <p>
+                <span>Locked on: @post.LockedOn</span>
+              </p>
+            </td>
+            <td style="width: 20%">
+              <div class="btn-group">
+                @if (post.IsAuthorizedForPostEditAndDelete) {
+                  <a asp-controller="Post" asp-action="Edit" asp-route-threadId="@post.ThreadId" asp-route-id="@post.PostId" class="btn btn-primary btn-sm">Edit</a>
+                }
+                @if (post.IsAuthorizedForPostLock) {
+                  if (post.LockedBy == null) {
+                    <a asp-controller="Post" asp-action="Lock" asp-route-threadId="@post.ThreadId" asp-route-id="@post.PostId" class="btn btn-warning btn-sm">Lock</a>
+                  } else {
+                    <a asp-controller="Post" asp-action="Unlock" asp-route-threadId="@post.ThreadId" asp-route-id="@post.PostId" class="btn btn-warning btn-sm">Unlock</a>
+                  }
+                }
+                @if (post.IsAuthorizedForPostEditAndDelete) {
+                  <a asp-controller="Post" asp-action="Delete" asp-route-threadId="@post.ThreadId" asp-route-id="@post.PostId" class="btn btn-danger btn-sm">Delete</a>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+      </table>
+    </div>
+  </div>
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <h4 class="text-center text-light mb-3">Ten Latest Blocked Users</h4>
+      <table class="table table-striped table-dark">
+        @foreach (var user in Model.LatestBlockedUsers) {
+          <tr>
+            <td style="width: 30%">
+              <p>
+                <a asp-controller="Profile" asp-action="Details" asp-route-username="@user.Username" class="light">@user.Username</a>
+              </p>
+            </td>
+            <td style="width: 20%">
+              <p class="pb-0 mb-0">
+                <span>Created on: @user.CreatedOn</span>
+              </p>
+              <p>
+                <span>Roles: @string.Join(", ", user.Roles)</span>
+              </p>
+            </td>
+            <td style="width: 20%">
+              <p class="pb-0 mb-0">
+                <span>Blocked by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@user.BlockedBy" class="light">@user.BlockedBy</a></span>
+              </p>
+              <p class="pb-0 mb-0">
+                <span>Blocked on: @user.BlockedOn</span>
+              </p>
+              <p>
+                <span>Blocked end: @user.BlockEnd</span>
+              </p>
+            </td>
+            <td style="width: 20%">
+              <div class="btn-group">
+                @if (user.IsAuthorizedProfileChangeRole) {
+                  <a asp-controller="Profile" asp-action="EditRole" asp-route-username="@user.Username" class="btn btn-primary btn-sm">Change Role</a>
+                }
+                @if (user.IsAuthorizedProfileBlock) {
+                  if (user.BlockedBy == null) {
+                    <a asp-controller="Profile" asp-action="Block" asp-route-username="@user.Username" class="btn btn-warning btn-sm">Block</a>
+                  } else {
+                    <a asp-controller="Profile" asp-action="Unblock" asp-route-username="@user.Username" class="btn btn-warning btn-sm">Unblock</a>
+                  }
+                }
+                @if (user.IsAuthorizedForProfileDelete) {
+                  <a asp-controller="Profile" asp-action="Delete" asp-route-username="@user.Username" class="btn btn-danger btn-sm">Delete User</a>
+                }
+              </div>
+            </td>
+          </tr>
+        }
+      </table>
+    </div>
+  </div>
+</div>
+

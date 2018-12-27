@@ -22,6 +22,9 @@
           <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
             <a asp-controller="Profile" asp-action="Details" asp-route-username="@User.Identity.Name" class="dropdown-item">Profile</a>
             <a asp-controller="Account" asp-action="Details" asp-route-username="@User.Identity.Name" class="dropdown-item">Account</a>
+            @if (Model.IsAuthorizedForForumManagement) {
+              <a asp-controller="ForumManagement" asp-action="Index" class="dropdown-item">Forum Management</a>
+            }
             <div class="dropdown-divider"></div>
             <form asp-controller="Account" asp-action="Logout" class="dropdown-item">
               <a href="#" onclick="this.parentNode.submit()"><i class="fas fa-sign-out-alt pr-1"></i>Log out</a>

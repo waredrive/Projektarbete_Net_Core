@@ -28,6 +28,7 @@ namespace Forum.Models.ViewModels.TopicViewModels {
 
   public class TopicsIndexPostVm {
     public int ThreadId { get; set; }
+    public int PostId { get; set; }
     public string ThreadText { get; set; }
     public DateTime LatestCommentTime { get; set; }
     public string LatestCommenter { get; set; }

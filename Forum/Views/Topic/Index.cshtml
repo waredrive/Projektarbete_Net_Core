@@ -1,7 +1,7 @@
 ﻿@using Forum.Attributes
 @model TopicsIndexVm
 @{
-  ViewBag.Title = "Forum Index";
+  ViewBag.Title = "Forum Topics";
 }
 <div class="container-fluid">
   <div class="col-md-12">
@@ -77,7 +77,7 @@
         @foreach (var post in Model.LatestPosts) {
           <tr>
             <td>
-              <a asp-controller="Post" asp-action="index" asp-route-threadId="@post.ThreadId" class="light">@post.ThreadText</a>
+              <a asp-controller="Post" asp-action="index" asp-route-threadId="@post.ThreadId" asp-fragment="@post.PostId" class="light">@post.ThreadText</a>
             </td>
             <td>
               <a asp-controller="Profile" asp-action="Details" asp-route-username="@post.LatestCommenter" asp-route-returnUrl="@ViewBag.ReturnUrl" class="light">@post.LatestCommenter</a>

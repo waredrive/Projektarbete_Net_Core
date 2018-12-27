@@ -46,15 +46,15 @@ namespace Forum.Models.Services {
       return  user.IsInRole(Roles.Admin);
     }
 
-    public async Task<bool> IsAuthorizedForTopicEditBlockAndDelete(int topicId, ClaimsPrincipal user) {
+    public async Task<bool> IsAuthorizedForTopicEditLockAndDelete(int topicId, ClaimsPrincipal user) {
       if (!user.Identity.IsAuthenticated)
         return false;
 
       var topicFromDb = await _db.Topic.FirstOrDefaultAsync(t => t.Id == topicId);
-      return topicFromDb != null && await IsAuthorizedForTopicEditBlockAndDelete(topicFromDb, user);
+      return topicFromDb != null && await IsAuthorizedForTopicEditLockAndDelete(topicFromDb, user);
     }
 
-    public async Task<bool> IsAuthorizedForTopicEditBlockAndDelete(Topic threadFromDb, ClaimsPrincipal user) {
+    public async Task<bool> IsAuthorizedForTopicEditLockAndDelete(Topic threadFromDb, ClaimsPrincipal user) {
       if (!user.Identity.IsAuthenticated || await IsProfileBlocked(user.Identity.Name))
         return false;
 
@@ -306,6 +306,16 @@ namespace Forum.Models.Services {
       var identityUser = await _userManager.FindByNameAsync(username);
       var profileRoles = await _userManager.GetRolesAsync(identityUser);
       return profileRoles.Contains(role);
+    }
+
+    public async Task<bool> IsAuthorizedForForumManagement(ClaimsPrincipal user) {
+      if (!user.Identity.IsAuthenticated)
+        return false;
+
+      if (await IsProfileBlocked(user.Identity.Name))
+        return false;
+
+      return user.IsInRole(Roles.Admin);
     }
   }
 }

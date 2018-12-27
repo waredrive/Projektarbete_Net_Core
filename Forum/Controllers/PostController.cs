@@ -3,6 +3,7 @@ using Forum.Attributes;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.PostViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.Controllers {
@@ -114,7 +115,7 @@ namespace Forum.Controllers {
       return RedirectToAction(nameof(Index));
     }
 
-    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
+    [RolesAuthorize(Roles.Admin, Roles.Moderator)]
     [Route("Lock/{id}")]
     [HttpGet]
     public async Task<IActionResult> Lock(int id) {
@@ -130,7 +131,7 @@ namespace Forum.Controllers {
       return View(await _postService.GetPostLockVm(id));
     }
 
-    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
+    [RolesAuthorize(Roles.Admin, Roles.Moderator)]
     [Route("Lock/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -151,7 +152,7 @@ namespace Forum.Controllers {
       return RedirectToAction(nameof(Index));
     }
 
-    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
+    [RolesAuthorize(Roles.Admin, Roles.Moderator)]
     [Route("Unlock/{id}")]
     [HttpGet]
     public async Task<IActionResult> Unlock(int id) {
@@ -167,7 +168,7 @@ namespace Forum.Controllers {
       return View(await _postService.GetPostUnlockVm(id));
     }
 
-    [AuthorizeRoles(Roles.Admin, Roles.Moderator)]
+    [RolesAuthorize(Roles.Admin, Roles.Moderator)]
     [Route("Unlock/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
