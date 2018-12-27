@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Forum.Models.ViewModels.ForumManagementViewModels {
   public class ForumManagementIndexVm {
-    public int UserCount { get; set; }
-    public int AdminCount { get; set; }
-    public int ModeratorCount { get; set; }
     public int BlockedMembersCount { get; set; }
     public int LockedTopicsCount { get; set; }
     public int LockedThreadsCount { get; set; }
     public int LockedPostsCount { get; set; }
+    public int BlockedByUserMembersCount { get; set; }
+    public int LockedByUserTopicsCount { get; set; }
+    public int LockedByUserThreadsCount { get; set; }
+    public int LockedByUserPostsCount { get; set; }
     public List<ForumManagementIndexBlockedUserVm> LatestBlockedUsers { get; set; }
     public List<ForumManagementIndexLockedTopicVm> LatestLockedTopics { get; set; }
     public List<ForumManagementIndexLockedThreadVm> LatestLockedThreads { get; set; }

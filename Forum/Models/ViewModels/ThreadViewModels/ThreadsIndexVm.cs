@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Forum.Models.ViewModels.ThreadViewModels {
   public class ThreadsIndexVm {
@@ -11,7 +9,7 @@ namespace Forum.Models.ViewModels.ThreadViewModels {
     public List<ThreadsIndexThreadVm> Threads { get; set; }
   }
 
-  public class ThreadsIndexThreadVm { 
+  public class ThreadsIndexThreadVm {
     public int ThreadId { get; set; }
     public string ThreadText { get; set; }
     public string CreatedBy { get; set; }

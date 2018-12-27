@@ -11,11 +11,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Models.Services {
   public class TopicService {
+    private readonly AuthorizationService _authorizationService;
     private readonly ForumDbContext _db;
     private readonly UserManager<IdentityUser> _userManager;
-    private readonly AuthorizationService _authorizationService;
 
-    public TopicService(ForumDbContext db, UserManager<IdentityUser> userManager, AuthorizationService authorizationService) {
+    public TopicService(ForumDbContext db, UserManager<IdentityUser> userManager,
+      AuthorizationService authorizationService) {
       _db = db;
       _userManager = userManager;
       _authorizationService = authorizationService;
@@ -56,9 +57,7 @@ namespace Forum.Models.Services {
 
       var topics = await _db.Topic.Include(t => t.Thread).ToListAsync();
 
-      foreach (var topic in topics) {
-        topicsIndexVm.Topics.Add(await GetThreadsIndexThreadVmAsync(topic, user));
-      }
+      foreach (var topic in topics) topicsIndexVm.Topics.Add(await GetThreadsIndexThreadVmAsync(topic, user));
 
       topicsIndexVm.LatestThreads.AddRange(_db.Thread.OrderByDescending(t => t.CreatedOn).Take(10).Select(t =>
         new TopicsIndexThreadVm {
@@ -81,11 +80,13 @@ namespace Forum.Models.Services {
     }
 
     private async Task<TopicsIndexTopicVm> GetThreadsIndexThreadVmAsync(Topic topic, ClaimsPrincipal user) {
-      var isAuthorizedForTopicEditBlockAndDelete = await _authorizationService.IsAuthorizedForTopicEditLockAndDelete(topic, user);
+      var isAuthorizedForTopicEditBlockAndDelete =
+        await _authorizationService.IsAuthorizedForTopicEditLockAndDelete(topic, user);
       var lockedBy = await _userManager.FindByIdAsync(topic.LockedBy);
 
       return new TopicsIndexTopicVm {
-        LatestActiveThread = _db.Post.Where(p => p.ThreadNavigation.Topic == topic.Id).OrderByDescending(p => p.CreatedOn)
+        LatestActiveThread = _db.Post.Where(p => p.ThreadNavigation.Topic == topic.Id)
+          .OrderByDescending(p => p.CreatedOn)
           .Take(1).Select(p => new TopicsIndexThreadVm {
             ThreadId = p.Thread,
             ThreadText = p.ThreadNavigation.ContentText,

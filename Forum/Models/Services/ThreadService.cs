@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Forum.Attributes;
 using Forum.Models.Context;
 using Forum.Models.Entities;
 using Forum.Models.ViewModels.ThreadViewModels;
@@ -49,7 +48,8 @@ namespace Forum.Models.Services {
           _db.Post.Add(post);
           await _db.SaveChangesAsync();
           transaction.Commit();
-        } catch (Exception) {
+        }
+        catch (Exception) {
           transaction.Rollback();
         }
       }
@@ -62,16 +62,14 @@ namespace Forum.Models.Services {
         Topic = topicFromDb.ContentText,
         IsTopicLocked = topicFromDb.LockedBy != null,
         Threads = new List<ThreadsIndexThreadVm>(),
-        IsAuthorizedForThreadCreate = await _authorizationService.IsAuthorizedForCreateThread(topicId, user),
+        IsAuthorizedForThreadCreate = await _authorizationService.IsAuthorizedForCreateThread(topicId, user)
       };
 
       //Included TopicNavigation  and Post to be used in IsAuthorizedForThreadEdit check within GetPostsIndexPostVmAsync method
       var threads = _db.Thread.Include(t => t.TopicNavigation).Include(t => t.Post)
-      .Where(t => t.Topic == topicId);
+        .Where(t => t.Topic == topicId);
 
-      foreach (var thread in threads) {
-        threadsIndexVm.Threads.Add(await GetThreadsIndexThreadVmAsync(thread, user));
-      }
+      foreach (var thread in threads) threadsIndexVm.Threads.Add(await GetThreadsIndexThreadVmAsync(thread, user));
 
       return threadsIndexVm;
     }
@@ -134,7 +132,8 @@ namespace Forum.Models.Services {
           _db.Thread.Remove(threadFromDb);
           await _db.SaveChangesAsync();
           transaction.Commit();
-        } catch (Exception) {
+        }
+        catch (Exception) {
           transaction.Rollback();
         }
       }
@@ -169,7 +168,7 @@ namespace Forum.Models.Services {
         CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
         PostCount = _db.Post.Count(p => p.Thread == t.Id),
         LockedBy = _userManager.FindByIdAsync(t.LockedBy).Result.UserName,
-        LockedOn = (DateTime)t.LockedOn,
+        LockedOn = (DateTime) t.LockedOn,
         ThreadId = t.Id,
         ThreadText = t.ContentText
       }).FirstOrDefaultAsync();

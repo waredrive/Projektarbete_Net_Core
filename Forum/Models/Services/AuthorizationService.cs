@@ -43,7 +43,7 @@ namespace Forum.Models.Services {
       if (!user.Identity.IsAuthenticated || await IsProfileBlocked(user.Identity.Name))
         return false;
 
-      return  user.IsInRole(Roles.Admin);
+      return user.IsInRole(Roles.Admin);
     }
 
     public async Task<bool> IsAuthorizedForTopicEditLockAndDelete(int topicId, ClaimsPrincipal user) {
@@ -102,7 +102,8 @@ namespace Forum.Models.Services {
       if (await ProfileIsInRole(profileUser.UserName, Roles.Admin) && threadFromDb.CreatedBy != userId)
         return false;
 
-      if (await ProfileIsInRole(profileUser.UserName, Roles.Moderator) && user.IsInRole(Roles.Moderator) && threadFromDb.CreatedBy != userId)
+      if (await ProfileIsInRole(profileUser.UserName, Roles.Moderator) && user.IsInRole(Roles.Moderator) &&
+          threadFromDb.CreatedBy != userId)
         return false;
 
       if (user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator))
@@ -137,7 +138,8 @@ namespace Forum.Models.Services {
       if (await ProfileIsInRole(profileUser.UserName, Roles.Admin) && threadFromDb.CreatedBy != userId)
         return false;
 
-      if (await ProfileIsInRole(profileUser.UserName, Roles.Moderator) && user.IsInRole(Roles.Moderator) && threadFromDb.CreatedBy != userId)
+      if (await ProfileIsInRole(profileUser.UserName, Roles.Moderator) && user.IsInRole(Roles.Moderator) &&
+          threadFromDb.CreatedBy != userId)
         return false;
 
       if (user.IsInRole(Roles.Admin))
@@ -177,7 +179,8 @@ namespace Forum.Models.Services {
       if (await ProfileIsInRole(profileUser.UserName, Roles.Admin) && threadFromDb.CreatedBy != userId)
         return false;
 
-      if (await ProfileIsInRole(profileUser.UserName, Roles.Moderator) && user.IsInRole(Roles.Moderator) && threadFromDb.CreatedBy != userId)
+      if (await ProfileIsInRole(profileUser.UserName, Roles.Moderator) && user.IsInRole(Roles.Moderator) &&
+          threadFromDb.CreatedBy != userId)
         return false;
 
       if (user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator))
@@ -204,7 +207,8 @@ namespace Forum.Models.Services {
       if (await ProfileIsInRole(profileUser.UserName, Roles.Admin) && postFromDb.CreatedBy != userId)
         return false;
 
-      if (await ProfileIsInRole(profileUser.UserName, Roles.Moderator) && user.IsInRole(Roles.Moderator) && postFromDb.CreatedBy != userId)
+      if (await ProfileIsInRole(profileUser.UserName, Roles.Moderator) && user.IsInRole(Roles.Moderator) &&
+          postFromDb.CreatedBy != userId)
         return false;
 
       if (user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator))
@@ -229,7 +233,8 @@ namespace Forum.Models.Services {
       if (await ProfileIsInRole(profileUser.UserName, Roles.Admin) && postFromDb.CreatedBy != userId)
         return false;
 
-      if (await ProfileIsInRole(profileUser.UserName, Roles.Moderator) && user.IsInRole(Roles.Moderator) && postFromDb.CreatedBy != userId)
+      if (await ProfileIsInRole(profileUser.UserName, Roles.Moderator) && user.IsInRole(Roles.Moderator) &&
+          postFromDb.CreatedBy != userId)
         return false;
 
       return user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator);
@@ -239,7 +244,8 @@ namespace Forum.Models.Services {
       if (await IsProfileInternal(username))
         return false;
 
-      if (await ProfileIsInRole(username, Roles.Admin) && !string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase))
+      if (await ProfileIsInRole(username, Roles.Admin) &&
+          !string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase))
         return false;
 
       if (string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase))
@@ -252,32 +258,39 @@ namespace Forum.Models.Services {
     }
 
     public async Task<bool> IsAuthorizedForAccountAndProfileEdit(string username, ClaimsPrincipal user) {
-      if (!user.Identity.IsAuthenticated || await IsProfileInternal(username) || await IsProfileBlocked(user.Identity.Name))
+      if (!user.Identity.IsAuthenticated || await IsProfileInternal(username) ||
+          await IsProfileBlocked(user.Identity.Name))
         return false;
 
-      if (await ProfileIsInRole(username, Roles.Admin) && !string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase))
+      if (await ProfileIsInRole(username, Roles.Admin) &&
+          !string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase))
         return false;
 
       return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase);
     }
 
     public async Task<bool> IsAuthorizedForProfileDelete(string username, ClaimsPrincipal user) {
-      if (await ProfileIsInRole(username, Roles.Admin) && !string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase))
+      if (await ProfileIsInRole(username, Roles.Admin) &&
+          !string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase))
         return false;
 
-      return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase) || user.IsInRole(Roles.Admin);
+      return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase) ||
+             user.IsInRole(Roles.Admin);
     }
 
     public async Task<bool> IsAuthorizedProfileChangeRole(string username, ClaimsPrincipal user) {
-      if (!user.Identity.IsAuthenticated || await IsProfileInternal(username) || await IsProfileBlocked(user.Identity.Name))
-        return false;;
+      if (!user.Identity.IsAuthenticated || await IsProfileInternal(username) ||
+          await IsProfileBlocked(user.Identity.Name))
+        return false;
+      ;
 
       return !await ProfileIsInRole(username, Roles.Admin) && user.IsInRole(Roles.Admin);
     }
 
 
     public async Task<bool> IsAuthorizedProfileBlock(string username, ClaimsPrincipal user) {
-      if (!user.Identity.IsAuthenticated || await IsProfileInternal(username) || await IsProfileBlocked(user.Identity.Name))
+      if (!user.Identity.IsAuthenticated || await IsProfileInternal(username) ||
+          await IsProfileBlocked(user.Identity.Name))
         return false;
 
       if (await ProfileIsInRole(username, Roles.Admin))

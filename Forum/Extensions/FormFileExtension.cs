@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Text;
 using System.IO;
-using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Forum.Validations;
 using Microsoft.AspNetCore.Http;
 
@@ -17,7 +14,6 @@ namespace Forum.Extensions {
     public const int ImagePixelHeight = 240;
 
     public static ImageValidationResult IsValidImage(this IFormFile postedFile) {
-
       var result = new ImageValidationResult();
 
       if (!string.Equals(postedFile.ContentType, "image/jpg", StringComparison.OrdinalIgnoreCase) &&
@@ -41,32 +37,32 @@ namespace Forum.Extensions {
 
       //  Attempt to read the file and check the first bytes
       try {
-        if (!postedFile.OpenReadStream().CanRead) {
-          return result.DefaultError();
-        }
+        if (!postedFile.OpenReadStream().CanRead) return result.DefaultError();
 
         //check if the image size exceeds the limits
         if (postedFile.Length > ImageMaxBytes) {
-          result.Errors.Add($"The image must have less than {ImageMaxBytes/1000}Kb.");
+          result.Errors.Add($"The image must have less than {ImageMaxBytes / 1000}Kb.");
           return result;
         }
+
         if (postedFile.Length < ImageMinBytes) {
-          result.Errors.Add($"The image must have more than {ImageMinBytes/1000}Kb.");
+          result.Errors.Add($"The image must have more than {ImageMinBytes / 1000}Kb.");
           return result;
         }
 
         //check for html-injection
         var buffer = new byte[ImageMaxBytes];
         postedFile.OpenReadStream().Read(buffer, 0, ImageMaxBytes);
-        var content = System.Text.Encoding.UTF8.GetString(buffer);
+        var content = Encoding.UTF8.GetString(buffer);
         if (Regex.IsMatch(content,
           @"<script|<html|<head|<title|<body|<pre|<table|<a\s+href|<img|<plaintext|<cross\-domain\-policy",
-          RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Multiline)) {
+          RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Multiline))
           return result.DefaultError();
-        }
-      } catch (Exception) {
+      }
+      catch (Exception) {
         return result.DefaultError();
-      } finally {
+      }
+      finally {
         postedFile.OpenReadStream().Dispose();
       }
 
@@ -74,17 +70,15 @@ namespace Forum.Extensions {
       // Check if sizing is within limits
       try {
         using (var bitmap = new Bitmap(postedFile.OpenReadStream())) {
-          if (bitmap.Width != ImagePixelWidth) {
-            result.Errors.Add($"The image must have {ImagePixelWidth}px width.");
-          }
-          if (bitmap.Height != ImagePixelHeight) {
-            result.Errors.Add($"The image must have {ImagePixelHeight}px height.");
-          }
+          if (bitmap.Width != ImagePixelWidth) result.Errors.Add($"The image must have {ImagePixelWidth}px width.");
+          if (bitmap.Height != ImagePixelHeight) result.Errors.Add($"The image must have {ImagePixelHeight}px height.");
           return result;
         }
-      } catch (Exception) {
+      }
+      catch (Exception) {
         return result.DefaultError();
-      } finally {
+      }
+      finally {
         postedFile.OpenReadStream().Dispose();
       }
     }

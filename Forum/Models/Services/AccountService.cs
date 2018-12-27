@@ -70,7 +70,8 @@ namespace Forum.Models.Services {
 
         _db.Member.Add(member);
         await _db.SaveChangesAsync();
-      } catch (Exception) {
+      }
+      catch (Exception) {
         await _userManager.DeleteAsync(user);
         throw;
       }
@@ -82,7 +83,7 @@ namespace Forum.Models.Services {
       if (!DoesAccountExist(accountLoginVm.UserName))
         return SignInResult.Failed;
 
-        if (await _authorizationService.IsProfileInternal(accountLoginVm.UserName))
+      if (await _authorizationService.IsProfileInternal(accountLoginVm.UserName))
         return SignInResult.Failed;
 
       var result = await _signInManager.PasswordSignInAsync(accountLoginVm.UserName, accountLoginVm.Password,
@@ -133,7 +134,8 @@ namespace Forum.Models.Services {
         memberFromDb.FirstName = accountEditVm.FirstName;
         memberFromDb.LastName = accountEditVm.LastName;
         await _db.SaveChangesAsync();
-      } catch (Exception) {
+      }
+      catch (Exception) {
         await _userManager.SetEmailAsync(identityUser, oldEmail);
         throw;
       }
@@ -171,7 +173,7 @@ namespace Forum.Models.Services {
         if (await _roleManager.RoleExistsAsync(role))
           continue;
 
-        var roleToAdd = new IdentityRole { Name = role };
+        var roleToAdd = new IdentityRole {Name = role};
         await _roleManager.CreateAsync(roleToAdd);
       }
     }

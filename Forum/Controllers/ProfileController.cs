@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Forum.Attributes;
+﻿using System.Threading.Tasks;
 using Forum.Extensions;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.ProfileViewModels;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.Controllers {
   [Route("Profile")]
   public class ProfileController : Controller {
-    private readonly ProfileService _profileService;
     private readonly AuthorizationService _authorizationService;
+    private readonly ProfileService _profileService;
 
     public ProfileController(ProfileService profileService, AuthorizationService authorizationService) {
       _profileService = profileService;
@@ -23,11 +18,10 @@ namespace Forum.Controllers {
     [Route("Details/{username}")]
     [HttpGet]
     public async Task<IActionResult> Details(string username) {
-
       if (!_profileService.DoesProfileExist(username))
         return NotFound();
 
-      if(await _authorizationService.IsProfileInternal(username))
+      if (await _authorizationService.IsProfileInternal(username))
         return RedirectToAction("AccessDenied", "Account");
 
       return View(await _profileService.GetProfileDetailsVm(username, User));
@@ -43,7 +37,6 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       return View(await _profileService.GetProfileEditVm(username));
-
     }
 
     [Route("Update/{username}")]
@@ -54,7 +47,7 @@ namespace Forum.Controllers {
         return NotFound();
 
       if (!ModelState.IsValid)
-        return (View(await _profileService.GetProfileEditVm(username)));
+        return View(await _profileService.GetProfileEditVm(username));
 
       if (!await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
         return RedirectToAction("AccessDenied", "Account");
@@ -76,7 +69,7 @@ namespace Forum.Controllers {
         return View(await _profileService.GetProfileEditVm(username));
       }
 
-      return RedirectToAction(nameof(Details), new { username = profileEditVm.NewUsername });
+      return RedirectToAction(nameof(Details), new {username = profileEditVm.NewUsername});
     }
 
     [Route("Role/{username}")]
@@ -89,8 +82,6 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       return View(await _profileService.GetProfileRoleEditVm(username));
-
-
     }
 
     [Route("Role/{username}")]
@@ -108,7 +99,7 @@ namespace Forum.Controllers {
 
       await _profileService.UpdateProfileRole(username, profileRoleEditVm);
 
-      return RedirectToAction(nameof(Details), new { username });
+      return RedirectToAction(nameof(Details), new {username});
     }
 
     [Route("Block/{username}")]
@@ -140,7 +131,7 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (await _authorizationService.IsProfileBlocked(username))
-        return RedirectToAction(nameof(Details), new { username });
+        return RedirectToAction(nameof(Details), new {username});
 
       var result = await _profileService.Block(username, profileBlockVm, User);
 
@@ -183,7 +174,7 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (!await _authorizationService.IsProfileBlocked(username))
-        return RedirectToAction(nameof(Details), new { username });
+        return RedirectToAction(nameof(Details), new {username});
 
       await _profileService.Unblock(username, profileUnblockVm, User);
 
@@ -210,7 +201,7 @@ namespace Forum.Controllers {
         return NotFound();
 
       if (!ModelState.IsValid)
-        return (View(profileDeleteVm));
+        return View(profileDeleteVm);
 
       if (!await _authorizationService.IsAuthorizedForProfileDelete(profileDeleteVm.Username, User))
         return RedirectToAction("AccessDenied", "Account");

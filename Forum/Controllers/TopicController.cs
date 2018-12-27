@@ -9,8 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Forum.Controllers {
   [Route("")]
   public class TopicController : Controller {
-    private readonly TopicService _topicService;
     private readonly AuthorizationService _authorizationService;
+    private readonly TopicService _topicService;
 
     public TopicController(TopicService topicService, AuthorizationService authorizationService) {
       _topicService = topicService;
@@ -30,7 +30,7 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Create() {
       if (!await _authorizationService.IsAuthorizedForCreateTopic(User))
-      return RedirectToAction("AccessDenied", "Account");
+        return RedirectToAction("AccessDenied", "Account");
 
       return View();
     }
@@ -41,7 +41,7 @@ namespace Forum.Controllers {
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(TopicCreateVm topicCreateVm) {
       if (!ModelState.IsValid)
-        return (View(topicCreateVm));
+        return View(topicCreateVm);
 
       if (!await _authorizationService.IsAuthorizedForCreateTopic(User))
         return RedirectToAction("AccessDenied", "Account");
@@ -72,7 +72,7 @@ namespace Forum.Controllers {
         return NotFound();
 
       if (!ModelState.IsValid)
-        return (View(topicEditVm));
+        return View(topicEditVm);
 
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDelete(id, User))
         return RedirectToAction("AccessDenied", "Account");
@@ -137,7 +137,7 @@ namespace Forum.Controllers {
         return NotFound();
 
       if (!ModelState.IsValid)
-        return (View(topicLockVm));
+        return View(topicLockVm);
 
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDelete(id, User))
         return RedirectToAction("AccessDenied", "Account");
@@ -174,7 +174,7 @@ namespace Forum.Controllers {
         return NotFound();
 
       if (!ModelState.IsValid)
-        return (View(topicUnlockVm));
+        return View(topicUnlockVm);
 
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDelete(id, User))
         return RedirectToAction("AccessDenied", "Account");

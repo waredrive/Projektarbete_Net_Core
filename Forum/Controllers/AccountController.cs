@@ -1,11 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace Forum.Controllers {
   [RequireHttps]
@@ -58,7 +55,7 @@ namespace Forum.Controllers {
     [Route("Login")]
     [HttpGet]
     public IActionResult Login(string returnUrl = null) {
-      return View(new AccountLoginVm { ReturnUrl = returnUrl });
+      return View(new AccountLoginVm {ReturnUrl = returnUrl});
     }
 
     [AllowAnonymous]
@@ -66,14 +63,11 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(AccountLoginVm accountLoginVm) {
-
       if (!ModelState.IsValid)
         return View(accountLoginVm);
 
       var result = await _accountService.Login(accountLoginVm);
-      if (result.Succeeded) {
-        return Redirect(Url.IsLocalUrl(accountLoginVm.ReturnUrl) ? accountLoginVm.ReturnUrl : "/");
-      }
+      if (result.Succeeded) return Redirect(Url.IsLocalUrl(accountLoginVm.ReturnUrl) ? accountLoginVm.ReturnUrl : "/");
 
       ModelState.AddModelError(string.Empty, "Invalid login attempt.");
 
@@ -100,7 +94,7 @@ namespace Forum.Controllers {
         return NotFound();
 
       if (!ModelState.IsValid)
-        return (View(accountEditVm));
+        return View(accountEditVm);
 
       if (!await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
         return RedirectToAction(nameof(AccessDenied));
@@ -144,7 +138,7 @@ namespace Forum.Controllers {
         return NotFound();
 
       if (!ModelState.IsValid)
-        return (View(accountPasswordEditVm));
+        return View(accountPasswordEditVm);
 
       if (!await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
         return RedirectToAction(nameof(AccessDenied));
@@ -172,14 +166,12 @@ namespace Forum.Controllers {
         return RedirectToAction(nameof(AccessDenied));
 
       return View(await _accountService.GetAccountDetailsVm(username, User));
-
     }
 
     [AllowAnonymous]
     [HttpGet]
     [Route("AccessDenied")]
     public IActionResult AccessDenied(string returnUrl = null) {
-
       var accountAccessDeniedVm = new AccountAccessDeniedVm {ReturnUrl = returnUrl};
       return View(accountAccessDeniedVm);
     }

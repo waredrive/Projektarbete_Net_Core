@@ -3,7 +3,6 @@ using Forum.Attributes;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.PostViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.Controllers {

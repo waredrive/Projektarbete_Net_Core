@@ -4,7 +4,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
-using Forum.Attributes;
 using Forum.Models.Context;
 using Forum.Models.ViewModels.ComponentViewModels.NavbarViewModels;
 using Forum.Models.ViewModels.ProfileViewModels;
@@ -17,12 +16,13 @@ namespace Forum.Models.Services {
   public class ProfileService {
     private readonly AuthorizationService _authorizationService;
     private readonly ForumDbContext _db;
-    private readonly UserManager<IdentityUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly UserManager<IdentityUser> _userManager;
 
     public ProfileService(
-      UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<IdentityUser> signInManager,  ForumDbContext db, AuthorizationService authorizationService) {
+      UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager,
+      SignInManager<IdentityUser> signInManager, ForumDbContext db, AuthorizationService authorizationService) {
       _userManager = userManager;
       _roleManager = roleManager;
       _signInManager = signInManager;
@@ -48,11 +48,13 @@ namespace Forum.Models.Services {
         TotalThreads = memberFromDb.ThreadCreatedByNavigation.Count,
         TotalPosts = memberFromDb.PostCreatedByNavigation.Count,
         IsAuthorizedForProfileEdit =
-        await _authorizationService.IsAuthorizedForAccountAndProfileEdit(identityUser.UserName, user),
+          await _authorizationService.IsAuthorizedForAccountAndProfileEdit(identityUser.UserName, user),
         UserIsOwner = UserIsOwner(username, user),
-        IsAuthorizedForProfileDelete = await _authorizationService.IsAuthorizedForProfileDelete(identityUser.UserName, user),
+        IsAuthorizedForProfileDelete =
+          await _authorizationService.IsAuthorizedForProfileDelete(identityUser.UserName, user),
         IsAuthorizedProfileBlock = await _authorizationService.IsAuthorizedProfileBlock(identityUser.UserName, user),
-        IsAuthorizedProfileChangeRole = await  _authorizationService.IsAuthorizedProfileChangeRole(identityUser.UserName, user)
+        IsAuthorizedProfileChangeRole =
+          await _authorizationService.IsAuthorizedProfileChangeRole(identityUser.UserName, user)
       };
     }
 
@@ -65,13 +67,12 @@ namespace Forum.Models.Services {
     }
 
     public async Task<IdentityResult> UpdateProfile(string username, ProfileEditVm profileEditVm) {
-      var identityUser = await _userManager.FindByNameAsync(username);     
+      var identityUser = await _userManager.FindByNameAsync(username);
       var oldUserName = identityUser.UserName;
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
 
-      if (memberFromDb.IsInternal) {
-        return IdentityResult.Failed(new IdentityError { Description = "This member cannot be edited" });
-      }
+      if (memberFromDb.IsInternal)
+        return IdentityResult.Failed(new IdentityError {Description = "This member cannot be edited"});
 
       var result = await _userManager.SetUserNameAsync(identityUser, profileEditVm.NewUsername);
 
@@ -79,18 +80,18 @@ namespace Forum.Models.Services {
         return result;
 
       try {
-        if (profileEditVm.ProfileImage != null) {
+        if (profileEditVm.ProfileImage != null)
           using (var memoryStream = new MemoryStream()) {
             await profileEditVm.ProfileImage.CopyToAsync(memoryStream);
             memberFromDb.ProfileImage = memoryStream.ToArray();
           }
-        }
 
         await _db.SaveChangesAsync();
 
         await _signInManager.SignOutAsync();
         await _signInManager.SignInAsync(identityUser, false, identityUser.Id);
-      } catch (Exception) {
+      }
+      catch (Exception) {
         await _userManager.SetUserNameAsync(identityUser, oldUserName);
         throw;
       }
@@ -118,8 +119,7 @@ namespace Forum.Models.Services {
 
       return new ProfileBlockVm {
         Username = identityUser.UserName,
-        BlockedEnd = DateTime.UtcNow,
-        
+        BlockedEnd = DateTime.UtcNow
       };
     }
 
@@ -161,7 +161,7 @@ namespace Forum.Models.Services {
         Username = identityUser.UserName,
         BlockedEnd = memberFromDb.BlockedEnd,
         BlockedOn = memberFromDb.BlockedOn,
-        BlockedBy = _userManager.FindByIdAsync(memberFromDb.BlockedBy).Result?.UserName,
+        BlockedBy = _userManager.FindByIdAsync(memberFromDb.BlockedBy).Result?.UserName
       };
     }
 
@@ -187,7 +187,8 @@ namespace Forum.Models.Services {
           await _userManager.AddToRoleAsync(identityUser, profileRoleEditVm.Role);
           await _db.SaveChangesAsync();
         }
-      } catch (Exception) {
+      }
+      catch (Exception) {
         var roles = await _userManager.GetRolesAsync(identityUser);
         await _userManager.RemoveFromRolesAsync(identityUser, roles.ToArray());
         await _userManager.AddToRolesAsync(identityUser, roles);
@@ -210,7 +211,7 @@ namespace Forum.Models.Services {
         BlockedBy = _userManager.FindByIdAsync(memberFromDb.BlockedBy).Result?.UserName,
         BlockedEnd = memberFromDb.BlockedEnd,
         TotalThreads = memberFromDb.ThreadCreatedByNavigation.Count,
-        TotalPosts = memberFromDb.PostCreatedByNavigation.Count,
+        TotalPosts = memberFromDb.PostCreatedByNavigation.Count
       };
     }
 
@@ -218,54 +219,39 @@ namespace Forum.Models.Services {
       var customDeletedIdentityUser = await _userManager.FindByNameAsync("[Deleted]");
 
       var identityUser = await _userManager.FindByNameAsync(profileDeleteVm.Username);
-      var memberFromDb = await _db.Member.Include(m => m.InverseBlockedByNavigation).Include(m => m.TopicCreatedByNavigation).Include(t => t.TopicEditedByNavigation).Include(t => t.TopicLockedByNavigation).Include(t => t.ThreadCreatedByNavigation).Include(t => t.ThreadEditedByNavigation).Include(t => t.ThreadLockedByNavigation).Include(p => p.PostEditedByNavigation).Include(p => p.PostLockedByNavigation).Include(p => p.PostCreatedByNavigation).FirstOrDefaultAsync(m => m.Id == identityUser.Id);
+      var memberFromDb = await _db.Member.Include(m => m.InverseBlockedByNavigation)
+        .Include(m => m.TopicCreatedByNavigation).Include(t => t.TopicEditedByNavigation)
+        .Include(t => t.TopicLockedByNavigation).Include(t => t.ThreadCreatedByNavigation)
+        .Include(t => t.ThreadEditedByNavigation).Include(t => t.ThreadLockedByNavigation)
+        .Include(p => p.PostEditedByNavigation).Include(p => p.PostLockedByNavigation)
+        .Include(p => p.PostCreatedByNavigation).FirstOrDefaultAsync(m => m.Id == identityUser.Id);
 
       if (memberFromDb.IsInternal)
         return;
 
-        foreach (var member in memberFromDb.InverseBlockedByNavigation) {
-          member.BlockedBy = customDeletedIdentityUser.Id;
-        }
+      foreach (var member in memberFromDb.InverseBlockedByNavigation) member.BlockedBy = customDeletedIdentityUser.Id;
 
-        foreach (var topic in memberFromDb.TopicCreatedByNavigation) {
-          topic.CreatedBy = customDeletedIdentityUser.Id;
-        }
+      foreach (var topic in memberFromDb.TopicCreatedByNavigation) topic.CreatedBy = customDeletedIdentityUser.Id;
 
-        foreach (var topic in memberFromDb.TopicEditedByNavigation) {
-          topic.EditedBy = customDeletedIdentityUser.Id;
-        }
+      foreach (var topic in memberFromDb.TopicEditedByNavigation) topic.EditedBy = customDeletedIdentityUser.Id;
 
-        foreach (var topic in memberFromDb.TopicLockedByNavigation) {
-          topic.LockedBy = customDeletedIdentityUser.Id;
-        }
+      foreach (var topic in memberFromDb.TopicLockedByNavigation) topic.LockedBy = customDeletedIdentityUser.Id;
 
-        foreach (var thread in memberFromDb.ThreadCreatedByNavigation) {
-          thread.CreatedBy = customDeletedIdentityUser.Id;
-        }
+      foreach (var thread in memberFromDb.ThreadCreatedByNavigation) thread.CreatedBy = customDeletedIdentityUser.Id;
 
-        foreach (var thread in memberFromDb.ThreadEditedByNavigation) {
-          thread.EditedBy = customDeletedIdentityUser.Id;
-        }
+      foreach (var thread in memberFromDb.ThreadEditedByNavigation) thread.EditedBy = customDeletedIdentityUser.Id;
 
-        foreach (var thread in memberFromDb.ThreadLockedByNavigation) {
-          thread.LockedBy = customDeletedIdentityUser.Id;
-        }
+      foreach (var thread in memberFromDb.ThreadLockedByNavigation) thread.LockedBy = customDeletedIdentityUser.Id;
 
-        foreach (var post in memberFromDb.PostEditedByNavigation) {
-          post.EditedBy = customDeletedIdentityUser.Id;
-        }
+      foreach (var post in memberFromDb.PostEditedByNavigation) post.EditedBy = customDeletedIdentityUser.Id;
 
-        foreach (var post in memberFromDb.PostLockedByNavigation) {
-          post.LockedBy = customDeletedIdentityUser.Id;
-        }
+      foreach (var post in memberFromDb.PostLockedByNavigation) post.LockedBy = customDeletedIdentityUser.Id;
 
-        foreach (var post in memberFromDb.PostCreatedByNavigation) {
-          post.CreatedBy = customDeletedIdentityUser.Id;
-        }
+      foreach (var post in memberFromDb.PostCreatedByNavigation) post.CreatedBy = customDeletedIdentityUser.Id;
 
-        _db.Member.Remove(memberFromDb);
-        await _db.SaveChangesAsync();
-        await _userManager.DeleteAsync(identityUser);
+      _db.Member.Remove(memberFromDb);
+      await _db.SaveChangesAsync();
+      await _userManager.DeleteAsync(identityUser);
     }
 
     public bool DoesProfileExist(string username) {
@@ -281,7 +267,8 @@ namespace Forum.Models.Services {
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
       return new NavbarVm {
         ProfileImage = Convert.ToBase64String(memberFromDb.ProfileImage),
-        IsAuthorizedForForumManagement = await _authorizationService.IsAuthorizedForForumManagement(user as ClaimsPrincipal)
+        IsAuthorizedForForumManagement =
+          await _authorizationService.IsAuthorizedForForumManagement(user as ClaimsPrincipal)
       };
     }
   }
