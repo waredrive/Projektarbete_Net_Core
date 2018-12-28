@@ -1,0 +1,49 @@
+﻿@model List<ForumManagementBlockedMemberVm>
+
+<table class="table table-striped table-dark">
+  @foreach (var user in Model) {
+    <tr>
+      <td style="width: 30%" class="align-middle">
+        <p>
+          <a asp-controller="Profile" asp-action="Details" asp-route-username="@user.Username" class="light">@user.Username</a>
+        </p>
+      </td>
+      <td style="width: 20%" class="align-middle">
+        <p class="pb-0 mb-0">
+          <span>Created on: @user.CreatedOn</span>
+        </p>
+        <p>
+          <span>Roles: @string.Join(", ", user.Roles)</span>
+        </p>
+      </td>
+      <td style="width: 20%" class="align-middle">
+        <p class="pb-0 mb-0">
+          <span>Blocked by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@user.BlockedBy" class="light">@user.BlockedBy</a></span>
+        </p>
+        <p class="pb-0 mb-0">
+          <span>Blocked on: @user.BlockedOn</span>
+        </p>
+        <p>
+          <span>Blocked end: @user.BlockEnd</span>
+        </p>
+      </td>
+      <td style="width: 20%" class="align-middle">
+        <div class="btn-group">
+          @if (user.IsAuthorizedProfileChangeRole) {
+            <a asp-controller="Profile" asp-action="EditRole" asp-route-username="@user.Username" class="btn btn-primary btn-sm">Change Role</a>
+          }
+          @if (user.IsAuthorizedProfileBlock) {
+            if (user.BlockedBy == null) {
+              <a asp-controller="Profile" asp-action="Block" asp-route-username="@user.Username" class="btn btn-warning btn-sm">Block</a>
+            } else {
+              <a asp-controller="Profile" asp-action="Unblock" asp-route-username="@user.Username" class="btn btn-warning btn-sm">Unblock</a>
+            }
+          }
+          @if (user.IsAuthorizedForProfileDelete) {
+            <a asp-controller="Profile" asp-action="Delete" asp-route-username="@user.Username" class="btn btn-danger btn-sm">Delete User</a>
+          }
+        </div>
+      </td>
+    </tr>
+  }
+</table>

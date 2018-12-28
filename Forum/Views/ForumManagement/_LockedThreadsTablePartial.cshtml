@@ -1,0 +1,46 @@
+﻿@model List<ForumManagementLockedThreadVm>
+
+<table class="table table-striped table-dark">
+  @foreach (var thread in Model) {
+    <tr>
+      <td style="width: 30%" class="align-middle">
+        <a asp-controller="Post" asp-action="index" asp-route-threadId="@thread.ThreadId" class="light">
+          <p>@thread.ThreadText</p>
+        </a>
+      </td>
+      <td style="width: 20%" class="align-middle">
+        <p class="pb-0 mb-0">
+          <span>Created by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@thread.CreatedBy" class="light">@thread.CreatedBy</a></span>
+        </p>
+        <p>
+          <span>Created on: @thread.CreatedOn</span>
+        </p>
+      </td>
+      <td style="width: 20%" class="align-middle">
+        <p class="pb-0 mb-0">
+          <span>Locked by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@thread.LockedBy" class="light">@thread.LockedBy</a></span>
+        </p>
+        <p>
+          <span>Locked on: @thread.LockedOn</span>
+        </p>
+      </td>
+      <td style="width: 20%" class="align-middle">
+        <div class="btn-group">
+          @if (thread.IsAuthorizedForThreadEdit) {
+            <a asp-controller="Thread" asp-action="Edit" asp-route-topicId="@thread.TopicId" asp-route-id="@thread.ThreadId" class="btn btn-primary btn-sm">Edit</a>
+          }
+          @if (thread.IsAuthorizedForThreadLock) {
+            if (thread.LockedBy == null) {
+              <a asp-controller="Thread" asp-action="Lock" asp-route-topicId="@thread.TopicId" asp-route-id="@thread.ThreadId" class="btn btn-warning btn-sm">Lock</a>
+            } else {
+              <a asp-controller="Thread" asp-action="Unlock" asp-route-topicId="@thread.TopicId" asp-route-id="@thread.ThreadId" class="btn btn-warning btn-sm">Unlock</a>
+            }
+          }
+          @if (thread.IsAuthorizedForThreadDelete) {
+            <a asp-controller="Thread" asp-action="Delete" asp-route-topicId="@thread.TopicId" asp-route-id="@thread.ThreadId" class="btn btn-danger btn-sm">Delete</a>
+          }
+        </div>
+      </td>
+    </tr>
+  }
+</table>

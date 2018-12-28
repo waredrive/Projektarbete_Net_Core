@@ -7,8 +7,9 @@ namespace Forum {
       CreateWebHostBuilder(args).Build().Run();
     }
 
-    //TODO: Add custom messages to AccessDenied (Use TempData)
-    //TODO: Refactor for less I/O to database - Use forumManagementService as example
+    //TODO: Add custom messages to AccessDenied (Use TempData).
+    //TODO: Create Partial views.
+    //TODO: Refactor for less I/O to database - Use forumManagementService as example.
     //TODO: Show site navigation when in Topic/Thread - use bootstrap breadcrumbs.
     //TODO: Add Unblock/Block, Edit and Delete buttons when in thread/topic.
     //TODO: Add back buttons in threads and topics.
