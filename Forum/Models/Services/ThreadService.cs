@@ -61,6 +61,7 @@ namespace Forum.Models.Services {
       var topicFromDb = await _db.Topic.Where(t => t.Id == topicId).FirstOrDefaultAsync();
 
       var threadsIndexVm = new ThreadsIndexVm {
+        TopicId = topicFromDb.Id,
         TopicText = topicFromDb.ContentText,
         IsTopicLocked = topicFromDb.LockedBy != null,
         Threads = new List<ThreadsIndexThreadVm>(),
@@ -194,6 +195,7 @@ namespace Forum.Models.Services {
         await _authorizationService.IsAuthorizedForThreadDeleteAsync(threadId, claimsPrincipalUser);
 
       return new ThreadOptionsVm {
+        TopicId = threadFromDb.Topic,
         ThreadId = threadId,
         LockedOn = threadFromDb.LockedOn,
         IsAuthorizedForThreadLock = isAuthorizedForThreadLock,

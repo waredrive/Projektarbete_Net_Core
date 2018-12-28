@@ -46,6 +46,7 @@ namespace Forum.Models.Services {
       var postsIndexVm = new PostsIndexVm {
         TopicText = threadFromDb.TopicNavigation.ContentText,
         TopicId = threadFromDb.Topic,
+        ThreadId = threadFromDb.Id,
         ThreadText = threadFromDb.ContentText,
         Posts = new List<PostsIndexPostVm>(),
         IsThreadLocked = threadFromDb.LockedBy != null,
@@ -168,6 +169,7 @@ namespace Forum.Models.Services {
       var isAuthorizedForPostLock = await _authorizationService.IsAuthorizedForPostLockAsync(postFromDb, claimsPrincipalUser);
 
       return new PostOptionsVm {
+        ThreadId = postFromDb.Thread,
         PostId = postFromDb.Id,
         LockedOn = postFromDb.LockedOn,
         IsAuthorizedForPostEditAndDelete = isAuthorizedForPostEditAndDelete,

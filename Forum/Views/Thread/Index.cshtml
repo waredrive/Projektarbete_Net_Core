@@ -6,6 +6,9 @@
   <div class="col-md-12">
     <div class="row">
       <h1 class="text-light">@Model.TopicText</h1>
+      <div class="my-auto ml-3">
+        @await Component.InvokeAsync("TopicOptions", @Model.TopicId)
+      </div>
     </div>
   </div>
   @if (@Model.IsAuthorizedForThreadCreate) {

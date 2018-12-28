@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Forum.Models.ViewModels.ThreadViewModels {
   public class ThreadsIndexVm {
+    public int TopicId { get; set; }
     public string TopicText { get; set; }
     public bool IsTopicLocked { get; set; }
     public bool IsAuthorizedForThreadCreate { get; set; }

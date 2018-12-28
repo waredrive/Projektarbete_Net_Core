@@ -5,6 +5,7 @@ namespace Forum.Models.ViewModels.PostViewModels {
   public class PostsIndexVm {
     public int TopicId { get; set; }
     public string TopicText { get; set; }
+    public int ThreadId { get; set; }
     public string ThreadText { get; set; }
     public bool IsThreadLocked { get; set; }
     public List<PostsIndexPostVm> Posts { get; set; }

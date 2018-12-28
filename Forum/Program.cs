@@ -10,8 +10,7 @@ namespace Forum {
     //TODO: Add custom messages to AccessDenied (Use TempData).
     //TODO: Make statistics in forumManager Sticky
     //TODO: Create Partial views.
-    //TODO: Add Unblock/Block, Edit and Delete buttons when in thread/topic.
-    //TODO: Prevent pages add to history, for omitting when back button is pressed.
+    //TODO: Prevent pages add to history, for omitting when back button is pressed. Only "nested" pages - Profile and Account.
     //TODO: Add pagination.
     //TODO: Add id to posts and threads so users can go to them from ex. latest posts.
     //TODO: Add Typeahead with ajax call for searching.
