@@ -30,6 +30,7 @@ namespace Forum {
       services.AddScoped<ThreadService>();
       services.AddScoped<PostService>();
       services.AddScoped<ProfileService>();
+      services.AddScoped<SharedService>();
       services.AddScoped<ForumManagementService>();
       services.AddMvc(o => {
         var policy = new AuthorizationPolicyBuilder()

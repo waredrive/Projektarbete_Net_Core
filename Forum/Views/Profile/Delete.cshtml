@@ -10,7 +10,7 @@
     <div class="row bg-light text-danger py-2 rounded">
       <div class="col-12">
         <h4>Warning!</h4>
-        <h5>This profile will be permanently removed, including all its posts!</h5>
+        <h5>This profile will be permanently removed! Your posts, threads and topics will remain but will be anonymized!</h5>
       </div>
     </div>
     <br/>
@@ -38,7 +38,7 @@
           @Html.HiddenFor(m => m.Username)
           <div class="btn-group float-right">
             <input type="submit" class="btn btn-danger rounded-left" value="Delete User"/>
-            <a href="javascript:history.back()" class="btn btn-warning">Back</a>
+            <a href="javascript:history.back()" class="btn btn-primary">Back</a>
           </div>
         </form>
       </div>

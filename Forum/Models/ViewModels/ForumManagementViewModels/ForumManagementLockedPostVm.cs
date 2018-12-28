@@ -4,7 +4,7 @@ namespace Forum.Models.ViewModels.ForumManagementViewModels {
   public class ForumManagementLockedPostVm {
     public int ThreadId { get; set; }
     public int PostId { get; set; }
-    public string PostText { get; set; }
+    public string ThreadText { get; set; }
     public DateTime CreatedOn { get; set; }
     public string CreatedBy { get; set; }
     public string CreatorProfileImage { get; set; }

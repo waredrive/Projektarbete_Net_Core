@@ -1,46 +1,47 @@
 ﻿@model List<ForumManagementBlockedMemberVm>
 
 <table class="table table-striped table-dark">
-  @foreach (var user in Model) {
-    <tr>
-      <td style="width: 30%" class="align-middle">
-        <p>
-          <a asp-controller="Profile" asp-action="Details" asp-route-username="@user.Username" class="light">@user.Username</a>
+  @foreach (var member in Model) {
+    <tr>           
+      <td style="width: 1%;" class="align-middle pr-0">
+        <img class="rounded float-left" src="data:image;base64,@member.CreatorProfileImage" alt="Profile picture" style="width: 50px; height: 50px" />
+      </td>     
+      <td style="width: 29%" class="align-middle">
+        <p class="pb-0 mb-0">
+          <a asp-controller="Profile" asp-action="Details" asp-route-username="@member.Username" class="light">@member.Username</a>
         </p>
       </td>
       <td style="width: 20%" class="align-middle">
-        <p class="pb-0 mb-0">
-          <span>Created on: @user.CreatedOn</span>
-        </p>
-        <p>
-          <span>Roles: @string.Join(", ", user.Roles)</span>
-        </p>
+        <p class="pb-0 mb-0 small">Created on: @member.CreatedOn</p>
+        <p class="pb-0 mb-0 small">Roles: @string.Join(", ", member.Roles)</p>
+      <td style="width: 1%;" class="align-middle pr-0">
+        <img class="rounded float-left" src="data:image;base64,@member.BlockerProfileImage" alt="Profile picture" style="width: 50px; height: 50px"/>
       </td>
-      <td style="width: 20%" class="align-middle">
-        <p class="pb-0 mb-0">
-          <span>Blocked by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@user.BlockedBy" class="light">@user.BlockedBy</a></span>
+      <td style="width: 19%" class="align-middle">
+        <p class="pb-0 mb-0 small">
+          Blocked by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@member.BlockedBy" class="light">@member.BlockedBy</a>
         </p>
-        <p class="pb-0 mb-0">
-          <span>Blocked on: @user.BlockedOn</span>
+        <p class="pb-0 mb-0 small">
+          Blocked on: @member.BlockedOn
         </p>
-        <p>
-          <span>Blocked end: @user.BlockEnd</span>
+        <p class="pb-0 mb-0 small">
+          Blocked end: @member.BlockEnd
         </p>
       </td>
       <td style="width: 20%" class="align-middle">
         <div class="btn-group">
-          @if (user.IsAuthorizedProfileChangeRole) {
-            <a asp-controller="Profile" asp-action="EditRole" asp-route-username="@user.Username" class="btn btn-primary btn-sm">Change Role</a>
+          @if (member.IsAuthorizedProfileChangeRole) {
+            <a asp-controller="Profile" asp-action="EditRole" asp-route-username="@member.Username" class="btn btn-primary btn-sm">Change Role</a>
           }
-          @if (user.IsAuthorizedProfileBlock) {
-            if (user.BlockedBy == null) {
-              <a asp-controller="Profile" asp-action="Block" asp-route-username="@user.Username" class="btn btn-warning btn-sm">Block</a>
+          @if (member.IsAuthorizedProfileBlock) {
+            if (member.BlockedBy == null) {
+              <a asp-controller="Profile" asp-action="Block" asp-route-username="@member.Username" class="btn btn-warning btn-sm">Block</a>
             } else {
-              <a asp-controller="Profile" asp-action="Unblock" asp-route-username="@user.Username" class="btn btn-warning btn-sm">Unblock</a>
+              <a asp-controller="Profile" asp-action="Unblock" asp-route-username="@member.Username" class="btn btn-warning btn-sm">Unblock</a>
             }
           }
-          @if (user.IsAuthorizedForProfileDelete) {
-            <a asp-controller="Profile" asp-action="Delete" asp-route-username="@user.Username" class="btn btn-danger btn-sm">Delete User</a>
+          @if (member.IsAuthorizedForProfileDelete) {
+            <a asp-controller="Profile" asp-action="Delete" asp-route-username="@member.Username" class="btn btn-danger btn-sm">Delete User</a>
           }
         </div>
       </td>

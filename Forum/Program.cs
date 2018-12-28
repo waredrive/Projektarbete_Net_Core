@@ -8,6 +8,8 @@ namespace Forum {
     }
 
     //TODO: Add custom messages to AccessDenied (Use TempData).
+    //TODO: Rename async methods to [methodName]Async.
+    //TODO: Make statistics Sticky
     //TODO: Create Partial views.
     //TODO: Refactor for less I/O to database - Use forumManagementService as example.
     //TODO: Show site navigation when in Topic/Thread - use bootstrap breadcrumbs.

@@ -1,0 +1,19 @@
+﻿@model ForumManagementLockedPostsVm
+@{
+  ViewBag.Title = $"Posts Locked By {Model.UserName}";
+}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-10">
+      <div class="row mt-4">
+        <div class="col-md-12">
+          <h4 class="text-center text-light mb-3">Posts Locked By @Model.UserName @if (Model.UserName == User.Identity.Name) {<span>(You)</span>}</h4>
+          <partial name="_LockedPostsTablePartial" for="@Model.LockedPosts" />
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <partial name="_StatisticsPartial" for="@Model.Statistics" />
+    </div>
+  </div>
+</div>

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace Forum.Models.ViewModels.ForumManagementViewModels {
   public class ForumManagementStatisticsVm {
+    public string UserName { get; set; }
     public int BlockedMembersCount { get; set; }
     public int LockedTopicsCount { get; set; }
     public int LockedThreadsCount { get; set; }

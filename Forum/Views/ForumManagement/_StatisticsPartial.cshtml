@@ -1,18 +1,20 @@
 ﻿@model ForumManagementStatisticsVm     
-<div class="mx-2 rounded bg-secondary text-light h-100">
+<div class="mx-2 rounded bg-secondary text-light pb-5">
   <h2 class="p-2 text-center">Statistics</h2>
-  <h4 class="p-2 text-center">Overall</h4>
+  <h4 class="p-2 text-center">All</h4>
   <ul class="list-group text-dark">
-    <a href="#" class="list-group-item list-group-item-action">Users blocked: @Model.BlockedMembersCount</a>
-    <a href="#" class="list-group-item list-group-item-action">Topics locked: @Model.LockedTopicsCount</a>
-    <a href="#" class="list-group-item list-group-item-action">Threads locked: @Model.LockedThreadsCount</a>
-    <a href="#" class="list-group-item list-group-item-action">Posts locked: @Model.LockedPostsCount</a>
-        </ul>
-        <h4 class="pt-4 pb-2 text-center">Yours</h4>
-        <ul class="list-group text-dark">
-          <a href="#" class="list-group-item list-group-item-action">Users blocked: @Model.BlockedByUserMembersCount</a>
-          <a href="#" class="list-group-item list-group-item-action">Topics locked: @Model.LockedByUserTopicsCount</a>
-          <a href="#" class="list-group-item list-group-item-action">Threads locked: @Model.LockedByUserThreadsCount</a>
-          <a href="#" class="list-group-item list-group-item-action">Posts locked: @Model.LockedByUserPostsCount</a>
-        </ul>
-      </div>
+    <a asp-controller="ForumManagement" asp-action="Index" class="list-group-item list-group-item-action">Latest Blocked</a>
+    <a asp-controller="ForumManagement" asp-action="BlockedMembersAll" class="list-group-item list-group-item-action">Members blocked: @Model.BlockedMembersCount</a>
+    <a asp-controller="ForumManagement" asp-action="BlockedMembersAll" class="list-group-item list-group-item-action">Members blocked: @Model.BlockedMembersCount</a>
+    <a asp-controller="ForumManagement" asp-action="LockedTopicsAll" class="list-group-item list-group-item-action">Topics locked: @Model.LockedTopicsCount</a>
+    <a asp-controller="ForumManagement" asp-action="LockedThreadsAll" class="list-group-item list-group-item-action">Threads locked: @Model.LockedThreadsCount</a>
+    <a asp-controller="ForumManagement" asp-action="LockedPostsAll" class="list-group-item list-group-item-action">Posts locked: @Model.LockedPostsCount</a>
+  </ul>
+  <h4 class="pt-4 pb-2 text-center">@Model.UserName @if (Model.UserName == User.Identity.Name) {<span>(You)</span>}</h4>
+  <ul class="list-group text-dark">
+    <a asp-controller="ForumManagement" asp-action="BlockedMembersUser" asp-route-username="@Model.UserName" class="list-group-item list-group-item-action">Members blocked: @Model.BlockedByUserMembersCount</a>
+    <a asp-controller="ForumManagement" asp-action="LockedTopicsUser" asp-route-username="@Model.UserName" class="list-group-item list-group-item-action">Topics locked: @Model.LockedByUserTopicsCount</a>
+    <a asp-controller="ForumManagement" asp-action="LockedThreadsUser" asp-route-username="@Model.UserName" class="list-group-item list-group-item-action">Threads locked: @Model.LockedByUserThreadsCount</a>
+    <a asp-controller="ForumManagement" asp-action="LockedPostsUser" asp-route-username="@Model.UserName" class="list-group-item list-group-item-action">Posts locked: @Model.LockedByUserPostsCount</a>
+  </ul>
+</div>

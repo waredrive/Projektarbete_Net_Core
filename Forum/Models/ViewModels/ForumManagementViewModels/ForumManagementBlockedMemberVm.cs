@@ -6,7 +6,7 @@ namespace Forum.Models.ViewModels.ForumManagementViewModels {
     public string MemberId { get; set; }
     public DateTime CreatedOn { get; set; }
     public string CreatorProfileImage { get; set; }
-    public string LockerProfileImage { get; set; }
+    public string BlockerProfileImage { get; set; }
     public string BlockedBy { get; set; }
     public DateTime? BlockedOn { get; set; }
     public DateTime? BlockEnd { get; set; }

@@ -2,41 +2,47 @@
 
 <table class="table table-striped table-dark">
   @foreach (var topic in Model) {
-    <tr>
-      <td style="width: 30%" class="align-middle">
-        <a asp-controller="Thread" asp-action="index" asp-route-topicId="@topic.TopicId" class="light">
-          <p>@topic.TopicText</p>
-        </a>
-      </td>
-      <td style="width: 20%" class="align-middle">
-        <p class="pb-0 mb-0">
-          <span>Created by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@topic.CreatedBy" class="light">@topic.CreatedBy</a></span>
-        </p>
-        <p>
-          <span>Created on: @topic.CreatedOn</span>
-        </p>
-      </td>
-      <td style="width: 20%" class="align-middle">
-        <p class="pb-0 mb-0">
-          <span>Locked by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@topic.LockedBy" class="light">@topic.LockedBy</a></span>
-        </p>
-        <p>
-          <span>Locked on: @topic.LockedOn</span>
-        </p>
-      </td>
-      <td style="width: 20%" class="align-middle">
-        <div class="btn-group">
-          @if (@topic.IsAuthorizedForTopicEditLockAndDelete) {
-            <a asp-controller="Topic" asp-action="Edit" asp-route-id="@topic.TopicId" class="btn btn-primary btn-sm">Edit</a>
-            if (topic.LockedBy == null) {
-              <a asp-controller="Topic" asp-action="Lock" asp-route-id="@topic.TopicId" class="btn btn-warning btn-sm">Lock</a>
-            } else {
-              <a asp-controller="Topic" asp-action="Unlock" asp-route-id="@topic.TopicId" class="btn btn-warning btn-sm">Unlock</a>
-            }
-            <a asp-controller="Topic" asp-action="Delete" asp-route-id="@topic.TopicId" class="btn btn-danger btn-sm">Delete</a>
+  <tr>
+    <td style="width: 30%" class="align-middle">
+      <a asp-controller="Thread" asp-action="index" asp-route-topicId="@topic.TopicId" class="light">
+        <p class="pb-0 mb-0">@topic.TopicText</p>
+      </a>
+    </td>
+    <td style="width: 1%;" class="align-middle pr-0">
+      <img class="rounded float-left" src="data:image;base64,@topic.CreatorProfileImage" alt="Profile picture" style="width: 50px; height: 50px" />
+    </td>
+    <td style="width: 19%" class="align-middle">
+      <p class="pb-0 mb-0 small">
+        Created by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@topic.CreatedBy" class="light">@topic.CreatedBy</a>
+      </p>
+      <p class="pb-0 mb-0 small">
+        Created on: @topic.CreatedOn
+      </p>
+    </td>
+    <td style="width: 1%;" class="align-middle pr-0">
+      <img class="rounded float-left" src="data:image;base64,@topic.LockerProfileImage" alt="Profile picture" style="width: 50px; height: 50px" />
+    </td>
+    <td style="width: 19%" class="align-middle">
+      <p class="pb-0 mb-0 small">
+        Locked by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@topic.LockedBy" class="light">@topic.LockedBy</a>
+      </p>
+      <p class="pb-0 mb-0 small">
+        Locked on: @topic.LockedOn
+      </p>
+    </td>
+    <td style="width: 20%" class="align-middle">
+      <div class="btn-group">
+        @if (@topic.IsAuthorizedForTopicEditLockAndDelete) {
+          <a asp-controller="Topic" asp-action="Edit" asp-route-id="@topic.TopicId" class="btn btn-primary btn-sm">Edit</a>
+          if (topic.LockedBy == null) {
+            <a asp-controller="Topic" asp-action="Lock" asp-route-id="@topic.TopicId" class="btn btn-warning btn-sm">Lock</a>
+          } else {
+            <a asp-controller="Topic" asp-action="Unlock" asp-route-id="@topic.TopicId" class="btn btn-warning btn-sm">Unlock</a>
           }
-        </div>
-      </td>
-    </tr>
+          <a asp-controller="Topic" asp-action="Delete" asp-route-id="@topic.TopicId" class="btn btn-danger btn-sm">Delete</a>
+        }
+      </div>
+    </td>
+  </tr>
   }
 </table>

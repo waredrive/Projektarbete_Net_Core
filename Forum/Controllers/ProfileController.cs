@@ -8,17 +8,19 @@ namespace Forum.Controllers {
   [Route("Profile")]
   public class ProfileController : Controller {
     private readonly AuthorizationService _authorizationService;
+    private readonly SharedService _sharedService;
     private readonly ProfileService _profileService;
 
-    public ProfileController(ProfileService profileService, AuthorizationService authorizationService) {
+    public ProfileController(ProfileService profileService, AuthorizationService authorizationService, SharedService sharedService) {
       _profileService = profileService;
       _authorizationService = authorizationService;
+      _sharedService = sharedService;
     }
 
     [Route("Details/{username}")]
     [HttpGet]
     public async Task<IActionResult> Details(string username) {
-      if (!_profileService.DoesProfileExist(username))
+      if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
       if (await _authorizationService.IsProfileInternal(username))
@@ -30,7 +32,7 @@ namespace Forum.Controllers {
     [Route("Update/{username}")]
     [HttpGet]
     public async Task<IActionResult> Edit(string username) {
-      if (!_profileService.DoesProfileExist(username))
+      if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
       if (!await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
@@ -43,7 +45,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(string username, ProfileEditVm profileEditVm) {
-      if (!_profileService.DoesProfileExist(username))
+      if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
       if (!ModelState.IsValid)
@@ -75,7 +77,7 @@ namespace Forum.Controllers {
     [Route("Role/{username}")]
     [HttpGet]
     public async Task<IActionResult> EditRole(string username) {
-      if (!_profileService.DoesProfileExist(username))
+      if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
       if (!await _authorizationService.IsAuthorizedProfileChangeRole(username, User))
@@ -88,7 +90,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditRole(string username, ProfileRoleEditVm profileRoleEditVm) {
-      if (!_profileService.DoesProfileExist(username))
+      if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
       if (!ModelState.IsValid)
@@ -105,7 +107,7 @@ namespace Forum.Controllers {
     [Route("Block/{username}")]
     [HttpGet]
     public async Task<IActionResult> Block(string username) {
-      if (!_profileService.DoesProfileExist(username))
+      if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
       if (!await _authorizationService.IsAuthorizedProfileBlock(username, User))
@@ -121,7 +123,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Block(string username, ProfileBlockVm profileBlockVm) {
-      if (!_profileService.DoesProfileExist(username))
+      if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
       if (!ModelState.IsValid)
@@ -147,7 +149,7 @@ namespace Forum.Controllers {
     [Route("Unblock/{username}")]
     [HttpGet]
     public async Task<IActionResult> Unblock(string username) {
-      if (!_profileService.DoesProfileExist(username))
+      if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
       if (!await _authorizationService.IsAuthorizedProfileBlock(username, User))
@@ -164,7 +166,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Unblock(string username, ProfileUnblockVm profileUnblockVm) {
-      if (!_profileService.DoesProfileExist(username))
+      if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
       if (!ModelState.IsValid)
@@ -184,7 +186,7 @@ namespace Forum.Controllers {
     [Route("Delete/{username}")]
     [HttpGet]
     public async Task<IActionResult> Delete(string username) {
-      if (!_profileService.DoesProfileExist(username))
+      if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
       if (await _authorizationService.IsAuthorizedForProfileDelete(username, User))
@@ -197,7 +199,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(string username, ProfileDeleteVm profileDeleteVm) {
-      if (!_profileService.DoesProfileExist(username))
+      if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
       if (!ModelState.IsValid)

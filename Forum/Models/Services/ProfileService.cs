@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Forum.Models.Services {
   public class ProfileService {
     private readonly AuthorizationService _authorizationService;
+    private readonly SharedService _sharedService;
     private readonly ForumDbContext _db;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly SignInManager<IdentityUser> _signInManager;
@@ -22,12 +23,13 @@ namespace Forum.Models.Services {
 
     public ProfileService(
       UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager,
-      SignInManager<IdentityUser> signInManager, ForumDbContext db, AuthorizationService authorizationService) {
+      SignInManager<IdentityUser> signInManager, ForumDbContext db, AuthorizationService authorizationService, SharedService sharedService) {
       _userManager = userManager;
       _roleManager = roleManager;
       _signInManager = signInManager;
       _db = db;
       _authorizationService = authorizationService;
+      _sharedService = sharedService;
     }
 
     public async Task<ProfileDetailsVm> GetProfileDetailsVm(string username, ClaimsPrincipal user) {
@@ -254,19 +256,13 @@ namespace Forum.Models.Services {
       await _userManager.DeleteAsync(identityUser);
     }
 
-    public bool DoesProfileExist(string username) {
-      return _userManager.FindByNameAsync(username).Result != null;
-    }
-
     public bool UserIsOwner(string username, ClaimsPrincipal user) {
       return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase);
     }
 
     public async Task<NavbarVm> GetNavbarVm(IPrincipal user) {
-      var identityUser = await _userManager.FindByNameAsync(user.Identity.Name);
-      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
       return new NavbarVm {
-        ProfileImage = Convert.ToBase64String(memberFromDb.ProfileImage),
+        ProfileImage = await _sharedService.GetProfileImageStringByUsername(user.Identity.Name),
         IsAuthorizedForForumManagement =
           await _authorizationService.IsAuthorizedForForumManagement(user as ClaimsPrincipal)
       };

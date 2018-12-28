@@ -5,23 +5,29 @@
     <tr>
       <td style="width: 30%" class="align-middle">
         <a asp-controller="Post" asp-action="index" asp-route-threadId="@thread.ThreadId" class="light">
-          <p>@thread.ThreadText</p>
+          <p class="pb-0 mb-0">@thread.ThreadText</p>
         </a>
       </td>
-      <td style="width: 20%" class="align-middle">
-        <p class="pb-0 mb-0">
-          <span>Created by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@thread.CreatedBy" class="light">@thread.CreatedBy</a></span>
+      <td style="width: 1%;" class="align-middle pr-0">
+        <img class="rounded float-left" src="data:image;base64,@thread.CreatorProfileImage" alt="Profile picture" style="width: 50px; height: 50px"/>
+      </td>
+      <td style="width: 19%" class="align-middle">
+        <p class="pb-0 mb-0 small">
+          Created by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@thread.CreatedBy" class="light">@thread.CreatedBy</a>
         </p>
-        <p>
-          <span>Created on: @thread.CreatedOn</span>
+        <p class="pb-0 mb-0 small">
+          Created on: @thread.CreatedOn
         </p>
       </td>
-      <td style="width: 20%" class="align-middle">
-        <p class="pb-0 mb-0">
-          <span>Locked by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@thread.LockedBy" class="light">@thread.LockedBy</a></span>
+      <td style="width: 1%;" class="align-middle pr-0">
+        <img class="rounded float-left" src="data:image;base64,@thread.LockerProfileImage" alt="Profile picture" style="width: 50px; height: 50px"/>
+      </td>
+      <td style="width: 19%" class="align-middle">
+        <p class="pb-0 mb-0 small">
+          Locked by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@thread.LockedBy" class="light">@thread.LockedBy</a>
         </p>
-        <p>
-          <span>Locked on: @thread.LockedOn</span>
+        <p class="pb-0 mb-0 small">
+          Locked on: @thread.LockedOn
         </p>
       </td>
       <td style="width: 20%" class="align-middle">

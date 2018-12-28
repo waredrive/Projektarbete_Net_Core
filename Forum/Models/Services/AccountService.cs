@@ -18,6 +18,7 @@ namespace Forum.Models.Services {
     private readonly AuthorizationService _authorizationService;
     private readonly ForumDbContext _db;
     private readonly IHostingEnvironment _env;
+    private readonly SharedService _sharedService;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
@@ -25,13 +26,14 @@ namespace Forum.Models.Services {
     public AccountService(
       UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
       RoleManager<IdentityRole> roleManager, ForumDbContext db, AuthorizationService authorizationService,
-      IHostingEnvironment env) {
+      IHostingEnvironment env, SharedService sharedService) {
       _userManager = userManager;
       _signInManager = signInManager;
       _roleManager = roleManager;
       _db = db;
       _authorizationService = authorizationService;
       _env = env;
+      _sharedService = sharedService;
     }
 
     public AccountRegisterVm GetAccountRegisterVm() {
@@ -80,7 +82,7 @@ namespace Forum.Models.Services {
     }
 
     public async Task<SignInResult> Login(AccountLoginVm accountLoginVm) {
-      if (!DoesAccountExist(accountLoginVm.UserName))
+      if (!_sharedService.DoesUserAccountExist(accountLoginVm.UserName))
         return SignInResult.Failed;
 
       if (await _authorizationService.IsProfileInternal(accountLoginVm.UserName))
@@ -96,7 +98,7 @@ namespace Forum.Models.Services {
     private async Task ResetOldBlockStatus(string username) {
       var identityUser = await _userManager.FindByNameAsync(username);
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
-      if (memberFromDb.BlockedEnd < DateTime.UtcNow) {
+      if (memberFromDb.BlockedEnd > DateTime.UtcNow) {
         memberFromDb.BlockedBy = null;
         memberFromDb.BlockedOn = null;
         memberFromDb.BlockedEnd = null;
@@ -184,10 +186,6 @@ namespace Forum.Models.Services {
         result.Errors.Add("You must be at least 13 years old to use this forum.");
 
       return result;
-    }
-
-    public bool DoesAccountExist(string username) {
-      return _userManager.FindByNameAsync(username).Result != null;
     }
   }
 }

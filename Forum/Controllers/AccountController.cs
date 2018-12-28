@@ -10,10 +10,12 @@ namespace Forum.Controllers {
   public class AccountController : Controller {
     private readonly AccountService _accountService;
     private readonly AuthorizationService _authorizationService;
+    private readonly SharedService _sharedService;
 
-    public AccountController(AccountService accountService, AuthorizationService authorizationService) {
+    public AccountController(AccountService accountService, AuthorizationService authorizationService, SharedService sharedService) {
       _accountService = accountService;
       _authorizationService = authorizationService;
+      _sharedService = sharedService;
     }
 
     [AllowAnonymous]
@@ -77,7 +79,7 @@ namespace Forum.Controllers {
     [Route("Update/{username}")]
     [HttpGet]
     public async Task<IActionResult> EditAccount(string username) {
-      if (!_accountService.DoesAccountExist(username))
+      if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
       if (!await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
@@ -90,7 +92,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditAccount(string username, AccountEditVm accountEditVm) {
-      if (!_accountService.DoesAccountExist(username))
+      if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
       if (!ModelState.IsValid)
@@ -121,7 +123,7 @@ namespace Forum.Controllers {
     [Route("Update/Password/{username}")]
     [HttpGet]
     public async Task<IActionResult> EditPassword(string username) {
-      if (!_accountService.DoesAccountExist(username))
+      if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
       if (!await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
@@ -134,7 +136,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditPassword(string username, AccountPasswordEditVm accountPasswordEditVm) {
-      if (!_accountService.DoesAccountExist(username))
+      if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
       if (!ModelState.IsValid)
@@ -159,7 +161,7 @@ namespace Forum.Controllers {
     public async Task<IActionResult> Details(string username, string returnUrl = null) {
       ViewBag.ReturnUrl = returnUrl ?? "/";
 
-      if (!_accountService.DoesAccountExist(username))
+      if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
       if (!await _authorizationService.IsAuthorizedForAccountDetailsView(username, User))

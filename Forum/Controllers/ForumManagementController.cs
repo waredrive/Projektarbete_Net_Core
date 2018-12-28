@@ -8,42 +8,79 @@ namespace Forum.Controllers {
   [Route("Manage")]
   public class ForumManagementController : Controller {
     private readonly AuthorizationService _authorizationService;
+    private readonly SharedService _sharedService;
     private readonly ForumManagementService _forumManagementService;
 
     public ForumManagementController(ForumManagementService forumManagementService,
-      AuthorizationService authorizationService) {
+      AuthorizationService authorizationService, SharedService sharedService) {
       _forumManagementService = forumManagementService;
       _authorizationService = authorizationService;
+      _sharedService = sharedService;
     }
 
-    [Route("")]
+    [Route("Blocked/Latest")]
     [HttpGet]
     public async Task<IActionResult> Index() {
       return View(await _forumManagementService.GetForumManagementIndexVm(User));
     }
 
-    [Route("Blocked/Topics")]
+    [Route("Locked/Topics/{username}")]
     [HttpGet]
-    public IActionResult BlockedTopics() {
-      return RedirectToAction("Details", "Profile", new {username = User.Identity.Name});
+    public async Task<IActionResult> LockedTopicsUser(string username) {
+      if (!_sharedService.DoesUserAccountExist(username))
+        return NotFound();
+
+      return View(await _forumManagementService.GetForumManagementLockedTopicsVm(User, username));
+    }
+    [Route("Locked/Topics/All")]
+    [HttpGet]
+    public async Task<IActionResult> LockedTopicsAll() {
+      return View(await _forumManagementService.GetForumManagementLockedTopicsVm(User));
     }
 
-    [Route("Blocked/Threads")]
+    [Route("Locked/Threads/{username}")]
     [HttpGet]
-    public IActionResult BlockedThreads() {
-      return RedirectToAction("Details", "Profile", new {username = User.Identity.Name});
+    public async Task<IActionResult> LockedThreadsUser(string username) {
+      if (!_sharedService.DoesUserAccountExist(username))
+        return NotFound();
+
+      return View(await _forumManagementService.GetForumManagementLockedThreadsVm(User, username));
     }
 
-    [Route("Blocked/Users")]
+    [Route("Locked/Threads/All")]
     [HttpGet]
-    public IActionResult BlockedUsers() {
-      return RedirectToAction("Details", "Profile", new {username = User.Identity.Name});
+    public async Task<IActionResult> LockedThreadsAll() {
+      return View(await _forumManagementService.GetForumManagementLockedThreadsVm(User));
     }
 
-    [Route("Blocked/Posts")]
+    [Route("Locked/Posts/{username}")]
     [HttpGet]
-    public IActionResult BlockedPosts() {
-      return RedirectToAction("Details", "Profile", new {username = User.Identity.Name});
+    public async Task<IActionResult> LockedPostsUser(string username) {
+      if (!_sharedService.DoesUserAccountExist(username))
+        return NotFound();
+
+      return View(await _forumManagementService.GetForumManagementLockedPostsVm(User, username));
+    }
+
+    [Route("Locked/Posts/All")]
+    [HttpGet]
+    public async Task<IActionResult> LockedPostsAll() {
+      return View(await _forumManagementService.GetForumManagementLockedPostsVm(User));
+    }
+
+    [Route("Blocked/Members/{username}")]
+    [HttpGet]
+    public async Task<IActionResult> BlockedMembersUser(string username) {
+      if (!_sharedService.DoesUserAccountExist(username))
+        return NotFound();
+
+      return View(await _forumManagementService.GetForumManagementBlockedMembersVm(User, username));
+    }
+
+    [Route("Blocked/Members/All")]
+    [HttpGet]
+    public async Task<IActionResult> BlockedMembersAll() {
+      return View(await _forumManagementService.GetForumManagementBlockedMembersVm(User));
     }
   }
 }
