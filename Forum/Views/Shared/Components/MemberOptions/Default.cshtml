@@ -1,0 +1,28 @@
+﻿@model MemberOptionsVm
+
+@if (Model.IsUserOwner) {
+  <div class="mt-4 btn-group">
+    @if (Model.IsAuthorizedForProfileDelete) {
+      <a asp-controller="Profile" asp-action="Delete" asp-route-username="@Model.Username" class="btn btn-danger btn-sm">Delete Profile</a>
+    }
+    @if (Model.IsAuthorizedForProfileEdit) {
+      <a asp-controller="Profile" asp-action="Edit" asp-route-username="@Model.Username" class="btn btn-warning btn-sm">Edit Profile</a>
+    }
+  </div>
+} else if (User.IsInRole(Roles.Admin) || User.IsInRole(Roles.Moderator) && !Model.IsUserOwner) {
+  <div class="btn-group">
+    @if (Model.IsAuthorizedProfileChangeRole) {
+      <a asp-controller="Profile" asp-action="EditRole" asp-route-username="@Model.Username" class="btn btn-primary btn-sm">Role</a>
+    }
+    @if (Model.IsAuthorizedProfileBlock) {
+      if (Model.BlockedOn == null) {
+        <a asp-controller="Profile" asp-action="Block" asp-route-username="@Model.Username" class="btn btn-warning btn-sm">Block</a>
+      } else {
+        <a asp-controller="Profile" asp-action="Unblock" asp-route-username="@Model.Username" class="btn btn-warning btn-sm">Unblock</a>
+      }
+    }
+    @if (@Model.IsAuthorizedForProfileDelete) {
+      <a asp-controller="Profile" asp-action="Delete" asp-route-username="@Model.Username" class="btn btn-danger btn-sm">Delete </a>
+    }
+  </div>
+}

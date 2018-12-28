@@ -3,7 +3,9 @@ using System.Collections.Generic;
 
 namespace Forum.Models.ViewModels.PostViewModels {
   public class PostsIndexVm {
-    public string Thread { get; set; }
+    public int TopicId { get; set; }
+    public string TopicText { get; set; }
+    public string ThreadText { get; set; }
     public bool IsThreadLocked { get; set; }
     public List<PostsIndexPostVm> Posts { get; set; }
     public bool IsAuthorizedForPostCreate { get; set; }
@@ -16,7 +18,5 @@ namespace Forum.Models.ViewModels.PostViewModels {
     public DateTime CreatedOn { get; set; }
     public string LockedBy { get; set; }
     public string EditedBy { get; set; }
-    public bool IsAuthorizedForPostEditAndDelete { get; set; }
-    public bool IsAuthorizedForPostLock { get; set; }
   }
 }

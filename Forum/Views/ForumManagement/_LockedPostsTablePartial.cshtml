@@ -29,21 +29,7 @@
         </p>
       </td>
       <td style="width: 20%" class="align-middle">
-        <div class="btn-group">
-          @if (post.IsAuthorizedForPostEditAndDelete) {
-            <a asp-controller="Post" asp-action="Edit" asp-route-threadId="@post.ThreadId" asp-route-id="@post.PostId" class="btn btn-primary btn-sm">Edit</a>
-          }
-          @if (post.IsAuthorizedForPostLock) {
-            if (post.LockedBy == null) {
-              <a asp-controller="Post" asp-action="Lock" asp-route-threadId="@post.ThreadId" asp-route-id="@post.PostId" class="btn btn-warning btn-sm">Lock</a>
-            } else {
-              <a asp-controller="Post" asp-action="Unlock" asp-route-threadId="@post.ThreadId" asp-route-id="@post.PostId" class="btn btn-warning btn-sm">Unlock</a>
-            }
-          }
-          @if (post.IsAuthorizedForPostEditAndDelete) {
-            <a asp-controller="Post" asp-action="Delete" asp-route-threadId="@post.ThreadId" asp-route-id="@post.PostId" class="btn btn-danger btn-sm">Delete</a>
-          }
-        </div>
+        @await Component.InvokeAsync("PostOptions", post.PostId)
       </td>
     </tr>
   }

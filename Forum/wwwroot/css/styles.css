@@ -1,4 +1,8 @@
-﻿a {
+﻿html {
+  overflow-y: scroll;
+}
+
+a {
   text-decoration: none !important;
   color: black;
 }

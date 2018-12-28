@@ -1,11 +1,11 @@
 ﻿@model ThreadsIndexVm
 @{
-  ViewBag.Title = @Model.Topic;
+  ViewBag.Title = @Model.TopicText;
 }
 <div class="container-fluid">
   <div class="col-md-12">
     <div class="row">
-      <h1 class="text-light">@Model.Topic</h1>
+      <h1 class="text-light">@Model.TopicText</h1>
     </div>
   </div>
   @if (@Model.IsAuthorizedForThreadCreate) {
@@ -15,6 +15,16 @@
       </div>
     </div>
   }
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item" aria-current="page">
+        <a asp-controller="Topic" asp-action="index">Forum</a>
+      </li>
+      <li class="breadcrumb-item" aria-current="page">
+        <a asp-controller="Thread" asp-action="index">@Model.TopicText</a>
+      </li>
+    </ol>
+  </nav>
   <div class="row">
     <div class="col-md-12">
       <table class="table table-striped table-dark">
@@ -40,21 +50,7 @@
               </p>
             </td>
             <td class="align-middle">
-              <div class="btn-group">
-                @if (thread.IsAuthorizedForThreadEdit) {
-                  <a asp-controller="Thread" asp-action="Edit" asp-route-id="@thread.ThreadId" class="btn btn-primary btn-sm">Edit</a>
-                }
-                @if (thread.IsAuthorizedForThreadLock) {
-                  if (thread.LockedBy == null) {
-                    <a asp-controller="Thread" asp-action="Lock" asp-route-id="@thread.ThreadId" class="btn btn-warning btn-sm">Lock</a>
-                  } else {
-                    <a asp-controller="Thread" asp-action="Unlock" asp-route-id="@thread.ThreadId" class="btn btn-warning btn-sm">Unlock</a>
-                  }
-                }
-                @if (thread.IsAuthorizedForThreadDelete) {
-                  <a asp-controller="Thread" asp-action="Delete" asp-route-id="@thread.ThreadId" class="btn btn-danger btn-sm">Delete</a>
-                }
-              </div>
+              @await Component.InvokeAsync("ThreadOptions", thread.ThreadId)
             </td>
           </tr>
         }

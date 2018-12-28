@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using Forum.Models.Context;
 using Forum.Models.Entities;
+using Forum.Models.ViewModels.ComponentViewModels.ThreadOptionsViewModels;
 using Forum.Models.ViewModels.ThreadViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -59,7 +61,7 @@ namespace Forum.Models.Services {
       var topicFromDb = await _db.Topic.Where(t => t.Id == topicId).FirstOrDefaultAsync();
 
       var threadsIndexVm = new ThreadsIndexVm {
-        Topic = topicFromDb.ContentText,
+        TopicText = topicFromDb.ContentText,
         IsTopicLocked = topicFromDb.LockedBy != null,
         Threads = new List<ThreadsIndexThreadVm>(),
         IsAuthorizedForThreadCreate = await _authorizationService.IsAuthorizedForCreateThreadAsync(topicId, user)
@@ -75,9 +77,6 @@ namespace Forum.Models.Services {
     }
 
     private async Task<ThreadsIndexThreadVm> GetThreadsIndexThreadVmAsync(Thread thread, ClaimsPrincipal user) {
-      var isAuthorizedForThreadEdit = await _authorizationService.IsAuthorizedForThreadEditAsync(thread, user);
-      var isAuthorizedForThreadDelete = await _authorizationService.IsAuthorizedForThreadDeleteAsync(thread, user);
-      var isAuthorizedForThreadLock = await _authorizationService.IsAuthorizedForThreadLockAsync(thread, user);
       var createdBy = await _userManager.FindByIdAsync(thread.CreatedBy);
 
       return new ThreadsIndexThreadVm {
@@ -86,9 +85,6 @@ namespace Forum.Models.Services {
         CreatedBy = createdBy.UserName,
         ThreadText = thread.ContentText,
         PostCount = thread.Post.Count,
-        IsAuthorizedForThreadEdit = isAuthorizedForThreadEdit,
-        IsAuthorizedForThreadDelete = isAuthorizedForThreadDelete,
-        IsAuthorizedForThreadLock = isAuthorizedForThreadLock,
         LockedBy = thread.LockedBy != null ? (await _userManager.FindByIdAsync(thread.LockedBy)).UserName : null
       };
     }
@@ -184,6 +180,26 @@ namespace Forum.Models.Services {
       threadFromDb.LockedOn = null;
 
       await _db.SaveChangesAsync();
+    }
+
+    public async Task<ThreadOptionsVm> GetThreadOptionsVmAsync(int threadId, IPrincipal user) {
+      var claimsPrincipalUser = user as ClaimsPrincipal;
+      var threadFromDb = await _db.Thread.FirstOrDefaultAsync(t => t.Id == threadId);
+
+      var isAuthorizedForThreadLock =
+        await _authorizationService.IsAuthorizedForThreadLockAsync(threadId, claimsPrincipalUser);
+      var isAuthorizedForThreadEdit =
+        await _authorizationService.IsAuthorizedForThreadEditAsync(threadId, claimsPrincipalUser);
+      var isAuthorizedForThreadDelete =
+        await _authorizationService.IsAuthorizedForThreadDeleteAsync(threadId, claimsPrincipalUser);
+
+      return new ThreadOptionsVm {
+        ThreadId = threadId,
+        LockedOn = threadFromDb.LockedOn,
+        IsAuthorizedForThreadLock = isAuthorizedForThreadLock,
+        IsAuthorizedForThreadEdit = isAuthorizedForThreadEdit,
+        IsAuthorizedForThreadDelete = isAuthorizedForThreadDelete
+      };
     }
 
     public bool IsThreadLocked(int id) {

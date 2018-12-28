@@ -11,10 +11,5 @@ namespace Forum.Models.ViewModels.ProfileViewModels {
     public DateTime? BlockedEnd { get; set; }
     public int TotalThreads { get; set; }
     public int TotalPosts { get; set; }
-    public bool IsAuthorizedForProfileEdit { get; set; }
-    public bool IsAuthorizedForProfileDelete { get; set; }
-    public bool IsAuthorizedProfileBlock { get; set; }
-    public bool IsAuthorizedProfileChangeRole { get; set; }
-    public bool UserIsOwner { get; set; }
   }
 }

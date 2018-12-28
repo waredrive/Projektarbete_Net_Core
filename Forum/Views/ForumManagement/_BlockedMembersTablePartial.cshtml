@@ -29,21 +29,7 @@
         </p>
       </td>
       <td style="width: 20%" class="align-middle">
-        <div class="btn-group">
-          @if (member.IsAuthorizedProfileChangeRole) {
-            <a asp-controller="Profile" asp-action="EditRole" asp-route-username="@member.Username" class="btn btn-primary btn-sm">Change Role</a>
-          }
-          @if (member.IsAuthorizedProfileBlock) {
-            if (member.BlockedBy == null) {
-              <a asp-controller="Profile" asp-action="Block" asp-route-username="@member.Username" class="btn btn-warning btn-sm">Block</a>
-            } else {
-              <a asp-controller="Profile" asp-action="Unblock" asp-route-username="@member.Username" class="btn btn-warning btn-sm">Unblock</a>
-            }
-          }
-          @if (member.IsAuthorizedForProfileDelete) {
-            <a asp-controller="Profile" asp-action="Delete" asp-route-username="@member.Username" class="btn btn-danger btn-sm">Delete User</a>
-          }
-        </div>
+        @await Component.InvokeAsync("MemberOptions", @member.Username)
       </td>
     </tr>
   }

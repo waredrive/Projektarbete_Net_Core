@@ -1,11 +1,11 @@
 ﻿@model PostsIndexVm
 @{
-  ViewBag.Title = @Model.Thread;
+  ViewBag.Title = @Model.ThreadText;
 }
 <div class="container-fluid">
   <div class="col-md-12">
     <div class="row">
-      <h1 class="text-light">@Model.Thread</h1>
+      <h1 class="text-light">@Model.ThreadText</h1>
     </div>
   </div>
   @if (Model.IsAuthorizedForPostCreate) {
@@ -15,6 +15,19 @@
       </div>
     </div>
   }
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item" aria-current="page">
+        <a asp-controller="Topic" asp-action="index">Forum</a>
+      </li>
+      <li class="breadcrumb-item" aria-current="page">
+        <a asp-controller="Thread" asp-action="index" asp-route-topicId="@Model.TopicId">@Model.TopicText</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <a asp-controller="Post" asp-action="index">@Model.ThreadText</a>
+      </li>
+    </ol>
+  </nav>
   <div class="row">
     <div class="col-md-12">
       <table class="table table-striped table-dark">
@@ -26,21 +39,7 @@
             <td><a asp-controller="Profile" asp-action="Details" asp-route-username="@post.CreatedBy" class="light">@post.CreatedBy</a></td>
             <td>@post.CreatedOn</td>
             <td>
-              <div class="btn-group">
-                @if (post.IsAuthorizedForPostEditAndDelete) {
-                  <a asp-controller="Post" asp-action="Edit" asp-route-id="@post.PostId" class="btn btn-primary btn-sm">Edit</a>
-                }
-                @if (post.IsAuthorizedForPostLock) {
-                  if (post.LockedBy == null) {
-                    <a asp-controller="Post" asp-action="Lock" asp-route-id="@post.PostId" class="btn btn-warning btn-sm">Lock</a>
-                  } else {
-                    <a asp-controller="Post" asp-action="Unlock" asp-route-id="@post.PostId" class="btn btn-warning btn-sm">Unlock</a>
-                  }
-                }
-                @if (post.IsAuthorizedForPostEditAndDelete) {
-                  <a asp-controller="Post" asp-action="Delete" asp-route-id="@post.PostId" class="btn btn-danger btn-sm">Delete</a>
-                }
-              </div>
+              @await Component.InvokeAsync("PostOptions", post.PostId)
             </td>
           </tr>
         }

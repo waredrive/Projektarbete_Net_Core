@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Forum.Models.Context;
+using Forum.Models.ViewModels.ComponentViewModels.MemberOptionsViewModels;
 using Forum.Models.ViewModels.ComponentViewModels.NavbarViewModels;
 using Forum.Models.ViewModels.ProfileViewModels;
 using Forum.Validations;
@@ -48,15 +49,7 @@ namespace Forum.Models.Services {
         BlockedBy = blockedBy?.UserName,
         BlockedEnd = memberFromDb.BlockedEnd,
         TotalThreads = memberFromDb.ThreadCreatedByNavigation.Count,
-        TotalPosts = memberFromDb.PostCreatedByNavigation.Count,
-        IsAuthorizedForProfileEdit =
-          await _authorizationService.IsAuthorizedForAccountAndProfileEditAsync(identityUser.UserName, user),
-        UserIsOwner = UserIsOwner(username, user),
-        IsAuthorizedForProfileDelete =
-          await _authorizationService.IsAuthorizedForProfileDeleteAsync(identityUser.UserName, user),
-        IsAuthorizedProfileBlock = await _authorizationService.IsAuthorizedProfileBlockAsync(identityUser.UserName, user),
-        IsAuthorizedProfileChangeRole =
-          await _authorizationService.IsAuthorizedProfileChangeRoleAsync(identityUser.UserName, user)
+        TotalPosts = memberFromDb.PostCreatedByNavigation.Count
       };
     }
 
@@ -260,7 +253,7 @@ namespace Forum.Models.Services {
       await _userManager.DeleteAsync(identityUser);
     }
 
-    private bool UserIsOwner(string username, ClaimsPrincipal user) {
+    private bool IsUserOwner(string username, ClaimsPrincipal user) {
       return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase);
     }
 
@@ -269,6 +262,29 @@ namespace Forum.Models.Services {
         ProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(user.Identity.Name),
         IsAuthorizedForForumManagement =
           await _authorizationService.IsAuthorizedForForumManagementAsync(user as ClaimsPrincipal)
+      };
+    }
+
+    public async Task<MemberOptionsVm> GetMemberOptionsVmAsync(string username, IPrincipal user) {
+      var identityUser = await _userManager.FindByNameAsync(username);
+      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
+      var claimsPrincipalUser = user as ClaimsPrincipal;
+      var isAuthorizedForProfileEdit =
+        await _authorizationService.IsAuthorizedForAccountAndProfileEditAsync(username, claimsPrincipalUser);
+      var isAuthorizedForProfileDelete =
+        await _authorizationService.IsAuthorizedForProfileDeleteAsync(username, claimsPrincipalUser);
+      var isAuthorizedProfileBlock = await _authorizationService.IsAuthorizedProfileBlockAsync(username, claimsPrincipalUser);
+      var isAuthorizedProfileChangeRole =
+        await _authorizationService.IsAuthorizedProfileChangeRoleAsync(username, claimsPrincipalUser);
+
+      return new MemberOptionsVm {
+        BlockedOn = memberFromDb.BlockedOn,
+        Username = identityUser.UserName,
+        IsAuthorizedForProfileDelete = isAuthorizedForProfileDelete,
+        IsAuthorizedProfileBlock = isAuthorizedProfileBlock,
+        IsAuthorizedForProfileEdit = isAuthorizedForProfileEdit,
+        IsAuthorizedProfileChangeRole = isAuthorizedProfileChangeRole,
+        IsUserOwner = IsUserOwner(username, claimsPrincipalUser)
       };
     }
   }

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using Forum.Models.Context;
 using Forum.Models.Entities;
+using Forum.Models.ViewModels.ComponentViewModels.PostOptionsViewModels;
 using Forum.Models.ViewModels.PostViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -39,10 +41,12 @@ namespace Forum.Models.Services {
     }
 
     public async Task<PostsIndexVm> GetPostsIndexVmAsync(int threadId, ClaimsPrincipal user) {
-      var threadFromDb = await _db.Thread.Where(t => t.Id == threadId).FirstOrDefaultAsync();
+      var threadFromDb = await _db.Thread.Include(t => t.TopicNavigation).Where(t => t.Id == threadId).FirstOrDefaultAsync();
 
       var postsIndexVm = new PostsIndexVm {
-        Thread = threadFromDb.ContentText,
+        TopicText = threadFromDb.TopicNavigation.ContentText,
+        TopicId = threadFromDb.Topic,
+        ThreadText = threadFromDb.ContentText,
         Posts = new List<PostsIndexPostVm>(),
         IsThreadLocked = threadFromDb.LockedBy != null,
         IsAuthorizedForPostCreate = await _authorizationService.IsAuthorizedForCreatePostAsync(threadId, user)
@@ -56,8 +60,6 @@ namespace Forum.Models.Services {
     }
 
     private async Task<PostsIndexPostVm> GetPostsIndexPostVmAsync(Post post, ClaimsPrincipal user) {
-      var isAuthorizedForPostEditAndDelete = await _authorizationService.IsAuthorizedForPostEditAndDeleteAsync(post, user);
-      var isAuthorizedForPostLock = await _authorizationService.IsAuthorizedForPostLockAsync(post, user);
       var createdBy = await _userManager.FindByIdAsync(post.CreatedBy);
       var lockedBy = await _userManager.FindByIdAsync(post.LockedBy);
 
@@ -66,8 +68,6 @@ namespace Forum.Models.Services {
         CreatedOn = post.CreatedOn,
         CreatedBy = createdBy.UserName,
         PostText = post.ContentText,
-        IsAuthorizedForPostEditAndDelete = isAuthorizedForPostEditAndDelete,
-        IsAuthorizedForPostLock = isAuthorizedForPostLock,
         LockedBy = lockedBy?.UserName
       };
     }
@@ -158,6 +158,21 @@ namespace Forum.Models.Services {
 
     public bool DoesPostExist(int id) {
       return _db.Post.Any(p => p.Id == id);
+    }
+
+    public async Task<PostOptionsVm> GetPostOptionsVmAsync(int postId, IPrincipal user) {
+      var claimsPrincipalUser = user as ClaimsPrincipal;
+      var postFromDb = await _db.Post.FirstOrDefaultAsync(p => p.Id == postId);
+
+      var isAuthorizedForPostEditAndDelete = await _authorizationService.IsAuthorizedForPostEditAndDeleteAsync(postFromDb, claimsPrincipalUser);
+      var isAuthorizedForPostLock = await _authorizationService.IsAuthorizedForPostLockAsync(postFromDb, claimsPrincipalUser);
+
+      return new PostOptionsVm {
+        PostId = postFromDb.Id,
+        LockedOn = postFromDb.LockedOn,
+        IsAuthorizedForPostEditAndDelete = isAuthorizedForPostEditAndDelete,
+        IsAuthorizedForPostLock = isAuthorizedForPostLock
+      };
     }
   }
 }

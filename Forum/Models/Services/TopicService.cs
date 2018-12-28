@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using Forum.Models.Context;
 using Forum.Models.Entities;
+using Forum.Models.ViewModels.ComponentViewModels.TopicOptionsViewModels;
 using Forum.Models.ViewModels.TopicViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -85,8 +87,7 @@ namespace Forum.Models.Services {
         TopicText = topic.ContentText,
         ThreadCount = topic.Thread.Count,
         PostCount = topic.Thread.Select(tt => tt.Post.Count).Sum(),
-        LockedBy = lockedBy?.UserName,
-        IsAuthorizedForTopicEditLockAndDelete = isAuthorizedForTopicEditLockAndDelete
+        LockedBy = lockedBy?.UserName
       };
     }
 
@@ -215,6 +216,16 @@ namespace Forum.Models.Services {
       topicFromDb.LockedOn = null;
 
       await _db.SaveChangesAsync();
+    }
+
+    public async Task<TopicOptionsVm> GetTopicOptionsVmAsync(int topicId, IPrincipal user) {
+      var topic = await _db.Topic.Where(t => t.Id == topicId).FirstOrDefaultAsync();
+      return new TopicOptionsVm {
+        LockedOn = topic.LockedOn,
+        TopicId = topic.Id,
+        IsAuthorizedForTopicEditLockAndDelete =
+          await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(topic.Id, user as ClaimsPrincipal)
+      };
     }
 
     public Task<bool> IsTopicLocked(int id) {
