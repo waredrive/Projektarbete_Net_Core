@@ -21,7 +21,7 @@ namespace Forum.Models.ViewModels.TopicViewModels {
     public int ThreadCount { get; set; }
     public int PostCount { get; set; }
     public TopicsIndexThreadVm LatestActiveThread { get; set; }
-    public bool IsAuthorizedForTopicEditBlockAndDelete { get; set; }
+    public bool IsAuthorizedForTopicEditLockAndDelete { get; set; }
   }
 
   public class TopicsIndexPostVm {

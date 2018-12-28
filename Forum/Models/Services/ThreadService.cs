@@ -22,12 +22,12 @@ namespace Forum.Models.Services {
       _userManager = userManager;
     }
 
-    public async Task Add(ThreadCreateVm threadCreateVm, ClaimsPrincipal user) {
+    public async Task AddAsync(ThreadCreateVm threadCreateVm, ClaimsPrincipal user) {
       var currentUserId = _userManager.GetUserId(user);
       if (currentUserId == null)
         return;
 
-      using (var transaction = _db.Database.BeginTransaction()) {
+      using (var transaction = await _db.Database.BeginTransactionAsync()) {
         try {
           var thread = new Thread {
             Topic = threadCreateVm.TopicId,
@@ -36,7 +36,7 @@ namespace Forum.Models.Services {
             CreatedOn = DateTime.UtcNow
           };
 
-          _db.Thread.Add(thread);
+          await _db.Thread.AddAsync(thread);
 
           var post = new Post {
             Thread = thread.Id,
@@ -45,7 +45,7 @@ namespace Forum.Models.Services {
             CreatedOn = DateTime.UtcNow
           };
 
-          _db.Post.Add(post);
+          await _db.Post.AddAsync(post);
           await _db.SaveChangesAsync();
           transaction.Commit();
         }
@@ -55,14 +55,14 @@ namespace Forum.Models.Services {
       }
     }
 
-    public async Task<ThreadsIndexVm> GetThreadsIndexVm(int topicId, ClaimsPrincipal user) {
+    public async Task<ThreadsIndexVm> GetThreadsIndexVmAsync(int topicId, ClaimsPrincipal user) {
       var topicFromDb = await _db.Topic.Where(t => t.Id == topicId).FirstOrDefaultAsync();
 
       var threadsIndexVm = new ThreadsIndexVm {
         Topic = topicFromDb.ContentText,
         IsTopicLocked = topicFromDb.LockedBy != null,
         Threads = new List<ThreadsIndexThreadVm>(),
-        IsAuthorizedForThreadCreate = await _authorizationService.IsAuthorizedForCreateThread(topicId, user)
+        IsAuthorizedForThreadCreate = await _authorizationService.IsAuthorizedForCreateThreadAsync(topicId, user)
       };
 
       //Included TopicNavigation  and Post to be used in IsAuthorizedForThreadEdit check within GetPostsIndexPostVmAsync method
@@ -75,9 +75,9 @@ namespace Forum.Models.Services {
     }
 
     private async Task<ThreadsIndexThreadVm> GetThreadsIndexThreadVmAsync(Thread thread, ClaimsPrincipal user) {
-      var isAuthorizedForThreadEdit = await _authorizationService.IsAuthorizedForThreadEdit(thread, user);
-      var isAuthorizedForThreadDelete = await _authorizationService.IsAuthorizedForThreadDelete(thread, user);
-      var isAuthorizedForThreadLock = await _authorizationService.IsAuthorizedForThreadLock(thread, user);
+      var isAuthorizedForThreadEdit = await _authorizationService.IsAuthorizedForThreadEditAsync(thread, user);
+      var isAuthorizedForThreadDelete = await _authorizationService.IsAuthorizedForThreadDeleteAsync(thread, user);
+      var isAuthorizedForThreadLock = await _authorizationService.IsAuthorizedForThreadLockAsync(thread, user);
       var createdBy = await _userManager.FindByIdAsync(thread.CreatedBy);
 
       return new ThreadsIndexThreadVm {
@@ -89,19 +89,19 @@ namespace Forum.Models.Services {
         IsAuthorizedForThreadEdit = isAuthorizedForThreadEdit,
         IsAuthorizedForThreadDelete = isAuthorizedForThreadDelete,
         IsAuthorizedForThreadLock = isAuthorizedForThreadLock,
-        LockedBy = thread.LockedBy != null ? _userManager.FindByIdAsync(thread.LockedBy).Result.UserName : null
+        LockedBy = thread.LockedBy != null ? (await _userManager.FindByIdAsync(thread.LockedBy)).UserName : null
       };
     }
 
-    public async Task<ThreadEditVm> GetThreadEditVm(int id) {
-      return await _db.Thread.Where(t => t.Id == id).Select(t => new ThreadEditVm {
+    public Task<ThreadEditVm> GetThreadEditVm(int id) {
+      return _db.Thread.Where(t => t.Id == id).Select(t => new ThreadEditVm {
         ThreadId = t.Id,
         TopicId = t.Topic,
         ThreadText = t.ContentText
       }).FirstOrDefaultAsync();
     }
 
-    public async Task Update(ThreadEditVm threadEditVm, ClaimsPrincipal user) {
+    public async Task UpdateAsync(ThreadEditVm threadEditVm, ClaimsPrincipal user) {
       var currentUserId = _userManager.GetUserId(user);
       if (currentUserId == null)
         return;
@@ -114,8 +114,8 @@ namespace Forum.Models.Services {
       await _db.SaveChangesAsync();
     }
 
-    public async Task<ThreadDeleteVm> GetThreadDeleteVm(int id) {
-      return await _db.Thread.Where(t => t.Id == id).Select(t => new ThreadDeleteVm {
+    public Task<ThreadDeleteVm> GetThreadDeleteVm(int id) {
+      return _db.Thread.Where(t => t.Id == id).Select(t => new ThreadDeleteVm {
         CreatedOn = t.CreatedOn,
         CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
         PostCount = _db.Post.Count(p => p.ThreadNavigation.Topic == t.Id),
@@ -124,9 +124,9 @@ namespace Forum.Models.Services {
       }).FirstOrDefaultAsync();
     }
 
-    public async Task Remove(ThreadDeleteVm threadDeleteVm) {
+    public async Task RemoveAsync(ThreadDeleteVm threadDeleteVm) {
       var threadFromDb = await _db.Thread.FirstOrDefaultAsync(t => t.Id == threadDeleteVm.ThreadId);
-      using (var transaction = _db.Database.BeginTransaction()) {
+      using (var transaction = await _db.Database.BeginTransactionAsync()) {
         try {
           _db.Post.RemoveRange(_db.Post.Where(p => p.ThreadNavigation.Id == threadFromDb.Id));
           _db.Thread.Remove(threadFromDb);
@@ -139,8 +139,8 @@ namespace Forum.Models.Services {
       }
     }
 
-    public async Task<ThreadLockVm> GetThreadLockVm(int id) {
-      return await _db.Thread.Where(t => t.Id == id).Select(t => new ThreadLockVm {
+    public Task<ThreadLockVm> GetThreadLockVm(int id) {
+      return _db.Thread.Where(t => t.Id == id).Select(t => new ThreadLockVm {
         CreatedOn = t.CreatedOn,
         CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
         PostCount = _db.Post.Count(p => p.Thread == t.Id),
@@ -150,7 +150,7 @@ namespace Forum.Models.Services {
     }
 
 
-    public async Task Lock(ThreadLockVm threadLockVm, ClaimsPrincipal user) {
+    public async Task LockAsync(ThreadLockVm threadLockVm, ClaimsPrincipal user) {
       var currentUserId = _userManager.GetUserId(user);
       if (currentUserId == null)
         return;
@@ -162,8 +162,8 @@ namespace Forum.Models.Services {
       await _db.SaveChangesAsync();
     }
 
-    public async Task<ThreadUnlockVm> GetThreadUnlockVm(int id) {
-      return await _db.Thread.Where(t => t.Id == id).Select(t => new ThreadUnlockVm {
+    public Task<ThreadUnlockVm> GetThreadUnlockVm(int id) {
+      return _db.Thread.Where(t => t.Id == id).Select(t => new ThreadUnlockVm {
         CreatedOn = t.CreatedOn,
         CreatedBy = _userManager.FindByIdAsync(t.CreatedBy).Result.UserName,
         PostCount = _db.Post.Count(p => p.Thread == t.Id),
@@ -174,7 +174,7 @@ namespace Forum.Models.Services {
       }).FirstOrDefaultAsync();
     }
 
-    public async Task Unlock(ThreadUnlockVm threadUnlockVm, ClaimsPrincipal user) {
+    public async Task UnlockAsync(ThreadUnlockVm threadUnlockVm, ClaimsPrincipal user) {
       var currentUserId = _userManager.GetUserId(user);
       if (currentUserId == null)
         return;

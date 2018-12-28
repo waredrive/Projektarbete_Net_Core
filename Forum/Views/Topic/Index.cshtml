@@ -43,7 +43,7 @@
               </p>
             </td>
             <td class="align-middle">
-              @if (@topic.IsAuthorizedForTopicEditBlockAndDelete) {
+              @if (@topic.IsAuthorizedForTopicEditLockAndDelete) {
                 <div class="btn-group">
                   <a asp-controller="Topic" asp-action="Edit" asp-route-id="@topic.TopicId" class="btn btn-primary btn-sm">Edit</a>
                   @if (topic.LockedBy == null) {

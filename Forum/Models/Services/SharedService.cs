@@ -10,28 +10,20 @@ using Microsoft.EntityFrameworkCore;
 namespace Forum.Models.Services {
   public class SharedService {
     private readonly UserManager<IdentityUser> _userManager;
-    private readonly SignInManager<IdentityUser> _signInManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
     private readonly ForumDbContext _db;
-    private readonly AuthorizationService _authorizationService;
 
     public SharedService(
-      UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
-      RoleManager<IdentityRole> roleManager, ForumDbContext db, AuthorizationService authorizationService,
-      IHostingEnvironment env) {
+      UserManager<IdentityUser> userManager, ForumDbContext db) {
       _userManager = userManager;
-      _signInManager = signInManager;
-      _roleManager = roleManager;
       _db = db;
-      _authorizationService = authorizationService;
     }
 
-    public async Task<string> GetProfileImageStringByUsername(string username) {
+    public async Task<string> GetProfileImageStringByUsernameAsync(string username) {
       var identityUser = await _userManager.FindByNameAsync(username);
-      return await GetProfileImageStringByMemberId(identityUser.Id);
+      return await GetProfileImageStringByMemberIdAsync(identityUser.Id);
     }
 
-    public async Task<string> GetProfileImageStringByMemberId(string id) {
+    public async Task<string> GetProfileImageStringByMemberIdAsync(string id) {
       var imageByteArr = await _db.Member.Where(m => m.Id == id).Select(m => m.ProfileImage).FirstOrDefaultAsync();
       return imageByteArr != null ? Convert.ToBase64String(imageByteArr) : null;
     }

@@ -15,7 +15,6 @@ namespace Forum.Models.ViewModels.ThreadViewModels {
     public string CreatedBy { get; set; }
     public DateTime CreatedOn { get; set; }
     public string LockedBy { get; set; }
-    public string RemovedBy { get; set; }
     public string EditedBy { get; set; }
     public int PostCount { get; set; }
     public bool IsAuthorizedForThreadEdit { get; set; }

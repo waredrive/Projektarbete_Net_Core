@@ -22,7 +22,7 @@ namespace Forum.Models.Services {
       _userManager = userManager;
     }
 
-    public async Task Add(PostCreateVm postCreateVm, ClaimsPrincipal user) {
+    public async Task AddAsync(PostCreateVm postCreateVm, ClaimsPrincipal user) {
       var currentUserId = _userManager.GetUserId(user);
       if (currentUserId == null)
         return;
@@ -34,18 +34,18 @@ namespace Forum.Models.Services {
         CreatedOn = DateTime.UtcNow
       };
 
-      _db.Post.Add(post);
+      await _db.Post.AddAsync(post);
       await _db.SaveChangesAsync();
     }
 
-    public async Task<PostsIndexVm> GetPostsIndexVm(int threadId, ClaimsPrincipal user) {
+    public async Task<PostsIndexVm> GetPostsIndexVmAsync(int threadId, ClaimsPrincipal user) {
       var threadFromDb = await _db.Thread.Where(t => t.Id == threadId).FirstOrDefaultAsync();
 
       var postsIndexVm = new PostsIndexVm {
         Thread = threadFromDb.ContentText,
         Posts = new List<PostsIndexPostVm>(),
         IsThreadLocked = threadFromDb.LockedBy != null,
-        IsAuthorizedForPostCreate = await _authorizationService.IsAuthorizedForCreatePost(threadId, user)
+        IsAuthorizedForPostCreate = await _authorizationService.IsAuthorizedForCreatePostAsync(threadId, user)
       };
 
       //Included Threadnavigation to be used in authorization check within GetPostsIndexPostVmAsync method
@@ -56,8 +56,8 @@ namespace Forum.Models.Services {
     }
 
     private async Task<PostsIndexPostVm> GetPostsIndexPostVmAsync(Post post, ClaimsPrincipal user) {
-      var isAuthorizedForPostEditAndDelete = await _authorizationService.IsAuthorizedForPostEditAndDelete(post, user);
-      var isAuthorizedForPostLock = await _authorizationService.IsAuthorizedForPostLock(post, user);
+      var isAuthorizedForPostEditAndDelete = await _authorizationService.IsAuthorizedForPostEditAndDeleteAsync(post, user);
+      var isAuthorizedForPostLock = await _authorizationService.IsAuthorizedForPostLockAsync(post, user);
       var createdBy = await _userManager.FindByIdAsync(post.CreatedBy);
       var lockedBy = await _userManager.FindByIdAsync(post.LockedBy);
 
@@ -72,15 +72,15 @@ namespace Forum.Models.Services {
       };
     }
 
-    public async Task<PostEditVm> GetPostEditVm(int id) {
-      return await _db.Post.Where(p => p.Id == id).Select(p => new PostEditVm {
+    public Task<PostEditVm> GetPostEditVm(int id) {
+      return _db.Post.Where(p => p.Id == id).Select(p => new PostEditVm {
         ThreadId = p.Thread,
         PostId = p.Id,
         PostText = p.ContentText
       }).FirstOrDefaultAsync();
     }
 
-    public async Task Update(PostEditVm postEditVm, ClaimsPrincipal user) {
+    public async Task UpdateAsync(PostEditVm postEditVm, ClaimsPrincipal user) {
       var currentUserId = _userManager.GetUserId(user);
       if (currentUserId == null)
         return;
@@ -93,8 +93,8 @@ namespace Forum.Models.Services {
       await _db.SaveChangesAsync();
     }
 
-    public async Task<PostDeleteVm> GetPostDeleteVm(int id) {
-      return await _db.Post.Where(p => p.Id == id).Select(p => new PostDeleteVm {
+    public Task<PostDeleteVm> GetPostDeleteVm(int id) {
+      return _db.Post.Where(p => p.Id == id).Select(p => new PostDeleteVm {
         CreatedOn = p.CreatedOn,
         CreatedBy = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName,
         PostId = p.Id,
@@ -102,14 +102,14 @@ namespace Forum.Models.Services {
       }).FirstOrDefaultAsync();
     }
 
-    public async Task Remove(PostDeleteVm postDeleteVm) {
+    public async Task RemoveAsync(PostDeleteVm postDeleteVm) {
       var postFromDb = await _db.Post.FirstOrDefaultAsync(t => t.Id == postDeleteVm.PostId);
       _db.Post.Remove(postFromDb);
       await _db.SaveChangesAsync();
     }
 
-    public async Task<PostLockVm> GetPostLockVm(int id) {
-      return await _db.Post.Where(p => p.Id == id).Select(p => new PostLockVm {
+    public Task<PostLockVm> GetPostLockVm(int id) {
+      return _db.Post.Where(p => p.Id == id).Select(p => new PostLockVm {
         CreatedOn = p.CreatedOn,
         CreatedBy = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName,
         PostId = p.Id,
@@ -117,7 +117,7 @@ namespace Forum.Models.Services {
       }).FirstOrDefaultAsync();
     }
 
-    public async Task Lock(PostLockVm postLockVm, ClaimsPrincipal user) {
+    public async Task LockAsync(PostLockVm postLockVm, ClaimsPrincipal user) {
       var currentUserId = _userManager.GetUserId(user);
       if (currentUserId == null)
         return;
@@ -129,8 +129,8 @@ namespace Forum.Models.Services {
       await _db.SaveChangesAsync();
     }
 
-    public async Task<PostUnlockVm> GetPostUnlockVm(int id) {
-      return await _db.Post.Where(p => p.Id == id).Select(p => new PostUnlockVm {
+    public Task<PostUnlockVm> GetPostUnlockVm(int id) {
+      return _db.Post.Where(p => p.Id == id).Select(p => new PostUnlockVm {
         CreatedOn = p.CreatedOn,
         CreatedBy = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName,
         LockedBy = _userManager.FindByIdAsync(p.LockedBy).Result.UserName,
@@ -140,7 +140,7 @@ namespace Forum.Models.Services {
       }).FirstOrDefaultAsync();
     }
 
-    public async Task Unlock(PostUnlockVm postUnlockVm, ClaimsPrincipal user) {
+    public async Task UnlockAsync(PostUnlockVm postUnlockVm, ClaimsPrincipal user) {
       var currentUserId = _userManager.GetUserId(user);
       if (currentUserId == null)
         return;

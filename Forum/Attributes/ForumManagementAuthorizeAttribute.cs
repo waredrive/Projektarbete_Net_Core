@@ -12,7 +12,7 @@ namespace Forum.Attributes {
       if (!user.Identity.IsAuthenticated) return;
 
       var authorizationService = context.HttpContext.RequestServices.GetService<AuthorizationService>();
-      if (authorizationService.IsAuthorizedForForumManagement(user).Result)
+      if (authorizationService.IsAuthorizedForForumManagementAsync(user).Result)
         return;
 
       context.Result = new RedirectResult("Account/AccessDenied");

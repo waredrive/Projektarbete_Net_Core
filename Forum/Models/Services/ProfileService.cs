@@ -32,7 +32,7 @@ namespace Forum.Models.Services {
       _sharedService = sharedService;
     }
 
-    public async Task<ProfileDetailsVm> GetProfileDetailsVm(string username, ClaimsPrincipal user) {
+    public async Task<ProfileDetailsVm> GetProfileDetailsVmAsync(string username, ClaimsPrincipal user) {
       var identityUser = await _userManager.FindByNameAsync(username);
       var memberFromDb = await _db.Member.Include(p => p.PostCreatedByNavigation)
         .Include(p => p.ThreadCreatedByNavigation).FirstOrDefaultAsync(m => m.Id == identityUser.Id);
@@ -50,17 +50,17 @@ namespace Forum.Models.Services {
         TotalThreads = memberFromDb.ThreadCreatedByNavigation.Count,
         TotalPosts = memberFromDb.PostCreatedByNavigation.Count,
         IsAuthorizedForProfileEdit =
-          await _authorizationService.IsAuthorizedForAccountAndProfileEdit(identityUser.UserName, user),
+          await _authorizationService.IsAuthorizedForAccountAndProfileEditAsync(identityUser.UserName, user),
         UserIsOwner = UserIsOwner(username, user),
         IsAuthorizedForProfileDelete =
-          await _authorizationService.IsAuthorizedForProfileDelete(identityUser.UserName, user),
-        IsAuthorizedProfileBlock = await _authorizationService.IsAuthorizedProfileBlock(identityUser.UserName, user),
+          await _authorizationService.IsAuthorizedForProfileDeleteAsync(identityUser.UserName, user),
+        IsAuthorizedProfileBlock = await _authorizationService.IsAuthorizedProfileBlockAsync(identityUser.UserName, user),
         IsAuthorizedProfileChangeRole =
-          await _authorizationService.IsAuthorizedProfileChangeRole(identityUser.UserName, user)
+          await _authorizationService.IsAuthorizedProfileChangeRoleAsync(identityUser.UserName, user)
       };
     }
 
-    public async Task<ProfileEditVm> GetProfileEditVm(string oldUsername) {
+    public async Task<ProfileEditVm> GetProfileEditVmAsync(string oldUsername) {
       var identityUser = await _userManager.FindByNameAsync(oldUsername);
 
       return new ProfileEditVm {
@@ -68,7 +68,7 @@ namespace Forum.Models.Services {
       };
     }
 
-    public async Task<IdentityResult> UpdateProfile(string username, ProfileEditVm profileEditVm) {
+    public async Task<IdentityResult> UpdateProfileAsync(string username, ProfileEditVm profileEditVm) {
       var identityUser = await _userManager.FindByNameAsync(username);
       var oldUserName = identityUser.UserName;
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
@@ -101,22 +101,23 @@ namespace Forum.Models.Services {
       return result;
     }
 
-    public async Task<ProfileRoleEditVm> GetProfileRoleEditVm(string username) {
+    public async Task<ProfileRoleEditVm> GetProfileRoleEditVmAsync(string username) {
       var identityUser = await _userManager.FindByNameAsync(username);
+      var role = (await _userManager.GetRolesAsync(identityUser)).First();
 
       return new ProfileRoleEditVm {
-        Role = _userManager.GetRolesAsync(identityUser).Result.First(),
+        Role = role,
         Username = identityUser.UserName,
         Roles = _roleManager.Roles.Select(r =>
           new SelectListItem {
             Text = r.Name,
             Value = r.Name,
-            Selected = r.Name == _userManager.GetRolesAsync(identityUser).Result.First()
+            Selected = r.Name == role
           }).ToArray()
       };
     }
 
-    public async Task<ProfileBlockVm> GetProfileBlockVm(string username) {
+    public async Task<ProfileBlockVm> GetProfileBlockVmAsync(string username) {
       var identityUser = await _userManager.FindByNameAsync(username);
 
       return new ProfileBlockVm {
@@ -125,8 +126,8 @@ namespace Forum.Models.Services {
       };
     }
 
-    public async Task<ValidationResult> Block(string username, ProfileBlockVm profileBlockVm, ClaimsPrincipal user) {
-      var validationResult = new ValidationResult();
+    public async Task<CustomValidationResult> BlockAsync(string username, ProfileBlockVm profileBlockVm, ClaimsPrincipal user) {
+      var validationResult = new CustomValidationResult();
 
       var identityUser = await _userManager.FindByNameAsync(username);
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
@@ -148,26 +149,27 @@ namespace Forum.Models.Services {
 
       memberFromDb.BlockedEnd = profileBlockVm.BlockedEnd;
       memberFromDb.BlockedOn = DateTime.UtcNow;
-      memberFromDb.BlockedBy = _userManager.FindByNameAsync(user.Identity.Name).Result.Id;
+      memberFromDb.BlockedBy = (await _userManager.FindByNameAsync(user.Identity.Name)).Id;
 
       await _db.SaveChangesAsync();
       return validationResult;
     }
 
-    public async Task<ProfileUnblockVm> GetProfileUnblockVm(string username) {
+    public async Task<ProfileUnblockVm> GetProfileUnblockVmAsync(string username) {
       var identityUser = await _userManager.FindByNameAsync(username);
       var memberFromDb = await _db.Member.Include(p => p.PostCreatedByNavigation)
         .Include(p => p.ThreadCreatedByNavigation).FirstOrDefaultAsync(m => m.Id == identityUser.Id);
+      var blockedBy = await _userManager.FindByIdAsync(memberFromDb.BlockedBy);
 
       return new ProfileUnblockVm {
         Username = identityUser.UserName,
         BlockedEnd = memberFromDb.BlockedEnd,
         BlockedOn = memberFromDb.BlockedOn,
-        BlockedBy = _userManager.FindByIdAsync(memberFromDb.BlockedBy).Result?.UserName
+        BlockedBy = blockedBy?.UserName
       };
     }
 
-    public async Task Unblock(string username, ProfileUnblockVm profileUnblockVm, ClaimsPrincipal user) {
+    public async Task UnblockAsync(string username, ProfileUnblockVm profileUnblockVm, ClaimsPrincipal user) {
       var identityUser = await _userManager.FindByNameAsync(username);
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
 
@@ -178,7 +180,7 @@ namespace Forum.Models.Services {
       await _db.SaveChangesAsync();
     }
 
-    public async Task UpdateProfileRole(string username, ProfileRoleEditVm profileRoleEditVm) {
+    public async Task UpdateProfileRoleAsync(string username, ProfileRoleEditVm profileRoleEditVm) {
       var identityUser = await _userManager.FindByNameAsync(username);
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
       var oldRoles = await _userManager.GetRolesAsync(identityUser);
@@ -199,25 +201,27 @@ namespace Forum.Models.Services {
       }
     }
 
-    public async Task<ProfileDeleteVm> GetProfileDeleteVm(string username) {
+    public async Task<ProfileDeleteVm> GetProfileDeleteVmAsync(string username) {
       var identityUser = await _userManager.FindByNameAsync(username);
       var memberFromDb = await _db.Member.Include(p => p.PostCreatedByNavigation)
         .Include(p => p.ThreadCreatedByNavigation).FirstOrDefaultAsync(m => m.Id == identityUser.Id);
+      var blockedBy = await _userManager.FindByIdAsync(memberFromDb.BlockedBy);
+      var roles = await _userManager.GetRolesAsync(identityUser);
 
       return new ProfileDeleteVm {
         ProfileImage = Convert.ToBase64String(memberFromDb.ProfileImage),
         Username = identityUser.UserName,
-        Roles = _userManager.GetRolesAsync(identityUser).Result.ToArray(),
+        Roles = roles.ToArray(),
         CreatedOn = memberFromDb.CreatedOn,
         BlockedOn = memberFromDb.BlockedOn,
-        BlockedBy = _userManager.FindByIdAsync(memberFromDb.BlockedBy).Result?.UserName,
+        BlockedBy = blockedBy?.UserName,
         BlockedEnd = memberFromDb.BlockedEnd,
         TotalThreads = memberFromDb.ThreadCreatedByNavigation.Count,
         TotalPosts = memberFromDb.PostCreatedByNavigation.Count
       };
     }
 
-    public async Task Remove(ProfileDeleteVm profileDeleteVm) {
+    public async Task RemoveAsync(ProfileDeleteVm profileDeleteVm) {
       var customDeletedIdentityUser = await _userManager.FindByNameAsync("[Deleted]");
 
       var identityUser = await _userManager.FindByNameAsync(profileDeleteVm.Username);
@@ -256,15 +260,15 @@ namespace Forum.Models.Services {
       await _userManager.DeleteAsync(identityUser);
     }
 
-    public bool UserIsOwner(string username, ClaimsPrincipal user) {
+    private bool UserIsOwner(string username, ClaimsPrincipal user) {
       return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase);
     }
 
-    public async Task<NavbarVm> GetNavbarVm(IPrincipal user) {
+    public async Task<NavbarVm> GetNavbarVmAsync(IPrincipal user) {
       return new NavbarVm {
-        ProfileImage = await _sharedService.GetProfileImageStringByUsername(user.Identity.Name),
+        ProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(user.Identity.Name),
         IsAuthorizedForForumManagement =
-          await _authorizationService.IsAuthorizedForForumManagement(user as ClaimsPrincipal)
+          await _authorizationService.IsAuthorizedForForumManagementAsync(user as ClaimsPrincipal)
       };
     }
   }

@@ -14,26 +14,18 @@ namespace Forum.Models.Services {
   public class ForumManagementService {
     private readonly AuthorizationService _authorizationService;
     private readonly ForumDbContext _db;
-    private readonly IHostingEnvironment _env;
     private readonly SharedService _sharedService;
-    private readonly RoleManager<IdentityRole> _roleManager;
-    private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
 
     public ForumManagementService(
-      UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
-      RoleManager<IdentityRole> roleManager, ForumDbContext db, AuthorizationService authorizationService,
-      IHostingEnvironment env, SharedService sharedService) {
+      UserManager<IdentityUser> userManager, ForumDbContext db, AuthorizationService authorizationService, SharedService sharedService) {
       _userManager = userManager;
-      _signInManager = signInManager;
-      _roleManager = roleManager;
       _db = db;
       _authorizationService = authorizationService;
-      _env = env;
       _sharedService = sharedService;
     }
 
-    public async Task<ForumManagementIndexVm> GetForumManagementIndexVm(ClaimsPrincipal user) {
+    public async Task<ForumManagementIndexVm> GetForumManagementIndexVmAsync(ClaimsPrincipal user) {
       var allBlockedMembers = await _db.Member.Where(m => m.BlockedBy != null).ToListAsync();
       var allLockedTopics = await _db.Topic.Where(m => m.LockedBy != null).ToListAsync();
       var allLockedThreads = await _db.Thread.Where(m => m.LockedBy != null).ToListAsync();
@@ -44,29 +36,29 @@ namespace Forum.Models.Services {
         LatestLockedPosts = new List<ForumManagementLockedPostVm>(),
         LatestLockedThreads = new List<ForumManagementLockedThreadVm>(),
         LatestLockedTopics = new List<ForumManagementLockedTopicVm>(),
-        Statistics = await GetForumManagementStatisticsVm(user.Identity.Name)
+        Statistics = await GetForumManagementStatisticsVmAsync(user.Identity.Name)
       };
 
       forumManagementIndexVm.LatestLockedTopics =
-        await GetForumManagementLockedTopicVms(allLockedTopics.OrderByDescending(t => t.LockedOn).Take(10).ToList(),
+        await GetForumManagementLockedTopicVmsAsync(allLockedTopics.OrderByDescending(t => t.LockedOn).Take(10).ToList(),
           user);
 
       forumManagementIndexVm.LatestLockedThreads =
-        await GetForumManagementLockedThreadVms(allLockedThreads.OrderByDescending(t => t.LockedOn).Take(10).ToList(),
+        await GetForumManagementLockedThreadVmsAsync(allLockedThreads.OrderByDescending(t => t.LockedOn).Take(10).ToList(),
           user);
 
       forumManagementIndexVm.LatestLockedPosts =
-        await GetForumManagementLockedPostVms(allLockedPosts.OrderByDescending(p => p.LockedOn).Take(10).ToList(),
+        await GetForumManagementLockedPostVmsAsync(allLockedPosts.OrderByDescending(p => p.LockedOn).Take(10).ToList(),
           user);
 
       forumManagementIndexVm.LatestBlockedMembers =
-        await GetForumManagementBlockedMemberVms(
+        await GetForumManagementBlockedMemberVmsAsync(
           allBlockedMembers.OrderByDescending(p => p.BlockedOn).Take(10).ToList(), user);
 
       return forumManagementIndexVm;
     }
 
-    private async Task<ForumManagementStatisticsVm> GetForumManagementStatisticsVm(string username) {
+    private async Task<ForumManagementStatisticsVm> GetForumManagementStatisticsVmAsync(string username) {
       var identityUser = await _userManager.FindByNameAsync(username);
 
       return new ForumManagementStatisticsVm {
@@ -82,7 +74,7 @@ namespace Forum.Models.Services {
       };
     }
 
-    private async Task<List<ForumManagementLockedTopicVm>> GetForumManagementLockedTopicVms(List<Topic> lockedTopics,
+    private async Task<List<ForumManagementLockedTopicVm>> GetForumManagementLockedTopicVmsAsync(List<Topic> lockedTopics,
       ClaimsPrincipal user) {
       var topics = new List<ForumManagementLockedTopicVm>();
 
@@ -91,8 +83,8 @@ namespace Forum.Models.Services {
         var createdBy = await _userManager.FindByIdAsync(topic.CreatedBy);
 
         topics.Add(new ForumManagementLockedTopicVm {
-          LockerProfileImage = await _sharedService.GetProfileImageStringByUsername(lockedBy.UserName),
-          CreatorProfileImage = await _sharedService.GetProfileImageStringByUsername(createdBy.UserName),
+          LockerProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(lockedBy.UserName),
+          CreatorProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(createdBy.UserName),
           TopicId = topic.Id,
           CreatedOn = topic.CreatedOn,
           LockedBy = lockedBy.UserName,
@@ -100,14 +92,14 @@ namespace Forum.Models.Services {
           CreatedBy = createdBy.UserName,
           TopicText = topic.ContentText,
           IsAuthorizedForTopicEditLockAndDelete =
-            await _authorizationService.IsAuthorizedForTopicEditLockAndDelete(topic, user)
+            await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(topic, user)
         });
       }
 
       return topics;
     }
 
-    private async Task<List<ForumManagementLockedThreadVm>> GetForumManagementLockedThreadVms(
+    private async Task<List<ForumManagementLockedThreadVm>> GetForumManagementLockedThreadVmsAsync(
       List<Thread> lockedThreads,
       ClaimsPrincipal user) {
       var threads = new List<ForumManagementLockedThreadVm>();
@@ -117,8 +109,8 @@ namespace Forum.Models.Services {
         var createdBy = await _userManager.FindByIdAsync(thread.CreatedBy);
 
         threads.Add(new ForumManagementLockedThreadVm {
-          LockerProfileImage = await _sharedService.GetProfileImageStringByUsername(lockedBy.UserName),
-          CreatorProfileImage = await _sharedService.GetProfileImageStringByUsername(createdBy.UserName),
+          LockerProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(lockedBy.UserName),
+          CreatorProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(createdBy.UserName),
           TopicId = thread.Topic,
           ThreadId = thread.Id,
           CreatedOn = thread.CreatedOn,
@@ -127,16 +119,16 @@ namespace Forum.Models.Services {
           CreatedBy = createdBy.UserName,
           ThreadText = thread.ContentText,
           IsAuthorizedForThreadEdit =
-            await _authorizationService.IsAuthorizedForThreadEdit(thread, user),
-          IsAuthorizedForThreadLock = await _authorizationService.IsAuthorizedForThreadLock(thread, user),
-          IsAuthorizedForThreadDelete = await _authorizationService.IsAuthorizedForThreadDelete(thread, user)
+            await _authorizationService.IsAuthorizedForThreadEditAsync(thread, user),
+          IsAuthorizedForThreadLock = await _authorizationService.IsAuthorizedForThreadLockAsync(thread, user),
+          IsAuthorizedForThreadDelete = await _authorizationService.IsAuthorizedForThreadDeleteAsync(thread, user)
         });
       }
 
       return threads;
     }
 
-    private async Task<List<ForumManagementLockedPostVm>> GetForumManagementLockedPostVms(List<Post> lockedPosts,
+    private async Task<List<ForumManagementLockedPostVm>> GetForumManagementLockedPostVmsAsync(List<Post> lockedPosts,
       ClaimsPrincipal user) {
       var posts = new List<ForumManagementLockedPostVm>();
       foreach (var post in lockedPosts) {
@@ -144,8 +136,8 @@ namespace Forum.Models.Services {
         var createdBy = await _userManager.FindByIdAsync(post.CreatedBy);
 
         posts.Add(new ForumManagementLockedPostVm {
-          LockerProfileImage = await _sharedService.GetProfileImageStringByUsername(lockedBy.UserName),
-          CreatorProfileImage = await _sharedService.GetProfileImageStringByUsername(createdBy.UserName),
+          LockerProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(lockedBy.UserName),
+          CreatorProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(createdBy.UserName),
           ThreadId = post.Thread,
           PostId = post.Id,
           CreatedOn = post.CreatedOn,
@@ -153,15 +145,15 @@ namespace Forum.Models.Services {
           LockedOn = post.LockedOn,
           CreatedBy = createdBy.UserName,
           ThreadText = post.ThreadNavigation.ContentText,
-          IsAuthorizedForPostEditAndDelete = await _authorizationService.IsAuthorizedForPostEditAndDelete(post, user),
-          IsAuthorizedForPostLock = await _authorizationService.IsAuthorizedForPostLock(post, user)
+          IsAuthorizedForPostEditAndDelete = await _authorizationService.IsAuthorizedForPostEditAndDeleteAsync(post, user),
+          IsAuthorizedForPostLock = await _authorizationService.IsAuthorizedForPostLockAsync(post, user)
         });
       }
 
       return posts;
     }
 
-    private async Task<List<ForumManagementBlockedMemberVm>> GetForumManagementBlockedMemberVms(
+    private async Task<List<ForumManagementBlockedMemberVm>> GetForumManagementBlockedMemberVmsAsync(
       List<Member> blockedMembers,
       ClaimsPrincipal user) {
       var members = new List<ForumManagementBlockedMemberVm>();
@@ -172,8 +164,8 @@ namespace Forum.Models.Services {
         var roles = await _userManager.GetRolesAsync(identityUser);
 
         members.Add(new ForumManagementBlockedMemberVm {
-          BlockerProfileImage = await _sharedService.GetProfileImageStringByUsername(blockedBy.UserName),
-          CreatorProfileImage = await _sharedService.GetProfileImageStringByUsername(identityUser.UserName),
+          BlockerProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(blockedBy.UserName),
+          CreatorProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(identityUser.UserName),
           MemberId = member.Id,
           CreatedOn = member.CreatedOn,
           BlockedBy = blockedBy.UserName,
@@ -182,19 +174,19 @@ namespace Forum.Models.Services {
           Username = identityUser.UserName,
           Roles = roles.ToArray(),
           IsAuthorizedForProfileEdit =
-            await _authorizationService.IsAuthorizedForAccountAndProfileEdit(identityUser.UserName, user),
+            await _authorizationService.IsAuthorizedForAccountAndProfileEditAsync(identityUser.UserName, user),
           IsAuthorizedForProfileDelete =
-            await _authorizationService.IsAuthorizedForProfileDelete(identityUser.UserName, user),
-          IsAuthorizedProfileBlock = await _authorizationService.IsAuthorizedProfileBlock(identityUser.UserName, user),
+            await _authorizationService.IsAuthorizedForProfileDeleteAsync(identityUser.UserName, user),
+          IsAuthorizedProfileBlock = await _authorizationService.IsAuthorizedProfileBlockAsync(identityUser.UserName, user),
           IsAuthorizedProfileChangeRole =
-            await _authorizationService.IsAuthorizedProfileChangeRole(identityUser.UserName, user)
+            await _authorizationService.IsAuthorizedProfileChangeRoleAsync(identityUser.UserName, user)
         });
       }
 
       return members;
     }
 
-    public async Task<ForumManagementLockedTopicsVm> GetForumManagementLockedTopicsVm(ClaimsPrincipal user, string username = null) {
+    public async Task<ForumManagementLockedTopicsVm> GetForumManagementLockedTopicsVmAsync(ClaimsPrincipal user, string username = null) {
       var lockedTopics  = new List<Topic>();
       IdentityUser identityUser = null;
 
@@ -207,12 +199,12 @@ namespace Forum.Models.Services {
 
       return new ForumManagementLockedTopicsVm {
         UserName = identityUser?.UserName ?? user.Identity.Name,
-        Statistics = await GetForumManagementStatisticsVm(identityUser?.UserName ?? user.Identity.Name),
-        LockedTopics = await GetForumManagementLockedTopicVms(lockedTopics, user)
+        Statistics = await GetForumManagementStatisticsVmAsync(identityUser?.UserName ?? user.Identity.Name),
+        LockedTopics = await GetForumManagementLockedTopicVmsAsync(lockedTopics, user)
       };
     }
 
-    public async Task<ForumManagementLockedThreadsVm> GetForumManagementLockedThreadsVm(ClaimsPrincipal user, string username = null) {
+    public async Task<ForumManagementLockedThreadsVm> GetForumManagementLockedThreadsVmAsync(ClaimsPrincipal user, string username = null) {
       var lockedThreads = new List<Thread>();
       IdentityUser identityUser = null;
 
@@ -225,12 +217,12 @@ namespace Forum.Models.Services {
 
       return new ForumManagementLockedThreadsVm {
         UserName = identityUser?.UserName ?? user.Identity.Name,
-        Statistics = await GetForumManagementStatisticsVm(identityUser?.UserName ?? user.Identity.Name),
-        LockedThreads = await GetForumManagementLockedThreadVms(lockedThreads, user)
+        Statistics = await GetForumManagementStatisticsVmAsync(identityUser?.UserName ?? user.Identity.Name),
+        LockedThreads = await GetForumManagementLockedThreadVmsAsync(lockedThreads, user)
       };
     }
 
-    public async Task<ForumManagementLockedPostsVm> GetForumManagementLockedPostsVm(ClaimsPrincipal user, string username = null) {
+    public async Task<ForumManagementLockedPostsVm> GetForumManagementLockedPostsVmAsync(ClaimsPrincipal user, string username = null) {
       var lockedPosts = new List<Post>();
       IdentityUser identityUser = null;
 
@@ -243,12 +235,12 @@ namespace Forum.Models.Services {
 
       return new ForumManagementLockedPostsVm {
         UserName = identityUser?.UserName ?? user.Identity.Name,
-        Statistics = await GetForumManagementStatisticsVm(identityUser?.UserName ?? user.Identity.Name),
-        LockedPosts = await GetForumManagementLockedPostVms(lockedPosts, user)
+        Statistics = await GetForumManagementStatisticsVmAsync(identityUser?.UserName ?? user.Identity.Name),
+        LockedPosts = await GetForumManagementLockedPostVmsAsync(lockedPosts, user)
       };
     }
 
-    public async Task<ForumManagementBlockedMembersVm> GetForumManagementBlockedMembersVm(ClaimsPrincipal user, string username = null) {
+    public async Task<ForumManagementBlockedMembersVm> GetForumManagementBlockedMembersVmAsync(ClaimsPrincipal user, string username = null) {
       var blockedMembers = new List<Member>();
       IdentityUser identityUser = null;
 
@@ -261,8 +253,8 @@ namespace Forum.Models.Services {
 
       return new ForumManagementBlockedMembersVm {
         UserName = identityUser?.UserName ?? user.Identity.Name,
-        Statistics = await GetForumManagementStatisticsVm(identityUser?.UserName ?? user.Identity.Name),
-        BlockedMembers = await GetForumManagementBlockedMemberVms(blockedMembers, user)
+        Statistics = await GetForumManagementStatisticsVmAsync(identityUser?.UserName ?? user.Identity.Name),
+        BlockedMembers = await GetForumManagementBlockedMemberVmsAsync(blockedMembers, user)
       };
     }
   }

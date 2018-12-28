@@ -22,14 +22,14 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Index() {
       ViewBag.ReturnUrl = Request.GetDisplayUrl();
-      return View(await _topicService.GetTopicsIndexVm(User));
+      return View(await _topicService.GetTopicsIndexVmAsync(User));
     }
 
     [RolesAuthorize(Roles.Admin)]
     [Route("Create")]
     [HttpGet]
     public async Task<IActionResult> Create() {
-      if (!await _authorizationService.IsAuthorizedForCreateTopic(User))
+      if (!await _authorizationService.IsAuthorizedForCreateTopicAsync(User))
         return RedirectToAction("AccessDenied", "Account");
 
       return View();
@@ -43,10 +43,10 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return View(topicCreateVm);
 
-      if (!await _authorizationService.IsAuthorizedForCreateTopic(User))
+      if (!await _authorizationService.IsAuthorizedForCreateTopicAsync(User))
         return RedirectToAction("AccessDenied", "Account");
 
-      await _topicService.Add(topicCreateVm, User);
+      await _topicService.AddAsync(topicCreateVm, User);
       return RedirectToAction(nameof(Index));
     }
 
@@ -54,10 +54,10 @@ namespace Forum.Controllers {
     [Route("Update/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id) {
-      if (!_topicService.DoesTopicExist(id))
+      if (!await _topicService.DoesTopicExist(id))
         return NotFound();
 
-      if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDelete(id, User))
+      if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
       return View(await _topicService.GetTopicCreateVm(id));
@@ -68,16 +68,16 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, TopicEditVm topicEditVm) {
-      if (!_topicService.DoesTopicExist(id))
+      if (!await _topicService.DoesTopicExist(id))
         return NotFound();
 
       if (!ModelState.IsValid)
         return View(topicEditVm);
 
-      if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDelete(id, User))
+      if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      await _topicService.Update(topicEditVm, User);
+      await _topicService.UpdateAsync(topicEditVm, User);
       return RedirectToAction(nameof(Index));
     }
 
@@ -85,13 +85,13 @@ namespace Forum.Controllers {
     [Route("Delete/{id}")]
     [HttpGet]
     public async Task<IActionResult> Delete(int id) {
-      if (!_topicService.DoesTopicExist(id))
+      if (!await _topicService.DoesTopicExist(id))
         return NotFound();
 
-      if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDelete(id, User))
+      if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      return View(await _topicService.GetTopicDeleteVm(id));
+      return View(await _topicService.GetTopicDeleteVmAsync(id));
     }
 
     [RolesAuthorize(Roles.Admin)]
@@ -99,16 +99,16 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id, TopicDeleteVm topicDeleteVm) {
-      if (!_topicService.DoesTopicExist(id))
+      if (!await _topicService.DoesTopicExist(id))
         return NotFound();
 
       if (!ModelState.IsValid)
         return View(topicDeleteVm);
 
-      if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDelete(id, User))
+      if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      await _topicService.Remove(topicDeleteVm);
+      await _topicService.RemoveAsync(topicDeleteVm);
       return RedirectToAction(nameof(Index));
     }
 
@@ -116,16 +116,16 @@ namespace Forum.Controllers {
     [Route("Lock/{id}")]
     [HttpGet]
     public async Task<IActionResult> Lock(int id) {
-      if (!_topicService.DoesTopicExist(id))
+      if (!await _topicService.DoesTopicExist(id))
         return NotFound();
 
-      if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDelete(id, User))
+      if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      if (_topicService.IsTopicLocked(id))
+      if (await _topicService.IsTopicLocked(id))
         return RedirectToAction(nameof(Unlock));
 
-      return View(await _topicService.GetTopicLockVm(id));
+      return View(await _topicService.GetTopicLockVmAsync(id));
     }
 
     [RolesAuthorize(Roles.Admin)]
@@ -133,19 +133,19 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Lock(int id, TopicLockVm topicLockVm) {
-      if (!_topicService.DoesTopicExist(id))
+      if (!await _topicService.DoesTopicExist(id))
         return NotFound();
 
       if (!ModelState.IsValid)
         return View(topicLockVm);
 
-      if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDelete(id, User))
+      if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      if (_topicService.IsTopicLocked(topicLockVm.TopicId))
+      if (await _topicService.IsTopicLocked(topicLockVm.TopicId))
         return RedirectToAction(nameof(Index));
 
-      await _topicService.Lock(topicLockVm, User);
+      await _topicService.LockAsync(topicLockVm, User);
       return RedirectToAction(nameof(Index));
     }
 
@@ -153,16 +153,16 @@ namespace Forum.Controllers {
     [Route("Unlock/{id}")]
     [HttpGet]
     public async Task<IActionResult> Unlock(int id) {
-      if (!_topicService.DoesTopicExist(id))
+      if (!await _topicService.DoesTopicExist(id))
         return NotFound();
 
-      if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDelete(id, User))
+      if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      if (!_topicService.IsTopicLocked(id))
+      if (!await _topicService.IsTopicLocked(id))
         return RedirectToAction(nameof(Lock));
 
-      return View(await _topicService.GetTopicUnlockVm(id));
+      return View(await _topicService.GetTopicUnlockVmAsync(id));
     }
 
     [RolesAuthorize(Roles.Admin)]
@@ -170,19 +170,19 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Unlock(int id, TopicUnlockVm topicUnlockVm) {
-      if (!_topicService.DoesTopicExist(id))
+      if (!await _topicService.DoesTopicExist(id))
         return NotFound();
 
       if (!ModelState.IsValid)
         return View(topicUnlockVm);
 
-      if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDelete(id, User))
+      if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      if (!_topicService.IsTopicLocked(topicUnlockVm.TopicId))
+      if (!await _topicService.IsTopicLocked(topicUnlockVm.TopicId))
         return RedirectToAction(nameof(Index));
 
-      await _topicService.Unlock(topicUnlockVm, User);
+      await _topicService.UnlockAsync(topicUnlockVm, User);
       return RedirectToAction(nameof(Index));
     }
   }

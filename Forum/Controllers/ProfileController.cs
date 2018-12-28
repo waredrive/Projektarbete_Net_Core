@@ -23,10 +23,10 @@ namespace Forum.Controllers {
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
-      if (await _authorizationService.IsProfileInternal(username))
+      if (await _authorizationService.IsProfileInternalAsync(username))
         return RedirectToAction("AccessDenied", "Account");
 
-      return View(await _profileService.GetProfileDetailsVm(username, User));
+      return View(await _profileService.GetProfileDetailsVmAsync(username, User));
     }
 
     [Route("Update/{username}")]
@@ -35,10 +35,10 @@ namespace Forum.Controllers {
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
-      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
+      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAsync(username, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      return View(await _profileService.GetProfileEditVm(username));
+      return View(await _profileService.GetProfileEditVmAsync(username));
     }
 
     [Route("Update/{username}")]
@@ -49,9 +49,9 @@ namespace Forum.Controllers {
         return NotFound();
 
       if (!ModelState.IsValid)
-        return View(await _profileService.GetProfileEditVm(username));
+        return View(await _profileService.GetProfileEditVmAsync(username));
 
-      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
+      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAsync(username, User))
         return RedirectToAction("AccessDenied", "Account");
 
       if (profileEditVm.ProfileImage != null) {
@@ -59,16 +59,16 @@ namespace Forum.Controllers {
         if (!imageCheckResult.Success) {
           foreach (var error in imageCheckResult.Errors)
             ModelState.AddModelError(nameof(profileEditVm.ProfileImage), error);
-          return View(await _profileService.GetProfileEditVm(username));
+          return View(await _profileService.GetProfileEditVmAsync(username));
         }
       }
 
-      var result = await _profileService.UpdateProfile(username, profileEditVm);
+      var result = await _profileService.UpdateProfileAsync(username, profileEditVm);
 
       if (!result.Succeeded) {
         foreach (var error in result.Errors)
           ModelState.AddModelError(string.Empty, error.Description);
-        return View(await _profileService.GetProfileEditVm(username));
+        return View(await _profileService.GetProfileEditVmAsync(username));
       }
 
       return RedirectToAction(nameof(Details), new {username = profileEditVm.NewUsername});
@@ -80,10 +80,10 @@ namespace Forum.Controllers {
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
-      if (!await _authorizationService.IsAuthorizedProfileChangeRole(username, User))
+      if (!await _authorizationService.IsAuthorizedProfileChangeRoleAsync(username, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      return View(await _profileService.GetProfileRoleEditVm(username));
+      return View(await _profileService.GetProfileRoleEditVmAsync(username));
     }
 
     [Route("Role/{username}")]
@@ -96,10 +96,10 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return View(profileRoleEditVm);
 
-      if (!await _authorizationService.IsAuthorizedProfileChangeRole(username, User))
+      if (!await _authorizationService.IsAuthorizedProfileChangeRoleAsync(username, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      await _profileService.UpdateProfileRole(username, profileRoleEditVm);
+      await _profileService.UpdateProfileRoleAsync(username, profileRoleEditVm);
 
       return RedirectToAction(nameof(Details), new {username});
     }
@@ -110,13 +110,13 @@ namespace Forum.Controllers {
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
-      if (!await _authorizationService.IsAuthorizedProfileBlock(username, User))
+      if (!await _authorizationService.IsAuthorizedProfileBlockAsync(username, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      if (await _authorizationService.IsProfileBlocked(username))
+      if (await _authorizationService.IsProfileBlockedAsync(username))
         return RedirectToAction(nameof(Unblock));
 
-      return View(await _profileService.GetProfileBlockVm(username));
+      return View(await _profileService.GetProfileBlockVmAsync(username));
     }
 
     [Route("Block/{username}")]
@@ -129,18 +129,18 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return View(profileBlockVm);
 
-      if (!await _authorizationService.IsAuthorizedProfileBlock(username, User))
+      if (!await _authorizationService.IsAuthorizedProfileBlockAsync(username, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      if (await _authorizationService.IsProfileBlocked(username))
+      if (await _authorizationService.IsProfileBlockedAsync(username))
         return RedirectToAction(nameof(Details), new {username});
 
-      var result = await _profileService.Block(username, profileBlockVm, User);
+      var result = await _profileService.BlockAsync(username, profileBlockVm, User);
 
       if (!result.Success) {
         foreach (var error in result.Errors)
           ModelState.AddModelError(string.Empty, error);
-        return View(await _profileService.GetProfileBlockVm(username));
+        return View(await _profileService.GetProfileBlockVmAsync(username));
       }
 
       return RedirectToAction(nameof(Details));
@@ -152,14 +152,14 @@ namespace Forum.Controllers {
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
-      if (!await _authorizationService.IsAuthorizedProfileBlock(username, User))
+      if (!await _authorizationService.IsAuthorizedProfileBlockAsync(username, User))
         return RedirectToAction("AccessDenied", "Account");
 
 
-      if (!await _authorizationService.IsProfileBlocked(username))
+      if (!await _authorizationService.IsProfileBlockedAsync(username))
         return RedirectToAction(nameof(Unblock));
 
-      return View(await _profileService.GetProfileUnblockVm(username));
+      return View(await _profileService.GetProfileUnblockVmAsync(username));
     }
 
     [Route("Unblock/{username}")]
@@ -172,13 +172,13 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return View(profileUnblockVm);
 
-      if (!await _authorizationService.IsAuthorizedProfileBlock(username, User))
+      if (!await _authorizationService.IsAuthorizedProfileBlockAsync(username, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      if (!await _authorizationService.IsProfileBlocked(username))
+      if (!await _authorizationService.IsProfileBlockedAsync(username))
         return RedirectToAction(nameof(Details), new {username});
 
-      await _profileService.Unblock(username, profileUnblockVm, User);
+      await _profileService.UnblockAsync(username, profileUnblockVm, User);
 
       return RedirectToAction(nameof(Details));
     }
@@ -189,8 +189,8 @@ namespace Forum.Controllers {
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
-      if (await _authorizationService.IsAuthorizedForProfileDelete(username, User))
-        return View(await _profileService.GetProfileDeleteVm(username));
+      if (await _authorizationService.IsAuthorizedForProfileDeleteAsync(username, User))
+        return View(await _profileService.GetProfileDeleteVmAsync(username));
 
       return RedirectToAction("AccessDenied", "Account");
     }
@@ -205,10 +205,10 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return View(profileDeleteVm);
 
-      if (!await _authorizationService.IsAuthorizedForProfileDelete(profileDeleteVm.Username, User))
+      if (!await _authorizationService.IsAuthorizedForProfileDeleteAsync(profileDeleteVm.Username, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      await _profileService.Remove(profileDeleteVm);
+      await _profileService.RemoveAsync(profileDeleteVm);
       return RedirectToAction("Index", "Topic");
     }
   }

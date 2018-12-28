@@ -13,8 +13,8 @@ namespace Forum.Extensions {
     public const int ImagePixelWidth = 240;
     public const int ImagePixelHeight = 240;
 
-    public static ImageValidationResult IsValidImage(this IFormFile postedFile) {
-      var result = new ImageValidationResult();
+    public static ImageCustomValidationResult IsValidImage(this IFormFile postedFile) {
+      var result = new ImageCustomValidationResult();
 
       if (!string.Equals(postedFile.ContentType, "image/jpg", StringComparison.OrdinalIgnoreCase) &&
           !string.Equals(postedFile.ContentType, "image/jpeg", StringComparison.OrdinalIgnoreCase) &&

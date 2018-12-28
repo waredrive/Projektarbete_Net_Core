@@ -41,7 +41,7 @@ namespace Forum.Controllers {
         return View(accountRegisterVm);
       }
 
-      var result = await _accountService.Add(accountRegisterVm);
+      var result = await _accountService.AddAsync(accountRegisterVm);
 
 
       if (result.Succeeded)
@@ -68,7 +68,7 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return View(accountLoginVm);
 
-      var result = await _accountService.Login(accountLoginVm);
+      var result = await _accountService.LoginAsync(accountLoginVm);
       if (result.Succeeded) return Redirect(Url.IsLocalUrl(accountLoginVm.ReturnUrl) ? accountLoginVm.ReturnUrl : "/");
 
       ModelState.AddModelError(string.Empty, "Invalid login attempt.");
@@ -82,10 +82,10 @@ namespace Forum.Controllers {
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
-      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
+      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAsync(username, User))
         return RedirectToAction(nameof(AccessDenied));
 
-      return View(await _accountService.GetAccountEditVm(User));
+      return View(await _accountService.GetAccountEditVmAsync(User));
     }
 
     [Route("Update/{username}")]
@@ -98,7 +98,7 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return View(accountEditVm);
 
-      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
+      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAsync(username, User))
         return RedirectToAction(nameof(AccessDenied));
 
       var ageValidationResult = _accountService.HasMinimumAllowedAge(accountEditVm.Birthdate);
@@ -109,7 +109,7 @@ namespace Forum.Controllers {
         return View(accountEditVm);
       }
 
-      var result = await _accountService.UpdateAccount(accountEditVm, User);
+      var result = await _accountService.UpdateAccountAsync(accountEditVm, User);
 
       if (!result.Succeeded) {
         foreach (var error in result.Errors)
@@ -126,7 +126,7 @@ namespace Forum.Controllers {
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
-      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
+      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAsync(username, User))
         return RedirectToAction(nameof(AccessDenied));
 
       return View();
@@ -142,7 +142,7 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return View(accountPasswordEditVm);
 
-      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEdit(username, User))
+      if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAsync(username, User))
         return RedirectToAction(nameof(AccessDenied));
 
       var result = await _accountService.UpdatePassword(accountPasswordEditVm, User);
@@ -164,10 +164,10 @@ namespace Forum.Controllers {
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
-      if (!await _authorizationService.IsAuthorizedForAccountDetailsView(username, User))
+      if (!await _authorizationService.IsAuthorizedForAccountDetailsViewAsync(username, User))
         return RedirectToAction(nameof(AccessDenied));
 
-      return View(await _accountService.GetAccountDetailsVm(username, User));
+      return View(await _accountService.GetAccountDetailsVmAsync(username, User));
     }
 
     [AllowAnonymous]

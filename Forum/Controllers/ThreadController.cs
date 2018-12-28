@@ -12,10 +12,10 @@ namespace Forum.Controllers {
     private readonly ThreadService _threadService;
     private readonly TopicService _topicService;
 
-    public ThreadController(ThreadService threadService, TopicService _topicService,
+    public ThreadController(ThreadService threadService, TopicService topicService,
       AuthorizationService authorizationService) {
       _threadService = threadService;
-      this._topicService = _topicService;
+      _topicService = topicService;
       _authorizationService = authorizationService;
     }
 
@@ -23,19 +23,19 @@ namespace Forum.Controllers {
     [Route("")]
     [HttpGet]
     public async Task<IActionResult> Index(int topicId) {
-      if (!_topicService.DoesTopicExist(topicId))
+      if (!await _topicService.DoesTopicExist(topicId))
         return NotFound();
 
-      return View(await _threadService.GetThreadsIndexVm(topicId, User));
+      return View(await _threadService.GetThreadsIndexVmAsync(topicId, User));
     }
 
     [Route("Create")]
     [HttpGet]
     public async Task<IActionResult> Create(int topicId) {
-      if (!_topicService.DoesTopicExist(topicId))
+      if (!await _topicService.DoesTopicExist(topicId))
         return NotFound();
 
-      if (!await _authorizationService.IsAuthorizedForThreadCreateInTopic(topicId, User))
+      if (!await _authorizationService.IsAuthorizedForThreadCreateInTopicAsync(topicId, User))
         return RedirectToAction("AccessDenied", "Account");
 
       return View(new ThreadCreateVm {TopicId = topicId});
@@ -48,10 +48,10 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return View(threadCreateVm);
 
-      if (!await _authorizationService.IsAuthorizedForThreadCreateInTopic(threadCreateVm.TopicId, User))
+      if (!await _authorizationService.IsAuthorizedForThreadCreateInTopicAsync(threadCreateVm.TopicId, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      await _threadService.Add(threadCreateVm, User);
+      await _threadService.AddAsync(threadCreateVm, User);
       return RedirectToAction(nameof(Index));
     }
 
@@ -61,7 +61,7 @@ namespace Forum.Controllers {
       if (!_threadService.DoesThreadExist(id))
         return NotFound();
 
-      if (!await _authorizationService.IsAuthorizedForThreadEdit(id, User))
+      if (!await _authorizationService.IsAuthorizedForThreadEditAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
       return View(await _threadService.GetThreadEditVm(id));
@@ -77,10 +77,10 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return View(threadEditVm);
 
-      if (!await _authorizationService.IsAuthorizedForThreadEdit(threadEditVm.ThreadId, User))
+      if (!await _authorizationService.IsAuthorizedForThreadEditAsync(threadEditVm.ThreadId, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      await _threadService.Update(threadEditVm, User);
+      await _threadService.UpdateAsync(threadEditVm, User);
       return RedirectToAction(nameof(Index));
     }
 
@@ -90,7 +90,7 @@ namespace Forum.Controllers {
       if (!_threadService.DoesThreadExist(id))
         return NotFound();
 
-      if (!await _authorizationService.IsAuthorizedForThreadDelete(id, User))
+      if (!await _authorizationService.IsAuthorizedForThreadDeleteAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
       return View(await _threadService.GetThreadDeleteVm(id));
@@ -106,10 +106,10 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return View(threadDeleteVm);
 
-      if (!await _authorizationService.IsAuthorizedForThreadDelete(threadDeleteVm.ThreadId, User))
+      if (!await _authorizationService.IsAuthorizedForThreadDeleteAsync(threadDeleteVm.ThreadId, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      await _threadService.Remove(threadDeleteVm);
+      await _threadService.RemoveAsync(threadDeleteVm);
       return RedirectToAction(nameof(Index));
     }
 
@@ -120,7 +120,7 @@ namespace Forum.Controllers {
       if (!_threadService.DoesThreadExist(id))
         return NotFound();
 
-      if (!await _authorizationService.IsAuthorizedForThreadLock(id, User))
+      if (!await _authorizationService.IsAuthorizedForThreadLockAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
       if (_threadService.IsThreadLocked(id))
@@ -140,13 +140,13 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return View(threadLockVm);
 
-      if (!await _authorizationService.IsAuthorizedForThreadLock(id, User))
+      if (!await _authorizationService.IsAuthorizedForThreadLockAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
       if (_threadService.IsThreadLocked(threadLockVm.ThreadId))
         return RedirectToAction(nameof(Index));
 
-      await _threadService.Lock(threadLockVm, User);
+      await _threadService.LockAsync(threadLockVm, User);
       return RedirectToAction(nameof(Index));
     }
 
@@ -157,7 +157,7 @@ namespace Forum.Controllers {
       if (!_threadService.DoesThreadExist(id))
         return NotFound();
 
-      if (!await _authorizationService.IsAuthorizedForThreadLock(id, User))
+      if (!await _authorizationService.IsAuthorizedForThreadLockAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
       if (!_threadService.IsThreadLocked(id))
@@ -177,13 +177,13 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return View(threadUnlockVm);
 
-      if (!await _authorizationService.IsAuthorizedForThreadLock(id, User))
+      if (!await _authorizationService.IsAuthorizedForThreadLockAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
       if (!_threadService.IsThreadLocked(threadUnlockVm.ThreadId))
         return RedirectToAction(nameof(Index));
 
-      await _threadService.Unlock(threadUnlockVm, User);
+      await _threadService.UnlockAsync(threadUnlockVm, User);
       return RedirectToAction(nameof(Index));
     }
   }

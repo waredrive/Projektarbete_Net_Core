@@ -16,7 +16,7 @@ namespace Forum.Views.Shared.Components.Navbar {
     }
 
     public async Task<IViewComponentResult> InvokeAsync() {
-      return User.Identity.IsAuthenticated ? View(await _profileService.GetNavbarVm(User)) : View(new NavbarVm());
+      return User.Identity.IsAuthenticated ? View(await _profileService.GetNavbarVmAsync(User)) : View(new NavbarVm());
     }
   }
 }
