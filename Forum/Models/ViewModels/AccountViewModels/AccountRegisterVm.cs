@@ -9,6 +9,7 @@ namespace Forum.Models.ViewModels.AccountViewModels {
     public string Email { get; set; }
 
     [Required]
+    [StringLength(18)]
     [Display(Name = "Username")]
     public string UserName { get; set; }
 

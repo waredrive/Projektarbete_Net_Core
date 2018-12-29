@@ -8,6 +8,7 @@ using Forum.Models.Context;
 using Forum.Models.Entities;
 using Forum.Models.ViewModels.ComponentViewModels.PostOptionsViewModels;
 using Forum.Models.ViewModels.PostViewModels;
+using Forum.Models.ViewModels.SharedViewModels.PaginationViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,12 +17,14 @@ namespace Forum.Models.Services {
     private readonly AuthorizationService _authorizationService;
     private readonly ForumDbContext _db;
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly SharedService _sharedService;
 
     public PostService(ForumDbContext db, AuthorizationService authorizationService,
-      UserManager<IdentityUser> userManager) {
+      UserManager<IdentityUser> userManager, SharedService sharedService) {
       _db = db;
       _authorizationService = authorizationService;
       _userManager = userManager;
+      _sharedService = sharedService;
     }
 
     public async Task AddAsync(PostCreateVm postCreateVm, ClaimsPrincipal user) {
@@ -40,10 +43,11 @@ namespace Forum.Models.Services {
       await _db.SaveChangesAsync();
     }
 
-    public async Task<PostsIndexVm> GetPostsIndexVmAsync(int threadId, ClaimsPrincipal user) {
+    public async Task<PostsIndexVm> GetPostsIndexVmAsync(ClaimsPrincipal user, int threadId, int currentPage, int pageSize = 15) {
       var threadFromDb = await _db.Thread.Include(t => t.TopicNavigation).Where(t => t.Id == threadId).FirstOrDefaultAsync();
 
       var postsIndexVm = new PostsIndexVm {
+        Pagination = await GetPaginationVmForPosts(threadId, currentPage, pageSize),
         TopicText = threadFromDb.TopicNavigation.ContentText,
         TopicId = threadFromDb.Topic,
         ThreadId = threadFromDb.Id,
@@ -54,22 +58,39 @@ namespace Forum.Models.Services {
       };
 
       //Included Threadnavigation to be used in authorization check within GetPostsIndexPostVmAsync method
-      var posts = _db.Post.Include(p => p.ThreadNavigation).Where(p => p.Thread == threadId);
+      var posts = _db.Post.Include(p => p.ThreadNavigation).OrderBy(t => t.CreatedOn)
+        .Where(t => t.Thread == threadId).Skip((currentPage - 1) * pageSize).Take(pageSize);
 
-      foreach (var post in posts) postsIndexVm.Posts.Add(await GetPostsIndexPostVmAsync(post, user));
+      foreach (var post in posts)
+        postsIndexVm.Posts.Add(await GetPostsIndexPostVmAsync(post, user));
       return postsIndexVm;
+    }
+
+    private async Task<PaginationVm> GetPaginationVmForPosts(int threadId, int currentPage, int pageSize) {
+      return new PaginationVm {
+        Count = await _db.Post.Where(t => t.Thread == threadId).CountAsync(),
+        CurrentPage = currentPage,
+        PageSize = pageSize
+      };
     }
 
     private async Task<PostsIndexPostVm> GetPostsIndexPostVmAsync(Post post, ClaimsPrincipal user) {
       var createdBy = await _userManager.FindByIdAsync(post.CreatedBy);
       var lockedBy = await _userManager.FindByIdAsync(post.LockedBy);
+      var editedBy = await _userManager.FindByIdAsync(post.EditedBy);
 
       return new PostsIndexPostVm {
         PostId = post.Id,
         CreatedOn = post.CreatedOn,
         CreatedBy = createdBy.UserName,
+        CreatorsProfileImage = await _sharedService.GetProfileImageStringByMemberIdAsync(createdBy.Id),
+        CreatorsTotalposts = await _db.Post.CountAsync(p => p.CreatedBy == post.CreatedBy),
+        CreatorsRoles = (await _userManager.GetRolesAsync(createdBy)).ToArray(),
         PostText = post.ContentText,
-        LockedBy = lockedBy?.UserName
+        LockedBy = lockedBy?.UserName,
+        LockedOn = post.LockedOn,
+        EditedBy = editedBy?.UserName,
+        EditedOn = post.EditedOn
       };
     }
 
@@ -135,7 +156,7 @@ namespace Forum.Models.Services {
         CreatedOn = p.CreatedOn,
         CreatedBy = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName,
         LockedBy = _userManager.FindByIdAsync(p.LockedBy).Result.UserName,
-        LockedOn = (DateTime) p.LockedOn,
+        LockedOn = (DateTime)p.LockedOn,
         PostId = p.Id,
         PostText = p.ContentText
       }).FirstOrDefaultAsync();

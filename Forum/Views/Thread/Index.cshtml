@@ -24,7 +24,7 @@
         <a asp-controller="Topic" asp-action="index" class="light">Forum</a>
       </li>
       <li class="breadcrumb-item active">
-        <a asp-controller="Thread" asp-action="index" class="light">@Model.TopicText</a>
+        <a asp-controller="Thread" asp-action="index" asp-route-page="1" class="light">@Model.TopicText</a>
       </li>
     </ol>
   </nav>
@@ -47,7 +47,7 @@
               <small>Started by <a asp-controller="Profile" asp-action="Details" asp-route-returnurl="@ViewBag.ReturnUrl" asp-route-username="@thread.CreatedBy" class="light">@thread.CreatedBy</a>, @thread.CreatedOn</small>
             </td>
             <td class="align-middle">
-              <p>
+              <p class="small pb-0 mb-0">
                 @thread.PostCount
                 @if (thread.PostCount == 1) {<span>reply</span>} else {<span>replies</span>}
               </p>
@@ -55,9 +55,19 @@
             <td class="align-middle">
               @await Component.InvokeAsync("ThreadOptions", thread.ThreadId)
             </td>
+            <td style="width: 50px;" class="align-middle pr-0">
+              <img class="rounded float-left" src="data:image;base64,@thread.LatestPosterProfileImage" alt="Profile picture" style="width: 50px; height: 50px" />
+            </td>
+            <td class="align-middle">
+              <p class="pb-0 mb-0 small"><a asp-controller="Profile" asp-action="Details" asp-route-username="@thread.LatestPoster" class="light">@thread.LatestPoster</a></p>
+              <p class="pb-0 mb-0 small">@thread.LatestPostedOn</p>
+            </td>
           </tr>
         }
       </table>
+      <div>
+        <partial name="_PaginationPartial" for="@Model.Pagination"/>
+      </div>
     </div>
   </div>
 </div>

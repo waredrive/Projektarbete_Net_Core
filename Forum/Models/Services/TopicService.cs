@@ -14,14 +14,16 @@ using Microsoft.EntityFrameworkCore;
 namespace Forum.Models.Services {
   public class TopicService {
     private readonly AuthorizationService _authorizationService;
+    private readonly SharedService _sharedService;
     private readonly ForumDbContext _db;
     private readonly UserManager<IdentityUser> _userManager;
 
     public TopicService(ForumDbContext db, UserManager<IdentityUser> userManager,
-      AuthorizationService authorizationService) {
+      AuthorizationService authorizationService, SharedService sharedService) {
       _db = db;
       _userManager = userManager;
       _authorizationService = authorizationService;
+      _sharedService = sharedService;
     }
 
     public async Task AddAsync(TopicCreateVm topicCreateVm, ClaimsPrincipal user) {
@@ -42,7 +44,7 @@ namespace Forum.Models.Services {
     public async Task<TopicsIndexVm> GetTopicsIndexVmAsync(ClaimsPrincipal user) {
       var topicsIndexVm = new TopicsIndexVm {
         Topics = new List<TopicsIndexTopicVm>(),
-        LatestThreads = new List<TopicsIndexThreadVm>(),
+        LatestThreads = new List<TopicsIndexLatestThreadVm>(),
         LatestPosts = new List<TopicsIndexPostVm>(),
         IsAuthorizedForTopicCreate = await _authorizationService.IsAuthorizedForCreateTopicAsync(user)
       };
@@ -51,9 +53,9 @@ namespace Forum.Models.Services {
       foreach (var topic in topics)
         topicsIndexVm.Topics.Add(await GetTopicsIndexTopicVmAsync(topic, user));
 
-      var latestThreads = await _db.Thread.OrderByDescending(t => t.CreatedOn).Take(10).ToListAsync();
+      var latestThreads = await _db.Thread.Include(t => t.Post).OrderByDescending(t => t.CreatedOn).Take(10).ToListAsync();
       foreach (var thread in latestThreads) {
-        topicsIndexVm.LatestThreads.Add(await GetTopicIndexThreadVmAsync(thread));
+        topicsIndexVm.LatestThreads.Add(await GetTopicIndexLatestThreadVmAsync(thread));
       }
 
       var latestPosts = await _db.Post.OrderByDescending(p => p.CreatedOn).Take(10).ToListAsync();
@@ -66,12 +68,11 @@ namespace Forum.Models.Services {
 
     private async Task<TopicsIndexTopicVm> GetTopicsIndexTopicVmAsync(Topic topic, ClaimsPrincipal user) {
       var lockedBy = await _userManager.FindByIdAsync(topic.LockedBy);
-      var mostRecentThreadPostedTo = await _db.Post.Where(p => p.ThreadNavigation.Topic == topic.Id)
-        .OrderByDescending(p => p.CreatedOn)
-        .Take(1).Select(p => p.ThreadNavigation).FirstOrDefaultAsync();
+      var mostRecentPostInTopic = await _db.Post.Where(p => p.ThreadNavigation.Topic == topic.Id)
+        .OrderByDescending(p => p.CreatedOn).FirstOrDefaultAsync();
 
       return new TopicsIndexTopicVm {
-        LatestActiveThread = mostRecentThreadPostedTo != null ? await GetTopicIndexThreadVmAsync(mostRecentThreadPostedTo) : null,
+        LatestThreadPostedTo = mostRecentPostInTopic != null ? await GetTopicIndexThreadVmAsync(mostRecentPostInTopic) : null,
         TopicId = topic.Id,
         TopicText = topic.ContentText,
         ThreadCount = topic.Thread.Count,
@@ -80,10 +81,11 @@ namespace Forum.Models.Services {
       };
     }
 
-    private async Task<TopicsIndexThreadVm> GetTopicIndexThreadVmAsync(Thread thread) {
+    private async Task<TopicsIndexLatestThreadVm> GetTopicIndexLatestThreadVmAsync(Thread thread) {
       var createdBy = await _userManager.FindByIdAsync(thread.CreatedBy);
 
-      return new TopicsIndexThreadVm {
+      return new TopicsIndexLatestThreadVm {
+        CreatorProfileImage = await _sharedService.GetProfileImageStringByMemberIdAsync(thread.CreatedBy),
         ThreadId = thread.Id,
         ThreadText = thread.ContentText,
         CreatedOn = thread.CreatedOn,
@@ -91,10 +93,23 @@ namespace Forum.Models.Services {
       };
     }
 
+    private async Task<TopicsIndexThreadVm> GetTopicIndexThreadVmAsync(Post mostRecentPostInTopic) {
+      var latestPostInThreadCreator =  await _userManager.FindByIdAsync(mostRecentPostInTopic.CreatedBy);
+
+      return new TopicsIndexThreadVm {
+        LatestCommenterProfileImage =  await _sharedService.GetProfileImageStringByMemberIdAsync(mostRecentPostInTopic.CreatedBy),
+        ThreadId = mostRecentPostInTopic.ThreadNavigation.Id,
+        ThreadText = mostRecentPostInTopic.ThreadNavigation.ContentText,
+        LatestCommenter = latestPostInThreadCreator?.UserName,
+        LatestCommentTime = mostRecentPostInTopic?.CreatedOn
+      };
+    }
+
     private async Task<TopicsIndexPostVm> GetTopicIndexPostVmAsync(Post post) {
       var createdBy = await _userManager.FindByIdAsync(post.CreatedBy);
 
       return new TopicsIndexPostVm {
+        CreatorProfileImage = await _sharedService.GetProfileImageStringByMemberIdAsync(post.CreatedBy),
         PostId = post.Id,
         ThreadId = post.Thread,
         ThreadText = post.ThreadNavigation.ContentText,

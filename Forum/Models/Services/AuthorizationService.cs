@@ -11,12 +11,14 @@ using Microsoft.EntityFrameworkCore;
 namespace Forum.Models.Services {
   public class AuthorizationService {
     private readonly ForumDbContext _db;
+    private readonly SharedService _sharedService;
     private readonly UserManager<IdentityUser> _userManager;
 
     public AuthorizationService(
-      UserManager<IdentityUser> userManager, ForumDbContext db) {
+      UserManager<IdentityUser> userManager, ForumDbContext db, SharedService sharedService) {
       _userManager = userManager;
       _db = db;
+      _sharedService = sharedService;
     }
 
     public async Task<bool> IsAuthorizedForCreatePostAsync(int threadId, ClaimsPrincipal user) {
@@ -270,6 +272,14 @@ namespace Forum.Models.Services {
     }
 
     public async Task<bool> IsAuthorizedForProfileDeleteAsync(string username, ClaimsPrincipal user) {
+      if (!_sharedService.DoesUserAccountExist(username))
+        return false;
+
+      var identityUser = await _userManager.FindByNameAsync(username);
+      var memberFromDb = await _db.Member.Where(m => m.Id == identityUser.Id).FirstOrDefaultAsync();
+      if (memberFromDb.IsInternal)
+        return false;
+
       if (await IsProfileInRoleAsync(username, Roles.Admin) &&
           !string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase))
         return false;

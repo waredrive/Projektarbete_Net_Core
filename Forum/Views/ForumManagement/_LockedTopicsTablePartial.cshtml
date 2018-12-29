@@ -30,10 +30,8 @@
         Locked on: @topic.LockedOn
       </p>
     </td>
-    <td style="width: 20%" class="align-middle">
-      <div class="btn-group">
+    <td style="width: 20%" class="align-middle  text-center">
         @await Component.InvokeAsync("TopicOptions", topic.TopicId)
-      </div>
     </td>
   </tr>
   }

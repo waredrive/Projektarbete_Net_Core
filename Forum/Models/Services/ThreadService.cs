@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Forum.Models.Context;
 using Forum.Models.Entities;
 using Forum.Models.ViewModels.ComponentViewModels.ThreadOptionsViewModels;
+using Forum.Models.ViewModels.SharedViewModels.PaginationViewModels;
 using Forum.Models.ViewModels.ThreadViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,12 +17,14 @@ namespace Forum.Models.Services {
     private readonly AuthorizationService _authorizationService;
     private readonly ForumDbContext _db;
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly SharedService _sharedService;
 
     public ThreadService(ForumDbContext db, AuthorizationService authorizationService,
-      UserManager<IdentityUser> userManager) {
+      UserManager<IdentityUser> userManager, SharedService sharedService) {
       _db = db;
       _authorizationService = authorizationService;
       _userManager = userManager;
+      _sharedService = sharedService;
     }
 
     public async Task AddAsync(ThreadCreateVm threadCreateVm, ClaimsPrincipal user) {
@@ -57,10 +60,11 @@ namespace Forum.Models.Services {
       }
     }
 
-    public async Task<ThreadsIndexVm> GetThreadsIndexVmAsync(int topicId, ClaimsPrincipal user) {
+    public async Task<ThreadsIndexVm> GetThreadsIndexVmAsync(ClaimsPrincipal user, int topicId, int currentPage, int pageSize = 20) {
       var topicFromDb = await _db.Topic.Where(t => t.Id == topicId).FirstOrDefaultAsync();
 
       var threadsIndexVm = new ThreadsIndexVm {
+        Pagination = await GetPaginationVmForThreads(topicId, currentPage, pageSize),
         TopicId = topicFromDb.Id,
         TopicText = topicFromDb.ContentText,
         IsTopicLocked = topicFromDb.LockedBy != null,
@@ -69,18 +73,31 @@ namespace Forum.Models.Services {
       };
 
       //Included TopicNavigation  and Post to be used in IsAuthorizedForThreadEdit check within GetPostsIndexPostVmAsync method
-      var threads = _db.Thread.Include(t => t.TopicNavigation).Include(t => t.Post)
-        .Where(t => t.Topic == topicId);
+      var threads = _db.Thread.Include(t => t.TopicNavigation).Include(t => t.Post).OrderByDescending(t => t.CreatedOn)
+        .Where(t => t.Topic == topicId).Skip((currentPage - 1) * pageSize).Take(pageSize);
 
       foreach (var thread in threads) threadsIndexVm.Threads.Add(await GetThreadsIndexThreadVmAsync(thread, user));
 
       return threadsIndexVm;
     }
 
+    private async Task<PaginationVm> GetPaginationVmForThreads(int topicId, int currentPage, int pageSize) {
+      return new PaginationVm {
+        Count = await _db.Thread.Where(t => t.Topic == topicId).CountAsync(),
+        CurrentPage = currentPage,
+        PageSize = pageSize
+      };
+    }
+
     private async Task<ThreadsIndexThreadVm> GetThreadsIndexThreadVmAsync(Thread thread, ClaimsPrincipal user) {
       var createdBy = await _userManager.FindByIdAsync(thread.CreatedBy);
+      var latestPostInThread = thread.Post.OrderByDescending(p => p.CreatedOn).FirstOrDefault();
+      var latestPoster = latestPostInThread != null ? await _userManager.FindByIdAsync(latestPostInThread.CreatedBy) : null;
 
       return new ThreadsIndexThreadVm {
+        LatestPoster = latestPoster?.UserName,
+        LatestPosterProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(latestPoster?.UserName),
+        LatestPostedOn = latestPostInThread?.CreatedOn,
         ThreadId = thread.Id,
         CreatedOn = thread.CreatedOn,
         CreatedBy = createdBy.UserName,

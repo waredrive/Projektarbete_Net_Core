@@ -22,11 +22,11 @@ namespace Forum.Controllers {
     [AllowAnonymous]
     [Route("")]
     [HttpGet]
-    public async Task<IActionResult> Index(int threadId) {
+    public async Task<IActionResult> Index(int threadId, int page = 1) {
       if (!_threadService.DoesThreadExist(threadId))
         return NotFound();
 
-      return View(await _postService.GetPostsIndexVmAsync(threadId, User));
+      return View(await _postService.GetPostsIndexVmAsync(User, threadId, page));
     }
 
     [Route("Create")]

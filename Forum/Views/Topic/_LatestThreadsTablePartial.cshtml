@@ -1,16 +1,15 @@
-﻿@model List<TopicsIndexThreadVm>
+﻿@model List<TopicsIndexLatestThreadVm>
 
 <table class="table table-striped table-dark">
   @foreach (var thread in Model) {
     <tr>
-      <td class="align-middle">
-        <a asp-controller="Post" asp-action="index" asp-route-threadId="@thread.ThreadId" class="light">@thread.ThreadText</a>
+      
+      <td style="width: 50px;" class="align-middle pr-0">
+        <img class="rounded float-left" src="data:image;base64,@thread.CreatorProfileImage" alt="Profile picture" style="width: 50px; height: 50px" />
       </td>
       <td class="align-middle">
-        <a asp-controller="Profile" asp-action="Details" asp-route-username="@thread.CreatedBy" class="light">@thread.CreatedBy</a>
-      </td>
-      <td class="align-middle">
-        <a asp-controller="Profile" asp-action="Details" asp-route-username="@thread.CreatedOn" class="light">@thread.CreatedOn</a>
+        <p class="pb-0 mb-0 small"><a asp-controller="Post" asp-action="index" asp-route-threadId="@thread.ThreadId" class="light">@thread.ThreadText</a></p>
+        <p class="pb-0 mb-0 small"><a asp-controller="Profile" asp-action="Details" asp-route-username="@thread.CreatedBy" class="light">@thread.CreatedBy</a> - @thread.CreatedOn</p>
       </td>
     </tr>
   }

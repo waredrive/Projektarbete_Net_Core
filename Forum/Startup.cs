@@ -24,6 +24,7 @@ namespace Forum {
         o.UseSqlServer(_config.GetConnectionString("ForumDb_Dev")));
       services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<IdentityDbContext>()
         .AddDefaultTokenProviders();
+      services.Configure<IdentityOptions>(o => o.User.RequireUniqueEmail = true);
       services.AddScoped<AuthorizationService>();
       services.AddScoped<AccountService>();
       services.AddScoped<TopicService>();

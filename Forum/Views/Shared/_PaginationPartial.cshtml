@@ -1,0 +1,17 @@
+﻿@model PaginationVm
+<ul class="pagination pagination-sm">
+  <li class="page-item @(!Model.ShowFirst? "disabled":"")">
+    <a asp-route-page="1" class="page-link light"><i class="fas fa-fast-backward"></i></a>
+  </li>
+
+  <li class="page-item @(!Model.ShowPrevious? "disabled":"")">
+    <a asp-route-page="@(Model.CurrentPage -1)" class="page-link light"><i class="fas fa-step-backward"></i></a>
+  </li>
+  <li class="page-item  @(!Model.ShowNext? "disabled":"")">
+    <a asp-route-page="@(Model.CurrentPage + 1)" class="page-link light"><i class="fas fa-step-forward"></i></a>
+  </li>
+
+  <li class="page-item  @(!Model.ShowLast? "disabled":"")">
+    <a asp-route-page="@Model.TotalPages" class="page-link light"><i class="fas fa-fast-forward"></i></a>
+  </li>
+</ul>

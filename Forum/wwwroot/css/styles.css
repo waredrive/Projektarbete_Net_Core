@@ -1,4 +1,4 @@
-﻿html{
+﻿html {
   overflow-y: scroll;
   position: relative;
   min-height: 100%;
@@ -17,6 +17,14 @@ footer {
 
 .breadcrumb-item::before {
   color: #f8f9fa !important;
+}
+
+.pagination > li > a, .pagination > li > span {
+  background-color: #868e96;
+}
+
+.pagination > li.disabled > a, .pagination > li.disabled > span {
+  background-color: #868e96 !important;
 }
 
 a {

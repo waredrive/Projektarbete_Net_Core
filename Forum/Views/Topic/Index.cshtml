@@ -11,41 +11,45 @@
       }
       <table class="table table-striped table-dark">
         @foreach (var topic in Model.Topics) {
-          <tr>
-            <td style="width: 80px;" class="align-middle">
-              @if (topic.LockedBy != null) {
-                <i class="fas fa-ban fa-3x text-danger"></i>
-              } else {
-                <i class="fas fa-comments fa-3x"></i>
+        <tr>
+          <td style="width: 80px;" class="align-middle">
+            @if (topic.LockedBy != null) {
+              <i class="fas fa-ban fa-3x text-danger"></i>
+            } else {
+              <i class="fas fa-comments fa-3x"></i>
+            }
+          </td>
+          <td class="align-middle">
+            <a asp-controller="Thread" asp-action="index" asp-route-topicId="@topic.TopicId" asp-route-page="1" class="light">
+              <p class="pb-0 mb-0">@topic.TopicText</p>
+            </a>
+          </td>
+          <td style="width: 10%;" class="align-middle">
+            <p class="small pb-0 mb-0">
+              <span class="font-weight-bold">@topic.ThreadCount </span>
+              @if (topic.ThreadCount == 1) {<span>thread</span>} else {<span>threads</span>}
+            </p>
+            <p class="small pb-0 mb-0">
+              <span class="font-weight-bold">@topic.PostCount</span>
+              @if (topic.PostCount == 1) {<span>reply</span>} else {<span>replies</span>}
+            </p>
+          </td>
+          <td style="width: 20%;" class="align-middle  text-center">
+            @await Component.InvokeAsync("TopicOptions", topic.TopicId)
+          </td>
+          @if (topic.LatestThreadPostedTo != null) {
+            <td style="width: 1%;" class="align-middle pr-0">
+              <img class="rounded float-left" src="data:image;base64,@topic.LatestThreadPostedTo.LatestCommenterProfileImage" alt="Profile picture" style="width: 50px; height: 50px" />
+            </td>
+            <td style="width: 29%" class="align-middle">
+              <p class="pb-0 mb-0 small"><a asp-controller="Post" asp-action="index" asp-route-threadId="@topic.LatestThreadPostedTo.ThreadId" class="light">@topic.LatestThreadPostedTo.ThreadText</a></p>
+              <p class="pb-0 mb-0 small">By <a asp-controller="Profile" asp-action="Details" asp-route-username="@topic.LatestThreadPostedTo.LatestCommenter" class="light">@topic.LatestThreadPostedTo.LatestCommenter</a></p>
+              <p class="pb-0 mb-0 small">@topic.LatestThreadPostedTo.LatestCommentTime</p>
+            </td>
+          } else {
+            <td style="width: 1%;" class="align-middle pr-0"></td>
+            <td style="width: 29%" class="align-middle"></td>
               }
-            </td>
-            <td class="align-middle">
-              <a asp-controller="Thread" asp-action="index" asp-route-topicId="@topic.TopicId" class="light">
-                <p class="pb-0 mb-0">@topic.TopicText</p>
-              </a>
-            </td>
-            <td class="align-middle">
-              <p class="pb-0 mb-0">
-                <span class="font-weight-bold">@topic.ThreadCount </span>
-                @if (topic.ThreadCount == 1) {<span>thread</span>} else {<span>threads</span>}
-              </p>
-              <p>
-                <span class="font-weight-bold">@topic.PostCount</span>
-                @if (topic.PostCount == 1) {<span>reply</span>} else {<span>replies</span>}
-              </p>
-            </td>
-            <td class="align-middle">
-              @await Component.InvokeAsync("TopicOptions", topic.TopicId)
-            </td>
-            <td class="align-middle">
-              <div>
-                @if (topic.LatestActiveThread != null) {
-                  <a asp-controller="Post" asp-action="index" asp-route-threadId="@topic.LatestActiveThread.ThreadId" class="light">@topic.LatestActiveThread.ThreadText</a>
-                  <p>By <a asp-controller="Profile" asp-action="Details" asp-route-username="@topic.LatestActiveThread.CreatedBy" class="light">@topic.LatestActiveThread.CreatedBy</a></p>
-                  <p>@topic.LatestActiveThread.CreatedOn</p>
-                }
-              </div>
-            </td>
           </tr>
         }
       </table>
