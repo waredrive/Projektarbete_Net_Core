@@ -8,6 +8,8 @@ namespace Forum {
     }
 
     //TODO: Add custom messages to AccessDenied (Use TempData).
+    //TODO: Add confirmations when adding, deleting, editing, etc. Maybe modal?
+    //TODO: Add visual indicator in Topic/Thread/Post that it is blocked.
     //TODO: Make statistics in forumManager Sticky
     //TODO: Create Partial views.
     //TODO: Prevent pages add to history, for omitting when back button is pressed. Only "nested" pages - Profile and Account.

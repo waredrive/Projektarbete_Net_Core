@@ -6,11 +6,6 @@ namespace Forum.Models.ViewModels.TopicViewModels {
     public List<TopicsIndexTopicVm> Topics { get; set; }
     public List<TopicsIndexPostVm> LatestPosts { get; set; }
     public List<TopicsIndexThreadVm> LatestThreads { get; set; }
-
-    public int TotalPosts { get; set; }
-    public int TotalMembers { get; set; }
-    public string NewestMember { get; set; }
-    public string MostActiveMember { get; set; }
     public bool IsAuthorizedForTopicCreate { get; set; }
   }
 

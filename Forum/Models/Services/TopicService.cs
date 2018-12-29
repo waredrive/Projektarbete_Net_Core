@@ -40,19 +40,10 @@ namespace Forum.Models.Services {
     }
 
     public async Task<TopicsIndexVm> GetTopicsIndexVmAsync(ClaimsPrincipal user) {
-      var mostActiveMemberId = _db.Member.Where(m => !m.IsInternal).OrderByDescending(m =>
-          m.PostCreatedByNavigation.Count + m.ThreadCreatedByNavigation.Count + m.TopicCreatedByNavigation.Count)
-        .Select(m => m.Id).First();
-      var newestMemberId = _db.Member.OrderByDescending(m => m.CreatedOn).First().Id;
-
       var topicsIndexVm = new TopicsIndexVm {
         Topics = new List<TopicsIndexTopicVm>(),
         LatestThreads = new List<TopicsIndexThreadVm>(),
         LatestPosts = new List<TopicsIndexPostVm>(),
-        TotalMembers = _userManager.Users.Count(),
-        TotalPosts = _db.Post.Count(),
-        MostActiveMember = (await _userManager.FindByIdAsync(mostActiveMemberId)).UserName,
-        NewestMember = (await _userManager.FindByIdAsync(newestMemberId)).UserName,
         IsAuthorizedForTopicCreate = await _authorizationService.IsAuthorizedForCreateTopicAsync(user)
       };
 
@@ -74,8 +65,6 @@ namespace Forum.Models.Services {
     }
 
     private async Task<TopicsIndexTopicVm> GetTopicsIndexTopicVmAsync(Topic topic, ClaimsPrincipal user) {
-      var isAuthorizedForTopicEditLockAndDelete =
-        await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(topic, user);
       var lockedBy = await _userManager.FindByIdAsync(topic.LockedBy);
       var mostRecentThreadPostedTo = await _db.Post.Where(p => p.ThreadNavigation.Topic == topic.Id)
         .OrderByDescending(p => p.CreatedOn)

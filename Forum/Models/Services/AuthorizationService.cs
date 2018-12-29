@@ -198,7 +198,7 @@ namespace Forum.Models.Services {
     }
 
     public async Task<bool> IsAuthorizedForPostEditAndDeleteAsync(Post postFromDb, ClaimsPrincipal user) {
-      if (!user.Identity.IsAuthenticated && await IsProfileBlockedAsync(user.Identity.Name))
+      if (!user.Identity.IsAuthenticated || await IsProfileBlockedAsync(user.Identity.Name))
         return false;
 
       var userId = _userManager.GetUserId(user);
@@ -224,7 +224,7 @@ namespace Forum.Models.Services {
     }
 
     public async Task<bool> IsAuthorizedForPostLockAsync(Post postFromDb, ClaimsPrincipal user) {
-      if (!user.Identity.IsAuthenticated && await IsProfileBlockedAsync(user.Identity.Name))
+      if (!user.Identity.IsAuthenticated || await IsProfileBlockedAsync(user.Identity.Name))
         return false;
 
       var userId = _userManager.GetUserId(user);

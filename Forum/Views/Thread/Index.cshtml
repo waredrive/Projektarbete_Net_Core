@@ -5,7 +5,7 @@
 <div class="container-fluid">
   <div class="col-md-12">
     <div class="row">
-      <h1 class="text-light">@Model.TopicText</h1>
+      <h3 class="text-light">@Model.TopicText</h3>
       <div class="my-auto ml-3">
         @await Component.InvokeAsync("TopicOptions", @Model.TopicId)
       </div>
@@ -18,13 +18,13 @@
       </div>
     </div>
   }
-  <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-      <li class="breadcrumb-item" aria-current="page">
-        <a asp-controller="Topic" asp-action="index">Forum</a>
+  <nav>
+    <ol class="breadcrumb bg-secondary">
+      <li class="breadcrumb-item">
+        <a asp-controller="Topic" asp-action="index" class="light">Forum</a>
       </li>
-      <li class="breadcrumb-item" aria-current="page">
-        <a asp-controller="Thread" asp-action="index">@Model.TopicText</a>
+      <li class="breadcrumb-item active">
+        <a asp-controller="Thread" asp-action="index" class="light">@Model.TopicText</a>
       </li>
     </ol>
   </nav>
@@ -60,10 +60,10 @@
       </table>
     </div>
   </div>
-  <div class="row">
-    <div class="col-md-12 text-light">
-      OTHER STUFF
-    </div>
-  </div>
 </div>
+
+@section footer {
+  @await Component.InvokeAsync("Footer")
+}
+
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Forum.Models.Context;
+using Forum.Models.ViewModels.ComponentViewModels.FooterViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,20 @@ namespace Forum.Models.Services {
 
     public bool DoesUserAccountExist(string username) {
       return _userManager.FindByNameAsync(username).Result != null;
+    }
+
+    public async Task<FooterVm> GetFooterVmAsync() {
+      var mostActiveMemberId = _db.Member.Where(m => !m.IsInternal).OrderByDescending(m =>
+          m.PostCreatedByNavigation.Count + m.ThreadCreatedByNavigation.Count + m.TopicCreatedByNavigation.Count)
+        .Select(m => m.Id).First();
+      var newestMemberId = _db.Member.OrderByDescending(m => m.CreatedOn).First().Id;
+
+      return new FooterVm {
+        TotalMembers = _userManager.Users.Count(),
+        TotalPosts = _db.Post.Count(),
+        MostActiveMember = (await _userManager.FindByIdAsync(mostActiveMemberId)).UserName,
+        NewestMember = (await _userManager.FindByIdAsync(newestMemberId)).UserName
+      };
     }
   }
 }

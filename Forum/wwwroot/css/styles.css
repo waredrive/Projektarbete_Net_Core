@@ -1,5 +1,22 @@
-﻿html {
+﻿html{
   overflow-y: scroll;
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+footer {
+  bottom: 0;
+  height: 60px;
+  width: 100%;
+  position: absolute;
+}
+
+.breadcrumb-item::before {
+  color: #f8f9fa !important;
 }
 
 a {
