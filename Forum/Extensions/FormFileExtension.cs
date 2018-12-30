@@ -9,9 +9,11 @@ using Microsoft.AspNetCore.Http;
 namespace Forum.Extensions {
   public static class FormFileExtension {
     public const int ImageMaxBytes = 100000;
-    public const int ImageMinBytes = 1000;
-    public const int ImagePixelWidth = 240;
-    public const int ImagePixelHeight = 240;
+    public const int ImageMinBytes = 5000;
+    public const int ImageMinPixelWidth = 240;
+    public const int ImageMinPixelHeight = 240;
+    public const int ImageMaxPixelWidth = 480;
+    public const int ImageMaxPixelHeight = 480;
 
     public static ImageCustomValidationResult IsValidImage(this IFormFile postedFile) {
       var result = new ImageCustomValidationResult();
@@ -41,12 +43,12 @@ namespace Forum.Extensions {
 
         //check if the image size exceeds the limits
         if (postedFile.Length > ImageMaxBytes) {
-          result.Errors.Add($"The image must have less than {ImageMaxBytes / 1000}Kb.");
+          result.Errors.Add($"The image must have less than {ImageMaxBytes / 1000}kB.");
           return result;
         }
 
         if (postedFile.Length < ImageMinBytes) {
-          result.Errors.Add($"The image must have more than {ImageMinBytes / 1000}Kb.");
+          result.Errors.Add($"The image must have more than {ImageMinBytes / 1000}kB.");
           return result;
         }
 
@@ -66,12 +68,18 @@ namespace Forum.Extensions {
         postedFile.OpenReadStream().Dispose();
       }
 
-      //  Try to instantiate new Bitmap, if .NET throws exception, the image is invalid
-      // Check if sizing is within limits
+      //  Try to instantiate new Bitmap, if .NET throws exception, the image is invalid.
+      // Check if dimensions are within limits.
       try {
         using (var bitmap = new Bitmap(postedFile.OpenReadStream())) {
-          if (bitmap.Width != ImagePixelWidth) result.Errors.Add($"The image must have {ImagePixelWidth}px width.");
-          if (bitmap.Height != ImagePixelHeight) result.Errors.Add($"The image must have {ImagePixelHeight}px height.");
+          if (bitmap.Width > ImageMaxPixelWidth) result.Errors.Add($"The image must have less than {ImageMaxPixelWidth}px width.");
+          if (bitmap.Height > ImageMaxPixelHeight) result.Errors.Add($"The image must have less than {ImageMaxPixelHeight}px height.");
+          if (bitmap.Width < ImageMinPixelWidth)
+            result.Errors.Add($"The image must have more than {ImageMinPixelWidth}px width.");
+          if (bitmap.Height < ImageMinPixelHeight)
+            result.Errors.Add($"The image must have more than {ImageMinPixelHeight}px height.");
+          if(bitmap.Width != bitmap.Height)
+            result.Errors.Add($"The image must be square.");
           return result;
         }
       }
