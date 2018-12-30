@@ -7,7 +7,7 @@
         <img class="rounded float-left" src="data:image;base64,@post.CreatorProfileImage" alt="Profile picture" style="width: 50px; height: 50px" />
       </td>
       <td class="align-middle">
-        <p class="pb-0 mb-0 small"><a asp-controller="Post" asp-action="index" asp-route-threadId="@post.ThreadId" asp-fragment="@post.PostId" class="light">@post.ThreadText</a></p>
+        <p class="pb-0 mb-0 small"><a asp-controller="Post" asp-action="index" asp-route-threadId="@post.ThreadId" asp-route-postId="@post.PostId" class="light">@post.ThreadText</a></p>
         <p class="pb-0 mb-0 small">Last post: <a asp-controller="Profile" asp-action="Details" asp-route-username="@post.LatestCommenter" asp-route-returnUrl="@ViewBag.ReturnUrl" class="light">@post.LatestCommenter </a>(@post.LatestCommentTime)</p>
       </td>
     </tr>

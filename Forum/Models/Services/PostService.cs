@@ -43,8 +43,13 @@ namespace Forum.Models.Services {
       await _db.SaveChangesAsync();
     }
 
-    public async Task<PostsIndexVm> GetPostsIndexVmAsync(ClaimsPrincipal user, int threadId, int currentPage, int pageSize = 15) {
+    public async Task<PostsIndexVm> GetPostsIndexVmAsync(ClaimsPrincipal user, int threadId, int currentPage, int? postId = null, int pageSize = 15) {
       var threadFromDb = await _db.Thread.Include(t => t.TopicNavigation).Where(t => t.Id == threadId).FirstOrDefaultAsync();
+
+      //if (postId != null) {
+      //  var posts = _db.Post.OrderBy(t => t.CreatedOn)
+      //    .Where(t => t.Thread == threadId).Skip((currentPage - 1) * pageSize).Take(pageSize);
+      //}
 
       var postsIndexVm = new PostsIndexVm {
         Pager = await GetPaginationVmForPosts(threadId, currentPage, pageSize),
@@ -57,13 +62,21 @@ namespace Forum.Models.Services {
         IsAuthorizedForPostCreate = await _authorizationService.IsAuthorizedForCreatePostAsync(threadId, user)
       };
 
-      //Included Threadnavigation to be used in authorization check within GetPostsIndexPostVmAsync method
-      var posts = _db.Post.Include(p => p.ThreadNavigation).OrderBy(t => t.CreatedOn)
+      var posts = _db.Post.OrderBy(t => t.CreatedOn)
         .Where(t => t.Thread == threadId).Skip((currentPage - 1) * pageSize).Take(pageSize);
 
       foreach (var post in posts)
-        postsIndexVm.Posts.Add(await GetPostsIndexPostVmAsync(post, user));
+        postsIndexVm.Posts.Add(await GetPostsIndexPostVmAsync(post));
       return postsIndexVm;
+    }
+
+    private async Task<IQueryable<Post>> FindPageWithPostAsync(int postId, int threadId, int pageSize, int currentPage = 1) {
+      var posts = _db.Post.Include(p => p.ThreadNavigation).OrderBy(t => t.CreatedOn)
+        .Where(t => t.Thread == threadId).Skip((currentPage - 1) * pageSize).Take(pageSize);
+      while (!posts.Any(p => p.Id == postId)) {
+        await FindPageWithPostAsync(postId, threadId, pageSize, ++currentPage);
+      }
+      return posts;
     }
 
     private async Task<Pager> GetPaginationVmForPosts(int threadId, int currentPage, int pageSize) {
@@ -71,7 +84,7 @@ namespace Forum.Models.Services {
       return new Pager(totalItems, currentPage, pageSize);
     }
 
-    private async Task<PostsIndexPostVm> GetPostsIndexPostVmAsync(Post post, ClaimsPrincipal user) {
+    private async Task<PostsIndexPostVm> GetPostsIndexPostVmAsync(Post post) {
       var createdBy = await _userManager.FindByIdAsync(post.CreatedBy);
       var lockedBy = await _userManager.FindByIdAsync(post.LockedBy);
       var editedBy = await _userManager.FindByIdAsync(post.EditedBy);

@@ -20,6 +20,9 @@ namespace Forum.Models.Services {
     }
 
     public async Task<string> GetProfileImageStringByUsernameAsync(string username) {
+      if (!DoesUserAccountExist(username))
+        return null;
+
       var identityUser = await _userManager.FindByNameAsync(username);
       return await GetProfileImageStringByMemberIdAsync(identityUser.Id);
     }
@@ -30,7 +33,9 @@ namespace Forum.Models.Services {
     }
 
     public bool DoesUserAccountExist(string username) {
-      return _userManager.FindByNameAsync(username).Result != null;
+      if (username == null)
+        return false;
+      return _userManager.FindByNameAsync(username)?.Result != null;
     }
 
     public async Task<FooterVm> GetFooterVmAsync() {

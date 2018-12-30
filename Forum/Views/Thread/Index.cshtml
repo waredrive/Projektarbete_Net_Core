@@ -55,18 +55,23 @@
             <td class="align-middle">
               @await Component.InvokeAsync("ThreadOptions", thread.ThreadId)
             </td>
-            <td style="width: 50px;" class="align-middle pr-0">
-              <img class="rounded float-left" src="data:image;base64,@thread.LatestPosterProfileImage" alt="Profile picture" style="width: 50px; height: 50px" />
-            </td>
-            <td class="align-middle">
-              <p class="pb-0 mb-0 small"><a asp-controller="Profile" asp-action="Details" asp-route-username="@thread.LatestPoster" class="light">@thread.LatestPoster</a></p>
-              <p class="pb-0 mb-0 small">@thread.LatestPostedOn</p>
-            </td>
+            @if (@thread.LatestPoster != null) {
+              <td style="width: 50px;" class="align-middle pr-0">
+                <img class="rounded float-left" src="data:image;base64,@thread.LatestPosterProfileImage" alt="Profile picture" style="width: 50px; height: 50px" />
+              </td>
+              <td class="align-middle">
+                <p class="pb-0 mb-0 small"><a asp-controller="Profile" asp-action="Details" asp-route-username="@thread.LatestPoster" class="light">@thread.LatestPoster</a></p>
+                <p class="pb-0 mb-0 small">@thread.LatestPostedOn</p>
+              </td>
+            } else {
+              <td style="width: 50px;" class="align-middle pr-0"></td>
+              <td class="align-middle"></td>
+            }
           </tr>
         }
       </table>
       <div>
-        <partial name="_PaginationPartial" for="@Model.Pager"/>
+        <partial name="_PaginationPartial" for="@Model.Pager" />
       </div>
     </div>
   </div>
