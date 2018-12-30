@@ -24,7 +24,7 @@
     </div>
     <div class="row py-3">
       <div class="col-12">
-        <form asp-controller="Post" asp-action="Delete">
+        <form asp-controller="Post" asp-action="Delete" asp-route-returnUrl="@ViewBag.ReturnUrl">
           <div class="btn-group float-right">
             @Html.HiddenFor(m => m.PostId)
             <input type="submit" class="btn btn-danger rounded-left" value="Delete Post" />

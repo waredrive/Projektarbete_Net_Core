@@ -29,7 +29,7 @@
         </p>
       </td>
       <td style="width: 20%" class="align-middle  text-center">
-        @await Component.InvokeAsync("PostOptions", post.PostId)
+        @await Component.InvokeAsync("PostOptions", new { postId = post.PostId})
       </td>
     </tr>
   }

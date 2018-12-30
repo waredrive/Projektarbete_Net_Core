@@ -13,7 +13,7 @@
       </h3>
     </div>
     <div class="my-auto row pt-2">
-      @await Component.InvokeAsync("ThreadOptions", @Model.ThreadId)
+      @await Component.InvokeAsync("ThreadOptions", new { threadId = @Model.ThreadId })
     </div>
   </div>
   @if (Model.IsAuthorizedForPostCreate) {
@@ -86,7 +86,7 @@
                     }
                   </div>
                   <div class="ml-auto align-self-center">
-                    @await Component.InvokeAsync("PostOptions", post.PostId)
+                    @await Component.InvokeAsync("PostOptions", new { postId = post.PostId })
                   </div>
                 </div>
               </div>

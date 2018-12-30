@@ -32,7 +32,8 @@ namespace Forum.Controllers {
 
     [Route("Create")]
     [HttpGet]
-    public async Task<IActionResult> Create(int threadId) {
+    public async Task<IActionResult> Create(int threadId, string returnUrl = null) {
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
       if (!_threadService.DoesThreadExist(threadId))
         return NotFound();
 
@@ -45,7 +46,7 @@ namespace Forum.Controllers {
     [Route("Create")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(PostCreateVm postCreateVm) {
+    public async Task<IActionResult> Create(PostCreateVm postCreateVm, string returnUrl) {
       if (!ModelState.IsValid)
         return View(postCreateVm);
 
@@ -53,12 +54,13 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       await _postService.AddAsync(postCreateVm, User);
-      return RedirectToAction(nameof(Index));
+      return Redirect(returnUrl);
     }
 
     [Route("Update/{id}")]
     [HttpGet]
-    public async Task<IActionResult> Edit(int id) {
+    public async Task<IActionResult> Edit(int id, string returnUrl = null) {
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
       if (!_postService.DoesPostExist(id))
         return NotFound();
 
@@ -71,7 +73,7 @@ namespace Forum.Controllers {
     [Route("Update/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, PostEditVm postEditVm) {
+    public async Task<IActionResult> Edit(int id, PostEditVm postEditVm, string returnUrl) {
       if (!_postService.DoesPostExist(id))
         return NotFound();
 
@@ -82,12 +84,13 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       await _postService.UpdateAsync(postEditVm, User);
-      return RedirectToAction(nameof(Index));
+      return Redirect(returnUrl);
     }
 
     [Route("Delete/{id}")]
     [HttpGet]
-    public async Task<IActionResult> Delete(int id) {
+    public async Task<IActionResult> Delete(int id, string returnUrl = null) {
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
       if (!_postService.DoesPostExist(id))
         return NotFound();
 
@@ -100,7 +103,7 @@ namespace Forum.Controllers {
     [Route("Delete/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int id, PostDeleteVm postDeleteVm) {
+    public async Task<IActionResult> Delete(int id, PostDeleteVm postDeleteVm, string returnUrl) {
       if (!_postService.DoesPostExist(id))
         return NotFound();
 
@@ -111,13 +114,14 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       await _postService.RemoveAsync(postDeleteVm);
-      return RedirectToAction(nameof(Index));
+      return Redirect(returnUrl);
     }
 
     [RolesAuthorize(Roles.Admin, Roles.Moderator)]
     [Route("Lock/{id}")]
     [HttpGet]
-    public async Task<IActionResult> Lock(int id) {
+    public async Task<IActionResult> Lock(int id, string returnUrl = null) {
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
       if (!_postService.DoesPostExist(id))
         return NotFound();
 
@@ -125,7 +129,7 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (_postService.IsPostLocked(id))
-        return RedirectToAction(nameof(Unlock));
+        return RedirectToAction(nameof(Unlock), new { returnUrl });
 
       return View(await _postService.GetPostLockVm(id));
     }
@@ -134,7 +138,7 @@ namespace Forum.Controllers {
     [Route("Lock/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Lock(int id, PostLockVm postLockVm) {
+    public async Task<IActionResult> Lock(int id, PostLockVm postLockVm, string returnUrl) {
       if (!_postService.DoesPostExist(id))
         return NotFound();
 
@@ -145,16 +149,17 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (_postService.IsPostLocked(postLockVm.PostId))
-        return RedirectToAction(nameof(Index));
+        return Redirect(returnUrl);
 
       await _postService.LockAsync(postLockVm, User);
-      return RedirectToAction(nameof(Index));
+      return Redirect(returnUrl);
     }
 
     [RolesAuthorize(Roles.Admin, Roles.Moderator)]
     [Route("Unlock/{id}")]
     [HttpGet]
-    public async Task<IActionResult> Unlock(int id) {
+    public async Task<IActionResult> Unlock(int id, string returnUrl = null) {
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
       if (!_postService.DoesPostExist(id))
         return NotFound();
 
@@ -162,7 +167,7 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (!_postService.IsPostLocked(id))
-        return RedirectToAction(nameof(Lock));
+        return RedirectToAction(nameof(Lock), new { returnUrl });
 
       return View(await _postService.GetPostUnlockVm(id));
     }
@@ -171,7 +176,7 @@ namespace Forum.Controllers {
     [Route("Unlock/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Unlock(int id, PostUnlockVm postUnlockVm) {
+    public async Task<IActionResult> Unlock(int id, PostUnlockVm postUnlockVm, string returnUrl) {
       if (!_postService.DoesPostExist(id))
         return NotFound();
 
@@ -182,10 +187,10 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (!_postService.IsPostLocked(postUnlockVm.PostId))
-        return RedirectToAction(nameof(Index));
+        return Redirect(returnUrl);
 
       await _postService.UnlockAsync(postUnlockVm, User);
-      return RedirectToAction(nameof(Index));
+      return Redirect(returnUrl);
     }
   }
 }

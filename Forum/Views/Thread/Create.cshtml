@@ -8,7 +8,7 @@
   <div class="col-12 rounded my-5 bg-secondary p-5 text-light">
     <h1>Create Thread</h1>
     <br />
-    <form asp-controller="Thread" asp-action="Create" autocomplete="off">
+    <form asp-controller="Thread" asp-action="Create" asp-route-returnUrl="@ViewBag.ReturnUrl" autocomplete="off">
       <div asp-validation-summary="ModelOnly"  class="text-danger bg-white rounded py-1"></div>
       <div class="form-group">
         <label asp-for="ThreadText" class="control-label"></label>

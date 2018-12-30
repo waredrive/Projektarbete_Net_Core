@@ -31,7 +31,7 @@
         </p>
       </td>
       <td style="width: 20%" class="align-middle text-center">
-        @await Component.InvokeAsync("ThreadOptions", thread.ThreadId)
+        @await Component.InvokeAsync("ThreadOptions", new { threadId = thread.ThreadId })
       </td>
     </tr>
   }

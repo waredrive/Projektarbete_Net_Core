@@ -8,7 +8,7 @@
   <div class="col-12 rounded my-5 bg-secondary p-5 text-light">
     <h1>Edit Thread</h1>
     <br />
-    <form asp-controller="Thread" asp-action="Edit" autocomplete="off">
+    <form asp-controller="Thread" asp-action="Edit" asp-route-returnUrl="@ViewBag.ReturnUrl" autocomplete="off">
       @Html.HiddenFor(m => m.TopicId)
       @Html.HiddenFor(m => m.ThreadId)
       <div asp-validation-summary="ModelOnly"  class="text-danger bg-white rounded py-1"></div>

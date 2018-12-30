@@ -29,7 +29,8 @@ namespace Forum.Controllers {
     [RolesAuthorize(Roles.Admin)]
     [Route("Create")]
     [HttpGet]
-    public async Task<IActionResult> Create() {
+    public async Task<IActionResult> Create(string returnUrl = null) {
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
       if (!await _authorizationService.IsAuthorizedForCreateTopicAsync(User))
         return RedirectToAction("AccessDenied", "Account");
 
@@ -40,7 +41,7 @@ namespace Forum.Controllers {
     [Route("Create")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(TopicCreateVm topicCreateVm) {
+    public async Task<IActionResult> Create(TopicCreateVm topicCreateVm, string returnUrl) {
       if (!ModelState.IsValid)
         return View(topicCreateVm);
 
@@ -48,13 +49,14 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       await _topicService.AddAsync(topicCreateVm, User);
-      return RedirectToAction(nameof(Index));
+      return Redirect(returnUrl);
     }
 
     [RolesAuthorize(Roles.Admin)]
     [Route("Update/{id}")]
     [HttpGet]
-    public async Task<IActionResult> Edit(int id) {
+    public async Task<IActionResult> Edit(int id, string returnUrl = null) {
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
       if (!await _topicService.DoesTopicExist(id))
         return NotFound();
 
@@ -68,7 +70,7 @@ namespace Forum.Controllers {
     [Route("Update/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, TopicEditVm topicEditVm) {
+    public async Task<IActionResult> Edit(int id, TopicEditVm topicEditVm, string returnUrl) {
       if (!await _topicService.DoesTopicExist(id))
         return NotFound();
 
@@ -79,13 +81,14 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       await _topicService.UpdateAsync(topicEditVm, User);
-      return RedirectToAction(nameof(Index));
+      return Redirect(returnUrl);
     }
 
     [RolesAuthorize(Roles.Admin)]
     [Route("Delete/{id}")]
     [HttpGet]
-    public async Task<IActionResult> Delete(int id) {
+    public async Task<IActionResult> Delete(int id, string returnUrl = null) {
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
       if (!await _topicService.DoesTopicExist(id))
         return NotFound();
 
@@ -99,7 +102,7 @@ namespace Forum.Controllers {
     [Route("Delete/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int id, TopicDeleteVm topicDeleteVm) {
+    public async Task<IActionResult> Delete(int id, TopicDeleteVm topicDeleteVm, string returnUrl) {
       if (!await _topicService.DoesTopicExist(id))
         return NotFound();
 
@@ -110,13 +113,14 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       await _topicService.RemoveAsync(topicDeleteVm);
-      return RedirectToAction(nameof(Index));
+      return Redirect(returnUrl);
     }
 
     [RolesAuthorize(Roles.Admin)]
     [Route("Lock/{id}")]
     [HttpGet]
-    public async Task<IActionResult> Lock(int id) {
+    public async Task<IActionResult> Lock(int id, string returnUrl = null) {
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
       if (!await _topicService.DoesTopicExist(id))
         return NotFound();
 
@@ -124,7 +128,7 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (await _topicService.IsTopicLocked(id))
-        return RedirectToAction(nameof(Unlock));
+        return RedirectToAction(nameof(Unlock), new { returnUrl });
 
       return View(await _topicService.GetTopicLockVmAsync(id));
     }
@@ -133,7 +137,7 @@ namespace Forum.Controllers {
     [Route("Lock/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Lock(int id, TopicLockVm topicLockVm) {
+    public async Task<IActionResult> Lock(int id, TopicLockVm topicLockVm, string returnUrl) {
       if (!await _topicService.DoesTopicExist(id))
         return NotFound();
 
@@ -144,16 +148,17 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (await _topicService.IsTopicLocked(topicLockVm.TopicId))
-        return RedirectToAction(nameof(Index));
+        return Redirect(returnUrl);
 
       await _topicService.LockAsync(topicLockVm, User);
-      return RedirectToAction(nameof(Index));
+      return Redirect(returnUrl);
     }
 
     [RolesAuthorize(Roles.Admin)]
     [Route("Unlock/{id}")]
     [HttpGet]
-    public async Task<IActionResult> Unlock(int id) {
+    public async Task<IActionResult> Unlock(int id, string returnUrl = null) {
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
       if (!await _topicService.DoesTopicExist(id))
         return NotFound();
 
@@ -161,7 +166,7 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (!await _topicService.IsTopicLocked(id))
-        return RedirectToAction(nameof(Lock));
+        return RedirectToAction(nameof(Lock), new { returnUrl });
 
       return View(await _topicService.GetTopicUnlockVmAsync(id));
     }
@@ -170,7 +175,7 @@ namespace Forum.Controllers {
     [Route("Unlock/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Unlock(int id, TopicUnlockVm topicUnlockVm) {
+    public async Task<IActionResult> Unlock(int id, TopicUnlockVm topicUnlockVm, string returnUrl) {
       if (!await _topicService.DoesTopicExist(id))
         return NotFound();
 
@@ -181,10 +186,10 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (!await _topicService.IsTopicLocked(topicUnlockVm.TopicId))
-        return RedirectToAction(nameof(Index));
+        return Redirect(returnUrl);
 
       await _topicService.UnlockAsync(topicUnlockVm, User);
-      return RedirectToAction(nameof(Index));
+      return Redirect(returnUrl);
     }
   }
 }

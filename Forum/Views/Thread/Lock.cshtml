@@ -19,7 +19,7 @@
     </div>
     <div class="row py-3">
       <div class="col-12">
-        <form asp-controller="Thread" asp-action="Lock">
+        <form asp-controller="Thread" asp-action="Lock" asp-route-returnUrl="@ViewBag.ReturnUrl">
           <div class="btn-group float-right">
             @Html.HiddenFor(m => m.ThreadId)
             <input type="submit" class="btn btn-warning rounded-left" value="Lock Thread" />

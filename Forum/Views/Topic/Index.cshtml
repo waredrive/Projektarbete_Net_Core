@@ -35,7 +35,7 @@
             </p>
           </td>
           <td style="width: 20%;" class="align-middle  text-center">
-            @await Component.InvokeAsync("TopicOptions", topic.TopicId)
+            @await Component.InvokeAsync("TopicOptions", new{ topicId = topic.TopicId })
           </td>
           @if (topic.LatestThreadPostedTo != null) {
             <td style="width: 1%;" class="align-middle pr-0">
