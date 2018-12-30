@@ -70,9 +70,11 @@ namespace Forum.Controllers {
         return View(accountLoginVm);
 
       var result = await _accountService.LoginAsync(accountLoginVm);
-      if (result.Succeeded)
-        return Redirect(Url.IsLocalUrl(accountLoginVm.ReturnUrl) ? accountLoginVm.ReturnUrl : "/");
-
+      if (result.Succeeded) {
+        var returnUrl = Url.IsLocalUrl(accountLoginVm.ReturnUrl) ? accountLoginVm.ReturnUrl : "/";
+        returnUrl += $"?returnUrl={returnUrl}"; 
+        return Redirect(returnUrl);
+      }
       ModelState.AddModelError(string.Empty, "Invalid login attempt.");
 
       return View(accountLoginVm);
@@ -163,8 +165,9 @@ namespace Forum.Controllers {
 
     [Route("Details/{username}")]
     [HttpGet]
-    public async Task<IActionResult> Details(string username, string returnUrl = null) {
+    public async Task<IActionResult> Details(string username, string returnUrl = null, bool fromProfile = false) {
       ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.FromProfile = fromProfile;
 
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();

@@ -37,7 +37,7 @@ namespace Forum.Models.Services {
           var thread = new Thread {
             Topic = threadCreateVm.TopicId,
             CreatedBy = currentUserId,
-            ContentText = threadCreateVm.ThreadText,
+            ContentText = threadCreateVm.ThreadText.Trim(),
             CreatedOn = DateTime.UtcNow
           };
 
@@ -46,7 +46,7 @@ namespace Forum.Models.Services {
           var post = new Post {
             Thread = thread.Id,
             CreatedBy = currentUserId,
-            ContentText = threadCreateVm.Post.PostText,
+            ContentText = threadCreateVm.Post.PostText.Trim(),
             CreatedOn = DateTime.UtcNow
           };
 
@@ -121,7 +121,7 @@ namespace Forum.Models.Services {
         return;
 
       var threadFromDb = await _db.Thread.FindAsync(threadEditVm.ThreadId);
-      threadFromDb.ContentText = threadEditVm.ThreadText;
+      threadFromDb.ContentText = threadEditVm.ThreadText.Trim();
       threadFromDb.EditedBy = currentUserId;
       threadFromDb.EditedOn = DateTime.UtcNow;
 

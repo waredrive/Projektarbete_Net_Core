@@ -8,20 +8,20 @@
   <div class="col-12 rounded my-5 bg-secondary p-5 text-light">
     <h1>Edit Profile</h1>
     <br />
-    <form asp-controller="Profile" asp-action="Edit" asp-route-username="@User.Identity.Name" asp-route-returnUrl="@ViewBag.ReturnUrl" enctype="multipart/form-data"  autocomplete="off">
-      <div asp-validation-summary="ModelOnly"  class="text-danger bg-white rounded py-1"></div>
+    <form asp-controller="Profile" asp-action="Edit" asp-route-username="@User.Identity.Name" asp-route-returnUrl="@ViewBag.ReturnUrl" enctype="multipart/form-data" autocomplete="off">
+      <div asp-validation-summary="ModelOnly" class="text-danger bg-white rounded py-1"></div>
       <div class="form-group">
         <label asp-for="NewUsername" class="control-label"></label>
-        <input asp-for="NewUsername" class="form-control"/>
-        <span asp-validation-for="NewUsername"  class="text-danger bg-white rounded-bottom py-1"></span>
+        <input asp-for="NewUsername" class="form-control" />
+        <span asp-validation-for="NewUsername" class="text-danger bg-white rounded-bottom py-1"></span>
       </div>
       <div class="form-group">
         <label asp-for="ProfileImage" class="control-label mb-0"></label>
         <small class="form-text text-light pb-1">The image must be of .jpg .gif or .png format. It must be a square with the min dimensions of 240x240px and max dimensions of 480x480px. The size must be between 5-100 kB.</small>
         <input asp-for="ProfileImage" accept="image/*" class="form-control">
-        <span asp-validation-for="ProfileImage"  class="text-danger bg-white rounded-bottom py-1"></span>
+        <span asp-validation-for="ProfileImage" class="text-danger bg-white rounded-bottom py-1"></span>
       </div>
-      <br/>
+      <br />
       <div class="btn-group float-right">
         <button type="submit" class="btn btn-warning">Update Profile</button>
         <a href="javascript:history.back()" class="btn btn-primary">Back</a>
@@ -31,6 +31,5 @@
 </div>
 
 @section scripts {
-  <partial name="_NoPushToBrowserHistoryScriptPartial"/>
   <partial name="_ValidationScriptsPartial" />
 }

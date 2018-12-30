@@ -35,7 +35,7 @@ namespace Forum.Models.Services {
       _sharedService = sharedService;
     }
 
-    public async Task<ProfileDetailsVm> GetProfileDetailsVmAsync(string username) {
+    public async Task<ProfileDetailsVm> GetProfileDetailsVmAsync(string username, ClaimsPrincipal user) {
       var identityUser = await _userManager.FindByNameAsync(username);
       var memberFromDb = await _db.Member.Include(m => m.PostCreatedByNavigation)
         .Include(m => m.ThreadCreatedByNavigation).FirstOrDefaultAsync(m => m.Id == identityUser.Id);
@@ -51,7 +51,9 @@ namespace Forum.Models.Services {
         BlockedBy = blockedBy?.UserName,
         BlockedEnd = memberFromDb.BlockedEnd,
         TotalThreads = memberFromDb.ThreadCreatedByNavigation.Count,
-        TotalPosts = memberFromDb.PostCreatedByNavigation.Count
+        TotalPosts = memberFromDb.PostCreatedByNavigation.Count,
+        IsAuthorizedForAccountView = await _authorizationService.IsAuthorizedForAccountDetailsViewAsync(identityUser.UserName, user),
+        IsUserOwner = IsUserOwner(identityUser.UserName, user)
       };
     }
 

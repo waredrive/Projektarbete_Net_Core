@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -29,7 +30,7 @@ namespace Forum.Models.Services {
       var allBlockedMembers = await _db.Member.Where(m => m.BlockedBy != null).ToListAsync();
       var allLockedTopics = await _db.Topic.Where(m => m.LockedBy != null).ToListAsync();
       var allLockedThreads = await _db.Thread.Where(m => m.LockedBy != null).ToListAsync();
-      var allLockedPosts = await _db.Post.Where(m => m.LockedBy != null).ToListAsync();
+      var allLockedPosts = await _db.Post.Include(p => p.ThreadNavigation).Where(m => m.LockedBy != null).ToListAsync();
 
       var forumManagementIndexVm = new ForumManagementIndexVm {
         LatestBlockedMembers = new List<ForumManagementBlockedMemberVm>(),

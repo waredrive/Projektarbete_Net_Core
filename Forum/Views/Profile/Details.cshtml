@@ -33,6 +33,9 @@
       <div class="col-12">
         <br />
         <div class="btn-group float-right">
+          @if (Model.IsAuthorizedForAccountView && !Model.IsUserOwner) {
+            <a asp-controller="Account" asp-action="Details" asp-route-username="@Model.Username" asp-route-returnUrl="@ViewBag.ReturnUrl" asp-route-fromProfile="true" class="btn btn-warning">Account Details</a>
+          }
           <a href="@ViewBag.ReturnUrl" class="btn btn-primary">Back</a>
         </div>
       </div>

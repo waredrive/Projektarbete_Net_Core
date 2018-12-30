@@ -11,5 +11,7 @@ namespace Forum.Models.ViewModels.ProfileViewModels {
     public DateTime? BlockedEnd { get; set; }
     public int TotalThreads { get; set; }
     public int TotalPosts { get; set; }
+    public bool IsAuthorizedForAccountView { get; set; }
+    public bool IsUserOwner { get; set; }
   }
 }

@@ -64,8 +64,8 @@ namespace Forum.Models.Services {
               ?.PhysicalPath),
           Id = user.Id,
           BirthDate = accountRegisterVm.Birthdate,
-          FirstName = accountRegisterVm.FirstName,
-          LastName = accountRegisterVm.LastName,
+          FirstName = accountRegisterVm.FirstName.Trim(),
+          LastName = accountRegisterVm.LastName.Trim(),
           CreatedOn = DateTime.UtcNow
         };
 
@@ -132,8 +132,8 @@ namespace Forum.Models.Services {
       try {
         var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
         memberFromDb.BirthDate = accountEditVm.Birthdate;
-        memberFromDb.FirstName = accountEditVm.FirstName;
-        memberFromDb.LastName = accountEditVm.LastName;
+        memberFromDb.FirstName = accountEditVm.FirstName.Trim();
+        memberFromDb.LastName = accountEditVm.LastName.Trim();
         await _db.SaveChangesAsync();
       }
       catch (Exception) {
@@ -156,6 +156,7 @@ namespace Forum.Models.Services {
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
 
       return new AccountDetailsVm {
+        UserName = identityUser.UserName,
         Birthdate = memberFromDb.BirthDate,
         Email = identityUser.Email,
         FirstName = memberFromDb.FirstName,

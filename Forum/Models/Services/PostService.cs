@@ -35,7 +35,7 @@ namespace Forum.Models.Services {
       var post = new Post {
         Thread = postCreateVm.ThreadId,
         CreatedBy = currentUserId,
-        ContentText = postCreateVm.PostText,
+        ContentText = postCreateVm.PostText.Trim(),
         CreatedOn = DateTime.UtcNow
       };
 
@@ -117,7 +117,7 @@ namespace Forum.Models.Services {
         return;
 
       var postFromDb = await _db.Post.FindAsync(postEditVm.PostId);
-      postFromDb.ContentText = postEditVm.PostText;
+      postFromDb.ContentText = postEditVm.PostText.Trim();
       postFromDb.EditedBy = currentUserId;
       postFromDb.EditedOn = DateTime.UtcNow;
 

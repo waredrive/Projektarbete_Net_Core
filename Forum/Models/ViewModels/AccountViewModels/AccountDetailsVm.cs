@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Forum.Models.ViewModels.AccountViewModels {
   public class AccountDetailsVm {
+    public string UserName { get; set; }
+
     [Display(Name = "E-mail")]
     public string Email { get; set; }
 

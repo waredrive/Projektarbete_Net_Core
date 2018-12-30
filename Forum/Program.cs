@@ -8,8 +8,6 @@ namespace Forum {
     }
 
     //TODO: Add confirmations when adding, deleting, editing, etc. Maybe modal?
-    //TODO: Add custom messages to AccessDenied (Use TempData).
-    //TODO: Add ViewAccount for Admins.
     //TODO: Add Typeahead with ajax call for searching.
     //TODO: A member can include idnavigation! Change all redundant searches for identityuser.
     //TODO: Add seed of Default deleted user if possible?

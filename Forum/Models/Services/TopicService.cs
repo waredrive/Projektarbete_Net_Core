@@ -33,7 +33,7 @@ namespace Forum.Models.Services {
 
       var topic = new Topic {
         CreatedBy = currentUserId,
-        ContentText = topicCreateVm.TopicText,
+        ContentText = topicCreateVm.TopicText.Trim(),
         CreatedOn = DateTime.UtcNow
       };
 
@@ -132,7 +132,7 @@ namespace Forum.Models.Services {
         return;
 
       var topicFromDb = await _db.Topic.FindAsync(topicEditVm.TopicId);
-      topicFromDb.ContentText = topicEditVm.TopicText;
+      topicFromDb.ContentText = topicEditVm.TopicText.Trim();
       topicFromDb.EditedBy = currentUserId;
       topicFromDb.EditedOn = DateTime.UtcNow;
 

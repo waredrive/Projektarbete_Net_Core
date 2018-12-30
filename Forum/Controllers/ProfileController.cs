@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Forum.Extensions;
+using Forum.Models;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.ProfileViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +30,7 @@ namespace Forum.Controllers {
       if (_sharedService.IsDeletedMember(username))
         return RedirectToAction(nameof(ProfileRemoved));
 
-      return View(await _profileService.GetProfileDetailsVmAsync(username));
+      return View(await _profileService.GetProfileDetailsVmAsync(username, User));
     }
 
     [Route("Details/ProfileRemoved")]
