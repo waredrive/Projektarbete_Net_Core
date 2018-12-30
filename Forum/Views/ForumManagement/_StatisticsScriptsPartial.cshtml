@@ -1,0 +1,7 @@
+﻿<script>
+    $(document).ready(() => {
+      $('ul.list-group a').filter((i, el) => {
+        return el.pathname === window.location.pathname;
+      }).addClass('active');
+    });
+</script>

@@ -23,10 +23,9 @@ namespace Forum.Controllers {
     [AllowAnonymous]
     [Route("")]
     [HttpGet]
-    public async Task<IActionResult> Index(int threadId, int postId, int page = 1) {
+    public async Task<IActionResult> Index(int threadId, int? postId = null, int page = 1) {
       if (!_threadService.DoesThreadExist(threadId))
         return NotFound();
-      // TODO: Add post id to search
 
       return View(await _postService.GetPostsIndexVmAsync(User, threadId, page, postId));
     }

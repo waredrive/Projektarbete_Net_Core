@@ -9,7 +9,7 @@
         <div class="col-md-12">
           <h4 class="text-center text-light mb-3">All Locked Posts</h4>
           <partial name="_LockedPostsTablePartial" for="@Model.LockedPosts" />
-          <partial name="_PaginationPartial" for="@Model.Pager"/>
+          <partial name="_PaginationPartial" for="@Model.Pager" />
         </div>
       </div>
     </div>
@@ -21,4 +21,8 @@
 
 @section footer {
   @await Component.InvokeAsync("Footer")
+}
+
+@section scripts {
+  <partial name="_StatisticsScriptsPartial" />
 }

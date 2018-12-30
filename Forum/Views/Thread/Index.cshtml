@@ -5,10 +5,15 @@
 <div class="container-fluid">
   <div class="col-md-12">
     <div class="row">
-      <h3 class="text-light">@Model.TopicText</h3>
-      <div class="my-auto ml-3">
-        @await Component.InvokeAsync("TopicOptions", @Model.TopicId)
-      </div>
+      <h3 class="text-light pt-2">
+      @if (Model.IsTopicLocked) {
+        <i class="fas fa-ban fa-lg text-danger"></i>
+      }
+        @Model.TopicText
+      </h3>
+    </div>
+    <div class="my-auto row pt-2">
+      @await Component.InvokeAsync("TopicOptions", @Model.TopicId)
     </div>
   </div>
   @if (@Model.IsAuthorizedForThreadCreate) {

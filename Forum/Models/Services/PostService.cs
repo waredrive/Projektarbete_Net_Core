@@ -46,10 +46,9 @@ namespace Forum.Models.Services {
     public async Task<PostsIndexVm> GetPostsIndexVmAsync(ClaimsPrincipal user, int threadId, int currentPage, int? postId = null, int pageSize = 15) {
       var threadFromDb = await _db.Thread.Include(t => t.TopicNavigation).Where(t => t.Id == threadId).FirstOrDefaultAsync();
 
-      //if (postId != null) {
-      //  var posts = _db.Post.OrderBy(t => t.CreatedOn)
-      //    .Where(t => t.Thread == threadId).Skip((currentPage - 1) * pageSize).Take(pageSize);
-      //}
+      if (postId != null) {
+        currentPage = await FindPageWithPostAsync((int)postId, threadId, pageSize);
+      }
 
       var postsIndexVm = new PostsIndexVm {
         Pager = await GetPaginationVmForPosts(threadId, currentPage, pageSize),
@@ -63,20 +62,21 @@ namespace Forum.Models.Services {
       };
 
       var posts = _db.Post.OrderBy(t => t.CreatedOn)
-        .Where(t => t.Thread == threadId).Skip((currentPage - 1) * pageSize).Take(pageSize);
+        .Where(p => p.Thread == threadId).Skip((currentPage - 1) * pageSize).Take(pageSize);
 
       foreach (var post in posts)
         postsIndexVm.Posts.Add(await GetPostsIndexPostVmAsync(post));
       return postsIndexVm;
     }
 
-    private async Task<IQueryable<Post>> FindPageWithPostAsync(int postId, int threadId, int pageSize, int currentPage = 1) {
-      var posts = _db.Post.Include(p => p.ThreadNavigation).OrderBy(t => t.CreatedOn)
-        .Where(t => t.Thread == threadId).Skip((currentPage - 1) * pageSize).Take(pageSize);
-      while (!posts.Any(p => p.Id == postId)) {
-        await FindPageWithPostAsync(postId, threadId, pageSize, ++currentPage);
+    private async Task<int> FindPageWithPostAsync(int postId, int threadId, int pageSize, int currentPage = 1) {
+      var page = currentPage;
+
+      while (!await _db.Post.OrderBy(t => t.CreatedOn)
+        .Where(p => p.Thread == threadId).Skip((page - 1) * pageSize).Take(pageSize).AnyAsync(p => p.Id == postId)) {
+        await FindPageWithPostAsync(postId, threadId, pageSize, ++page);
       }
-      return posts;
+      return page;
     }
 
     private async Task<Pager> GetPaginationVmForPosts(int threadId, int currentPage, int pageSize) {

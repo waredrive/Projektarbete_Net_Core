@@ -1,10 +1,9 @@
-﻿@model ForumManagementStatisticsVm     
+﻿@model ForumManagementStatisticsVm
 <div class="mx-2 rounded bg-secondary text-light pb-5 sticky-top" style=" z-index: 5;">
   <h2 class="p-2 text-center">Statistics</h2>
   <h4 class="p-2 text-center">All</h4>
   <ul class="list-group text-dark">
     <a asp-controller="ForumManagement" asp-action="Index" class="list-group-item list-group-item-action">Latest Blocked</a>
-    <a asp-controller="ForumManagement" asp-action="BlockedMembersAll" class="list-group-item list-group-item-action">Members blocked: @Model.BlockedMembersCount</a>
     <a asp-controller="ForumManagement" asp-action="BlockedMembersAll" class="list-group-item list-group-item-action">Members blocked: @Model.BlockedMembersCount</a>
     <a asp-controller="ForumManagement" asp-action="LockedTopicsAll" class="list-group-item list-group-item-action">Topics locked: @Model.LockedTopicsCount</a>
     <a asp-controller="ForumManagement" asp-action="LockedThreadsAll" class="list-group-item list-group-item-action">Threads locked: @Model.LockedThreadsCount</a>
