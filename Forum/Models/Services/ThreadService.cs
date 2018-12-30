@@ -16,8 +16,8 @@ namespace Forum.Models.Services {
   public class ThreadService {
     private readonly AuthorizationService _authorizationService;
     private readonly ForumDbContext _db;
-    private readonly UserManager<IdentityUser> _userManager;
     private readonly SharedService _sharedService;
+    private readonly UserManager<IdentityUser> _userManager;
 
     public ThreadService(ForumDbContext db, AuthorizationService authorizationService,
       UserManager<IdentityUser> userManager, SharedService sharedService) {
@@ -60,7 +60,8 @@ namespace Forum.Models.Services {
       }
     }
 
-    public async Task<ThreadsIndexVm> GetThreadsIndexVmAsync(ClaimsPrincipal user, int topicId, int currentPage, int pageSize = 20) {
+    public async Task<ThreadsIndexVm> GetThreadsIndexVmAsync(ClaimsPrincipal user, int topicId, int currentPage,
+      int pageSize = 20) {
       var topicFromDb = await _db.Topic.Where(t => t.Id == topicId).FirstOrDefaultAsync();
 
       var threadsIndexVm = new ThreadsIndexVm {
@@ -89,7 +90,9 @@ namespace Forum.Models.Services {
     private async Task<ThreadsIndexThreadVm> GetThreadsIndexThreadVmAsync(Thread thread, ClaimsPrincipal user) {
       var createdBy = await _userManager.FindByIdAsync(thread.CreatedBy);
       var latestPostInThread = thread.Post.OrderByDescending(p => p.CreatedOn).FirstOrDefault();
-      var latestPoster = latestPostInThread != null ? await _userManager.FindByIdAsync(latestPostInThread.CreatedBy) : null;
+      var latestPoster = latestPostInThread != null
+        ? await _userManager.FindByIdAsync(latestPostInThread.CreatedBy)
+        : null;
 
       return new ThreadsIndexThreadVm {
         LatestPoster = latestPoster?.UserName,

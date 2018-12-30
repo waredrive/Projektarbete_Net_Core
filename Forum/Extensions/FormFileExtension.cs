@@ -72,14 +72,16 @@ namespace Forum.Extensions {
       // Check if dimensions are within limits.
       try {
         using (var bitmap = new Bitmap(postedFile.OpenReadStream())) {
-          if (bitmap.Width > ImageMaxPixelWidth) result.Errors.Add($"The image must have less than {ImageMaxPixelWidth}px width.");
-          if (bitmap.Height > ImageMaxPixelHeight) result.Errors.Add($"The image must have less than {ImageMaxPixelHeight}px height.");
+          if (bitmap.Width > ImageMaxPixelWidth)
+            result.Errors.Add($"The image must have less than {ImageMaxPixelWidth}px width.");
+          if (bitmap.Height > ImageMaxPixelHeight)
+            result.Errors.Add($"The image must have less than {ImageMaxPixelHeight}px height.");
           if (bitmap.Width < ImageMinPixelWidth)
             result.Errors.Add($"The image must have more than {ImageMinPixelWidth}px width.");
           if (bitmap.Height < ImageMinPixelHeight)
             result.Errors.Add($"The image must have more than {ImageMinPixelHeight}px height.");
-          if(bitmap.Width != bitmap.Height)
-            result.Errors.Add($"The image must be square.");
+          if (bitmap.Width != bitmap.Height)
+            result.Errors.Add("The image must be square.");
           return result;
         }
       }

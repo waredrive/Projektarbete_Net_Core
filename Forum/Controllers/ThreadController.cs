@@ -130,7 +130,7 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (_threadService.IsThreadLocked(id))
-        return RedirectToAction(nameof(Unlock), new { returnUrl });
+        return RedirectToAction(nameof(Unlock), new {returnUrl});
 
       return View(await _threadService.GetThreadLockVm(id));
     }
@@ -168,7 +168,7 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (!_threadService.IsThreadLocked(id))
-        return RedirectToAction(nameof(Lock), new { returnUrl });
+        return RedirectToAction(nameof(Lock), new {returnUrl});
 
       return View(await _threadService.GetThreadUnlockVm(id));
     }

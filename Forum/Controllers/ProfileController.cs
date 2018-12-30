@@ -1,21 +1,18 @@
 ﻿using System.Threading.Tasks;
 using Forum.Extensions;
-using Forum.Models.Identity;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.ProfileViewModels;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Session;
 
 namespace Forum.Controllers {
   [Route("Profile")]
   public class ProfileController : Controller {
     private readonly AuthorizationService _authorizationService;
-    private readonly SharedService _sharedService;
     private readonly ProfileService _profileService;
+    private readonly SharedService _sharedService;
 
-    public ProfileController(ProfileService profileService, AuthorizationService authorizationService, SharedService sharedService) {
+    public ProfileController(ProfileService profileService, AuthorizationService authorizationService,
+      SharedService sharedService) {
       _profileService = profileService;
       _authorizationService = authorizationService;
       _sharedService = sharedService;

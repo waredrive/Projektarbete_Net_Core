@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Forum.Models.Pagination;
 
 namespace Forum.Models.ViewModels.PostViewModels {
   public class PostsIndexVm {
@@ -10,7 +11,7 @@ namespace Forum.Models.ViewModels.PostViewModels {
     public bool IsThreadLocked { get; set; }
     public List<PostsIndexPostVm> Posts { get; set; }
     public bool IsAuthorizedForPostCreate { get; set; }
-    public Pagination.Pager Pager { get; set; }
+    public Pager Pager { get; set; }
   }
 
   public class PostsIndexPostVm {

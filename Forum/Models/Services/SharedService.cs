@@ -1,18 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Forum.Models.Context;
 using Forum.Models.Identity;
 using Forum.Models.ViewModels.ComponentViewModels.FooterViewModels;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Models.Services {
   public class SharedService {
-    private readonly UserManager<IdentityUser> _userManager;
     private readonly ForumDbContext _db;
+    private readonly UserManager<IdentityUser> _userManager;
 
     public SharedService(
       UserManager<IdentityUser> userManager, ForumDbContext db) {
@@ -41,9 +39,12 @@ namespace Forum.Models.Services {
 
     public async Task<FooterVm> GetFooterVmAsync() {
       var mostActiveMembersUsername = await _db.Member.Include(m => m.IdNavigation).OrderByDescending(m =>
-          m.PostCreatedByNavigation.Count + m.ThreadCreatedByNavigation.Count + m.TopicCreatedByNavigation.Count).Where(m => !IsDeletedMember(m.IdNavigation.UserName)).Select(m => m.IdNavigation.UserName).FirstOrDefaultAsync();
+          m.PostCreatedByNavigation.Count + m.ThreadCreatedByNavigation.Count + m.TopicCreatedByNavigation.Count)
+        .Where(m => !IsDeletedMember(m.IdNavigation.UserName)).Select(m => m.IdNavigation.UserName)
+        .FirstOrDefaultAsync();
 
-      var newestMemberUserName = await _db.Member.Include(m => m.IdNavigation).OrderByDescending(m => m.CreatedOn).Select(m =>m.IdNavigation.UserName).FirstOrDefaultAsync();
+      var newestMemberUserName = await _db.Member.Include(m => m.IdNavigation).OrderByDescending(m => m.CreatedOn)
+        .Select(m => m.IdNavigation.UserName).FirstOrDefaultAsync();
 
       return new FooterVm {
         TotalMembers = _userManager.Users.Count(),

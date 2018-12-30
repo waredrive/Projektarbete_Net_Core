@@ -16,8 +16,8 @@ namespace Forum.Models.Services {
   public class PostService {
     private readonly AuthorizationService _authorizationService;
     private readonly ForumDbContext _db;
-    private readonly UserManager<IdentityUser> _userManager;
     private readonly SharedService _sharedService;
+    private readonly UserManager<IdentityUser> _userManager;
 
     public PostService(ForumDbContext db, AuthorizationService authorizationService,
       UserManager<IdentityUser> userManager, SharedService sharedService) {
@@ -43,12 +43,12 @@ namespace Forum.Models.Services {
       await _db.SaveChangesAsync();
     }
 
-    public async Task<PostsIndexVm> GetPostsIndexVmAsync(ClaimsPrincipal user, int threadId, int currentPage, int? postId = null, int pageSize = 15) {
-      var threadFromDb = await _db.Thread.Include(t => t.TopicNavigation).Where(t => t.Id == threadId).FirstOrDefaultAsync();
+    public async Task<PostsIndexVm> GetPostsIndexVmAsync(ClaimsPrincipal user, int threadId, int currentPage,
+      int? postId = null, int pageSize = 15) {
+      var threadFromDb = await _db.Thread.Include(t => t.TopicNavigation).Where(t => t.Id == threadId)
+        .FirstOrDefaultAsync();
 
-      if (postId != null) {
-        currentPage = await FindPageWithPostAsync((int)postId, threadId, pageSize);
-      }
+      if (postId != null) currentPage = await FindPageWithPostAsync((int) postId, threadId, pageSize);
 
       var postsIndexVm = new PostsIndexVm {
         Pager = await GetPaginationVmForPosts(threadId, currentPage, pageSize),
@@ -73,9 +73,8 @@ namespace Forum.Models.Services {
       var page = currentPage;
 
       while (!await _db.Post.OrderBy(t => t.CreatedOn)
-        .Where(p => p.Thread == threadId).Skip((page - 1) * pageSize).Take(pageSize).AnyAsync(p => p.Id == postId)) {
+        .Where(p => p.Thread == threadId).Skip((page - 1) * pageSize).Take(pageSize).AnyAsync(p => p.Id == postId))
         await FindPageWithPostAsync(postId, threadId, pageSize, ++page);
-      }
       return page;
     }
 
@@ -166,7 +165,7 @@ namespace Forum.Models.Services {
         CreatedOn = p.CreatedOn,
         CreatedBy = _userManager.FindByIdAsync(p.CreatedBy).Result.UserName,
         LockedBy = _userManager.FindByIdAsync(p.LockedBy).Result.UserName,
-        LockedOn = (DateTime)p.LockedOn,
+        LockedOn = (DateTime) p.LockedOn,
         PostId = p.Id,
         PostText = p.ContentText
       }).FirstOrDefaultAsync();
@@ -196,8 +195,10 @@ namespace Forum.Models.Services {
       var claimsPrincipalUser = user as ClaimsPrincipal;
       var postFromDb = await _db.Post.FirstOrDefaultAsync(p => p.Id == postId);
 
-      var isAuthorizedForPostEditAndDelete = await _authorizationService.IsAuthorizedForPostEditAndDeleteAsync(postFromDb, claimsPrincipalUser);
-      var isAuthorizedForPostLock = await _authorizationService.IsAuthorizedForPostLockAsync(postFromDb, claimsPrincipalUser);
+      var isAuthorizedForPostEditAndDelete =
+        await _authorizationService.IsAuthorizedForPostEditAndDeleteAsync(postFromDb, claimsPrincipalUser);
+      var isAuthorizedForPostLock =
+        await _authorizationService.IsAuthorizedForPostLockAsync(postFromDb, claimsPrincipalUser);
 
       return new PostOptionsVm {
         ReturnUrl = returnUrl,

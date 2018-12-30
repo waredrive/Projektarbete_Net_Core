@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Forum.Attributes;
 using Forum.Models.Context;
 using Forum.Models.Entities;
 using Forum.Models.Identity;
@@ -19,8 +18,8 @@ namespace Forum.Models.Services {
     private readonly AuthorizationService _authorizationService;
     private readonly ForumDbContext _db;
     private readonly IHostingEnvironment _env;
-    private readonly SharedService _sharedService;
     private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly SharedService _sharedService;
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
 
@@ -61,7 +60,8 @@ namespace Forum.Models.Services {
 
         var member = new Member {
           ProfileImage =
-            await File.ReadAllBytesAsync(_env.WebRootFileProvider.GetFileInfo("img/profile/default_profile.jpg")?.PhysicalPath),
+            await File.ReadAllBytesAsync(_env.WebRootFileProvider.GetFileInfo("img/profile/default_profile.jpg")
+              ?.PhysicalPath),
           Id = user.Id,
           BirthDate = accountRegisterVm.Birthdate,
           FirstName = accountRegisterVm.FirstName,

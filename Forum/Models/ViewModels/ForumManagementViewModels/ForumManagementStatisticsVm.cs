@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Forum.Models.ViewModels.ForumManagementViewModels {
+﻿namespace Forum.Models.ViewModels.ForumManagementViewModels {
   public class ForumManagementStatisticsVm {
     public string UserName { get; set; }
     public int BlockedMembersCount { get; set; }

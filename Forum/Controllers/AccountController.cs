@@ -12,7 +12,8 @@ namespace Forum.Controllers {
     private readonly AuthorizationService _authorizationService;
     private readonly SharedService _sharedService;
 
-    public AccountController(AccountService accountService, AuthorizationService authorizationService, SharedService sharedService) {
+    public AccountController(AccountService accountService, AuthorizationService authorizationService,
+      SharedService sharedService) {
       _accountService = accountService;
       _authorizationService = authorizationService;
       _sharedService = sharedService;
@@ -69,7 +70,8 @@ namespace Forum.Controllers {
         return View(accountLoginVm);
 
       var result = await _accountService.LoginAsync(accountLoginVm);
-      if (result.Succeeded) return Redirect(Url.IsLocalUrl(accountLoginVm.ReturnUrl) ? accountLoginVm.ReturnUrl : "/");
+      if (result.Succeeded)
+        return Redirect(Url.IsLocalUrl(accountLoginVm.ReturnUrl) ? accountLoginVm.ReturnUrl : "/");
 
       ModelState.AddModelError(string.Empty, "Invalid login attempt.");
 
@@ -118,12 +120,12 @@ namespace Forum.Controllers {
         return View(accountEditVm);
       }
 
-      return RedirectToAction(nameof(Details), new { returnUrl });
+      return RedirectToAction(nameof(Details), new {returnUrl});
     }
 
     [Route("Update/Password/{username}")]
     [HttpGet]
-    public async Task<IActionResult> EditPassword(string username, string returnUrl= null) {
+    public async Task<IActionResult> EditPassword(string username, string returnUrl = null) {
       ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
@@ -137,7 +139,8 @@ namespace Forum.Controllers {
     [Route("Update/Password/{username}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> EditPassword(string username, AccountPasswordEditVm accountPasswordEditVm, string returnUrl) {
+    public async Task<IActionResult> EditPassword(string username, AccountPasswordEditVm accountPasswordEditVm,
+      string returnUrl) {
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -155,7 +158,7 @@ namespace Forum.Controllers {
         return View(accountPasswordEditVm);
       }
 
-      return RedirectToAction(nameof(Details), new { username });
+      return RedirectToAction(nameof(Details), new {username});
     }
 
     [Route("Details/{username}")]

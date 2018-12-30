@@ -12,21 +12,21 @@ using Forum.Models.ViewModels.ProfileViewModels;
 using Forum.Validations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Models.Services {
   public class ProfileService {
     private readonly AuthorizationService _authorizationService;
-    private readonly SharedService _sharedService;
     private readonly ForumDbContext _db;
     private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly SharedService _sharedService;
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly UserManager<IdentityUser> _userManager;
 
     public ProfileService(
       UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager,
-      SignInManager<IdentityUser> signInManager, ForumDbContext db, AuthorizationService authorizationService, SharedService sharedService) {
+      SignInManager<IdentityUser> signInManager, ForumDbContext db, AuthorizationService authorizationService,
+      SharedService sharedService) {
       _userManager = userManager;
       _roleManager = roleManager;
       _signInManager = signInManager;
@@ -43,7 +43,7 @@ namespace Forum.Models.Services {
       var roles = await _userManager.GetRolesAsync(identityUser);
 
       return new ProfileDetailsVm {
-        ProfileImage = await  _sharedService.GetProfileImageStringByMemberIdAsync(memberFromDb.Id),
+        ProfileImage = await _sharedService.GetProfileImageStringByMemberIdAsync(memberFromDb.Id),
         Username = identityUser.UserName,
         Roles = roles.ToArray(),
         CreatedOn = memberFromDb.CreatedOn,
@@ -55,7 +55,7 @@ namespace Forum.Models.Services {
       };
     }
 
-    public async Task<ProfileRemovedVm>GetProfileRemovedVmAsync() {
+    public async Task<ProfileRemovedVm> GetProfileRemovedVmAsync() {
       return new ProfileRemovedVm {
         ProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(DeletedMember.Username),
         Username = DeletedMember.Username,
@@ -130,7 +130,8 @@ namespace Forum.Models.Services {
       };
     }
 
-    public async Task<CustomValidationResult> BlockAsync(string username, ProfileBlockVm profileBlockVm, ClaimsPrincipal user) {
+    public async Task<CustomValidationResult> BlockAsync(string username, ProfileBlockVm profileBlockVm,
+      ClaimsPrincipal user) {
       var validationResult = new CustomValidationResult();
 
       var identityUser = await _userManager.FindByNameAsync(username);
@@ -283,7 +284,8 @@ namespace Forum.Models.Services {
         await _authorizationService.IsAuthorizedForAccountAndProfileEditAsync(username, claimsPrincipalUser);
       var isAuthorizedForProfileDelete =
         await _authorizationService.IsAuthorizedForProfileDeleteAsync(username, claimsPrincipalUser);
-      var isAuthorizedProfileBlock = await _authorizationService.IsAuthorizedProfileBlockAsync(username, claimsPrincipalUser);
+      var isAuthorizedProfileBlock =
+        await _authorizationService.IsAuthorizedProfileBlockAsync(username, claimsPrincipalUser);
       var isAuthorizedProfileChangeRole =
         await _authorizationService.IsAuthorizedProfileChangeRoleAsync(username, claimsPrincipalUser);
 

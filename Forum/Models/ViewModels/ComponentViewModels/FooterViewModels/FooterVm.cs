@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Forum.Models.ViewModels.ComponentViewModels.FooterViewModels {
+﻿namespace Forum.Models.ViewModels.ComponentViewModels.FooterViewModels {
   public class FooterVm {
     public int TotalPosts { get; set; }
     public int TotalMembers { get; set; }

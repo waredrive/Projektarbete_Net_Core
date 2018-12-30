@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Forum.Models.Pagination;
 
 namespace Forum.Models.ViewModels.ThreadViewModels {
   public class ThreadsIndexVm {
@@ -9,7 +9,7 @@ namespace Forum.Models.ViewModels.ThreadViewModels {
     public bool IsTopicLocked { get; set; }
     public bool IsAuthorizedForThreadCreate { get; set; }
     public List<ThreadsIndexThreadVm> Threads { get; set; }
-    public Pagination.Pager Pager { get; set; }
+    public Pager Pager { get; set; }
   }
 
   public class ThreadsIndexThreadVm {
@@ -23,5 +23,4 @@ namespace Forum.Models.ViewModels.ThreadViewModels {
     public string LockedBy { get; set; }
     public int PostCount { get; set; }
   }
-
 }

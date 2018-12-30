@@ -14,8 +14,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Forum.Models.Services {
   public class TopicService {
     private readonly AuthorizationService _authorizationService;
-    private readonly SharedService _sharedService;
     private readonly ForumDbContext _db;
+    private readonly SharedService _sharedService;
     private readonly UserManager<IdentityUser> _userManager;
 
     public TopicService(ForumDbContext db, UserManager<IdentityUser> userManager,
@@ -53,15 +53,13 @@ namespace Forum.Models.Services {
       foreach (var topic in topics)
         topicsIndexVm.Topics.Add(await GetTopicsIndexTopicVmAsync(topic, user));
 
-      var latestThreads = await _db.Thread.Include(t => t.Post).OrderByDescending(t => t.CreatedOn).Take(10).ToListAsync();
-      foreach (var thread in latestThreads) {
+      var latestThreads =
+        await _db.Thread.Include(t => t.Post).OrderByDescending(t => t.CreatedOn).Take(10).ToListAsync();
+      foreach (var thread in latestThreads)
         topicsIndexVm.LatestThreads.Add(await GetTopicIndexLatestThreadVmAsync(thread));
-      }
 
       var latestPosts = await _db.Post.OrderByDescending(p => p.CreatedOn).Take(10).ToListAsync();
-      foreach (var post in latestPosts) {
-        topicsIndexVm.LatestPosts.Add(await GetTopicIndexPostVmAsync(post));
-      }
+      foreach (var post in latestPosts) topicsIndexVm.LatestPosts.Add(await GetTopicIndexPostVmAsync(post));
 
       return topicsIndexVm;
     }
@@ -72,7 +70,9 @@ namespace Forum.Models.Services {
         .OrderByDescending(p => p.CreatedOn).FirstOrDefaultAsync();
 
       return new TopicsIndexTopicVm {
-        LatestThreadPostedTo = mostRecentPostInTopic != null ? await GetTopicIndexThreadVmAsync(mostRecentPostInTopic) : null,
+        LatestThreadPostedTo = mostRecentPostInTopic != null
+          ? await GetTopicIndexThreadVmAsync(mostRecentPostInTopic)
+          : null,
         TopicId = topic.Id,
         TopicText = topic.ContentText,
         ThreadCount = topic.Thread.Count,
@@ -94,10 +94,11 @@ namespace Forum.Models.Services {
     }
 
     private async Task<TopicsIndexThreadVm> GetTopicIndexThreadVmAsync(Post mostRecentPostInTopic) {
-      var latestPostInThreadCreator =  await _userManager.FindByIdAsync(mostRecentPostInTopic.CreatedBy);
+      var latestPostInThreadCreator = await _userManager.FindByIdAsync(mostRecentPostInTopic.CreatedBy);
 
       return new TopicsIndexThreadVm {
-        LatestCommenterProfileImage =  await _sharedService.GetProfileImageStringByMemberIdAsync(mostRecentPostInTopic.CreatedBy),
+        LatestCommenterProfileImage =
+          await _sharedService.GetProfileImageStringByMemberIdAsync(mostRecentPostInTopic.CreatedBy),
         ThreadId = mostRecentPostInTopic.ThreadNavigation.Id,
         ThreadText = mostRecentPostInTopic.ThreadNavigation.ContentText,
         LatestCommenter = latestPostInThreadCreator?.UserName,
@@ -138,7 +139,7 @@ namespace Forum.Models.Services {
       await _db.SaveChangesAsync();
     }
 
-    public async Task<TopicDeleteVm>GetTopicDeleteVmAsync(int id) {
+    public async Task<TopicDeleteVm> GetTopicDeleteVmAsync(int id) {
       var topic = await _db.Topic.Include(t => t.Thread).Where(t => t.Id == id).FirstOrDefaultAsync();
       var createdBy = await _userManager.FindByIdAsync(topic.CreatedBy);
 
@@ -161,7 +162,8 @@ namespace Forum.Models.Services {
           _db.Topic.Remove(topicFromDb);
           await _db.SaveChangesAsync();
           transaction.Commit();
-        } catch (Exception) {
+        }
+        catch (Exception) {
           transaction.Rollback();
         }
       }
@@ -198,13 +200,13 @@ namespace Forum.Models.Services {
       var createdBy = await _userManager.FindByIdAsync(topic.CreatedBy);
       var lockedBy = await _userManager.FindByIdAsync(topic.LockedBy);
 
-      return  new TopicUnlockVm {
+      return new TopicUnlockVm {
         CreatedOn = topic.CreatedOn,
         CreatedBy = createdBy.UserName,
         ThreadCount = topic.Thread.Count,
         PostCount = _db.Post.Count(p => p.ThreadNavigation.Topic == topic.Id),
         LockedBy = lockedBy.UserName,
-        LockedOn = (DateTime)topic.LockedOn,
+        LockedOn = (DateTime) topic.LockedOn,
         TopicId = topic.Id,
         TopicText = topic.ContentText
       };

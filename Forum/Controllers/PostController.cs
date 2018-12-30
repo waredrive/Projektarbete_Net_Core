@@ -129,7 +129,7 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (_postService.IsPostLocked(id))
-        return RedirectToAction(nameof(Unlock), new { returnUrl });
+        return RedirectToAction(nameof(Unlock), new {returnUrl});
 
       return View(await _postService.GetPostLockVm(id));
     }
@@ -167,7 +167,7 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (!_postService.IsPostLocked(id))
-        return RedirectToAction(nameof(Lock), new { returnUrl });
+        return RedirectToAction(nameof(Lock), new {returnUrl});
 
       return View(await _postService.GetPostUnlockVm(id));
     }

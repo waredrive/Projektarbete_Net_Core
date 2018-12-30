@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -7,7 +6,6 @@ using Forum.Models.Context;
 using Forum.Models.Entities;
 using Forum.Models.Pagination;
 using Forum.Models.ViewModels.ForumManagementViewModels;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +17,8 @@ namespace Forum.Models.Services {
     private readonly UserManager<IdentityUser> _userManager;
 
     public ForumManagementService(
-      UserManager<IdentityUser> userManager, ForumDbContext db, AuthorizationService authorizationService, SharedService sharedService) {
+      UserManager<IdentityUser> userManager, ForumDbContext db, AuthorizationService authorizationService,
+      SharedService sharedService) {
       _userManager = userManager;
       _db = db;
       _authorizationService = authorizationService;
@@ -41,11 +40,13 @@ namespace Forum.Models.Services {
       };
 
       forumManagementIndexVm.LatestLockedTopics =
-        await GetForumManagementLockedTopicVmsAsync(allLockedTopics.OrderByDescending(t => t.LockedOn).Take(10).ToList(),
+        await GetForumManagementLockedTopicVmsAsync(
+          allLockedTopics.OrderByDescending(t => t.LockedOn).Take(10).ToList(),
           user);
 
       forumManagementIndexVm.LatestLockedThreads =
-        await GetForumManagementLockedThreadVmsAsync(allLockedThreads.OrderByDescending(t => t.LockedOn).Take(10).ToList(),
+        await GetForumManagementLockedThreadVmsAsync(
+          allLockedThreads.OrderByDescending(t => t.LockedOn).Take(10).ToList(),
           user);
 
       forumManagementIndexVm.LatestLockedPosts =
@@ -75,7 +76,8 @@ namespace Forum.Models.Services {
       };
     }
 
-    private async Task<List<ForumManagementLockedTopicVm>> GetForumManagementLockedTopicVmsAsync(List<Topic> lockedTopics,
+    private async Task<List<ForumManagementLockedTopicVm>> GetForumManagementLockedTopicVmsAsync(
+      List<Topic> lockedTopics,
       ClaimsPrincipal user) {
       var topics = new List<ForumManagementLockedTopicVm>();
 
@@ -146,7 +148,8 @@ namespace Forum.Models.Services {
           LockedOn = post.LockedOn,
           CreatedBy = createdBy.UserName,
           ThreadText = post.ThreadNavigation.ContentText,
-          IsAuthorizedForPostEditAndDelete = await _authorizationService.IsAuthorizedForPostEditAndDeleteAsync(post, user),
+          IsAuthorizedForPostEditAndDelete =
+            await _authorizationService.IsAuthorizedForPostEditAndDeleteAsync(post, user),
           IsAuthorizedForPostLock = await _authorizationService.IsAuthorizedForPostLockAsync(post, user)
         });
       }
@@ -178,7 +181,8 @@ namespace Forum.Models.Services {
             await _authorizationService.IsAuthorizedForAccountAndProfileEditAsync(identityUser.UserName, user),
           IsAuthorizedForProfileDelete =
             await _authorizationService.IsAuthorizedForProfileDeleteAsync(identityUser.UserName, user),
-          IsAuthorizedProfileBlock = await _authorizationService.IsAuthorizedProfileBlockAsync(identityUser.UserName, user),
+          IsAuthorizedProfileBlock =
+            await _authorizationService.IsAuthorizedProfileBlockAsync(identityUser.UserName, user),
           IsAuthorizedProfileChangeRole =
             await _authorizationService.IsAuthorizedProfileChangeRoleAsync(identityUser.UserName, user)
         });
@@ -187,15 +191,18 @@ namespace Forum.Models.Services {
       return members;
     }
 
-    public async Task<ForumManagementLockedTopicsVm> GetForumManagementLockedTopicsVmAsync(ClaimsPrincipal user, int currentPage, string username = null, int pageSize = 20) {
-      var lockedTopics  = new List<Topic>();
+    public async Task<ForumManagementLockedTopicsVm> GetForumManagementLockedTopicsVmAsync(ClaimsPrincipal user,
+      int currentPage, string username = null, int pageSize = 20) {
+      var lockedTopics = new List<Topic>();
       IdentityUser identityUser = null;
 
       if (username != null) {
-       identityUser = await _userManager.FindByNameAsync(username);
-        lockedTopics = await _db.Topic.Where(t => t.LockedBy == identityUser.Id).OrderBy(t => t.LockedOn).Skip((currentPage - 1) * pageSize).Take(pageSize).ToListAsync();
+        identityUser = await _userManager.FindByNameAsync(username);
+        lockedTopics = await _db.Topic.Where(t => t.LockedBy == identityUser.Id).OrderBy(t => t.LockedOn)
+          .Skip((currentPage - 1) * pageSize).Take(pageSize).ToListAsync();
       } else {
-        lockedTopics = await _db.Topic.Where(t => t.LockedBy != null).OrderBy(t => t.LockedOn).Skip((currentPage - 1) * pageSize).Take(pageSize).ToListAsync();
+        lockedTopics = await _db.Topic.Where(t => t.LockedBy != null).OrderBy(t => t.LockedOn)
+          .Skip((currentPage - 1) * pageSize).Take(pageSize).ToListAsync();
       }
 
       return new ForumManagementLockedTopicsVm {
@@ -211,15 +218,18 @@ namespace Forum.Models.Services {
       return new Pager(totalItems, currentPage, pageSize);
     }
 
-    public async Task<ForumManagementLockedThreadsVm> GetForumManagementLockedThreadsVmAsync(ClaimsPrincipal user, int currentPage, string username = null, int pageSize = 20) {
+    public async Task<ForumManagementLockedThreadsVm> GetForumManagementLockedThreadsVmAsync(ClaimsPrincipal user,
+      int currentPage, string username = null, int pageSize = 20) {
       var lockedThreads = new List<Thread>();
       IdentityUser identityUser = null;
 
       if (username != null) {
         identityUser = await _userManager.FindByNameAsync(username);
-        lockedThreads = await _db.Thread.Where(t => t.LockedBy == identityUser.Id).OrderBy(t => t.LockedOn).Skip((currentPage - 1) * pageSize).Take(pageSize).ToListAsync();
+        lockedThreads = await _db.Thread.Where(t => t.LockedBy == identityUser.Id).OrderBy(t => t.LockedOn)
+          .Skip((currentPage - 1) * pageSize).Take(pageSize).ToListAsync();
       } else {
-        lockedThreads = await _db.Thread.Where(t => t.LockedBy != null).OrderBy(t => t.LockedOn).Skip((currentPage - 1) * pageSize).Take(pageSize).ToListAsync();
+        lockedThreads = await _db.Thread.Where(t => t.LockedBy != null).OrderBy(t => t.LockedOn)
+          .Skip((currentPage - 1) * pageSize).Take(pageSize).ToListAsync();
       }
 
       return new ForumManagementLockedThreadsVm {
@@ -235,15 +245,18 @@ namespace Forum.Models.Services {
       return new Pager(totalItems, currentPage, pageSize);
     }
 
-    public async Task<ForumManagementLockedPostsVm> GetForumManagementLockedPostsVmAsync(ClaimsPrincipal user, int currentPage, string username = null, int pageSize = 20) {
+    public async Task<ForumManagementLockedPostsVm> GetForumManagementLockedPostsVmAsync(ClaimsPrincipal user,
+      int currentPage, string username = null, int pageSize = 20) {
       var lockedPosts = new List<Post>();
       IdentityUser identityUser = null;
 
       if (username != null) {
         identityUser = await _userManager.FindByNameAsync(username);
-        lockedPosts = await _db.Post.Include(p => p.ThreadNavigation).Where(p => p.LockedBy == identityUser.Id).OrderBy(p => p.LockedOn).Skip((currentPage - 1) * pageSize).Take(pageSize).ToListAsync();
+        lockedPosts = await _db.Post.Include(p => p.ThreadNavigation).Where(p => p.LockedBy == identityUser.Id)
+          .OrderBy(p => p.LockedOn).Skip((currentPage - 1) * pageSize).Take(pageSize).ToListAsync();
       } else {
-        lockedPosts = await _db.Post.Include(p => p.ThreadNavigation).Where(p => p.LockedBy != null).OrderBy(p => p.LockedOn).Skip((currentPage - 1) * pageSize).Take(pageSize).ToListAsync();
+        lockedPosts = await _db.Post.Include(p => p.ThreadNavigation).Where(p => p.LockedBy != null)
+          .OrderBy(p => p.LockedOn).Skip((currentPage - 1) * pageSize).Take(pageSize).ToListAsync();
       }
 
       return new ForumManagementLockedPostsVm {
@@ -259,15 +272,18 @@ namespace Forum.Models.Services {
       return new Pager(totalItems, currentPage, pageSize);
     }
 
-    public async Task<ForumManagementBlockedMembersVm> GetForumManagementBlockedMembersVmAsync(ClaimsPrincipal user, int currentPage, string username = null, int pageSize = 20) {
+    public async Task<ForumManagementBlockedMembersVm> GetForumManagementBlockedMembersVmAsync(ClaimsPrincipal user,
+      int currentPage, string username = null, int pageSize = 20) {
       var blockedMembers = new List<Member>();
       IdentityUser identityUser = null;
 
       if (username != null) {
         identityUser = await _userManager.FindByNameAsync(username);
-        blockedMembers = await _db.Member.Where(m => m.BlockedBy == identityUser.Id).OrderBy(m => m.BlockedOn).Skip((currentPage - 1) * pageSize).Take(pageSize).ToListAsync();
+        blockedMembers = await _db.Member.Where(m => m.BlockedBy == identityUser.Id).OrderBy(m => m.BlockedOn)
+          .Skip((currentPage - 1) * pageSize).Take(pageSize).ToListAsync();
       } else {
-        blockedMembers = await _db.Member.Where(m => m.BlockedBy != null).OrderBy(m => m.BlockedOn).Skip((currentPage - 1) * pageSize).Take(pageSize).ToListAsync();
+        blockedMembers = await _db.Member.Where(m => m.BlockedBy != null).OrderBy(m => m.BlockedOn)
+          .Skip((currentPage - 1) * pageSize).Take(pageSize).ToListAsync();
       }
 
       return new ForumManagementBlockedMembersVm {

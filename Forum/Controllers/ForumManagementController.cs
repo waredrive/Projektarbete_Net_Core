@@ -7,8 +7,8 @@ namespace Forum.Controllers {
   [ForumManagementAuthorize]
   [Route("Manage")]
   public class ForumManagementController : Controller {
-    private readonly SharedService _sharedService;
     private readonly ForumManagementService _forumManagementService;
+    private readonly SharedService _sharedService;
 
     public ForumManagementController(ForumManagementService forumManagementService, SharedService sharedService) {
       _forumManagementService = forumManagementService;
@@ -29,6 +29,7 @@ namespace Forum.Controllers {
 
       return View(await _forumManagementService.GetForumManagementLockedTopicsVmAsync(User, page, username));
     }
+
     [Route("Locked/Topics/All")]
     [HttpGet]
     public async Task<IActionResult> LockedTopicsAll(int page = 1) {
