@@ -76,7 +76,7 @@ namespace Forum.Models.Services {
         TopicId = topic.Id,
         TopicText = topic.ContentText,
         ThreadCount = topic.Thread.Count,
-        PostCount = topic.Thread.Select(tt => tt.Post.Count).Sum(),
+        PostCount = _db.Post.Count(p => p.ThreadNavigation.Topic == topic.Id),
         LockedBy = lockedBy?.UserName
       };
     }
