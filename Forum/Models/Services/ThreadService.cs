@@ -6,8 +6,8 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Forum.Models.Context;
 using Forum.Models.Entities;
+using Forum.Models.Pagination;
 using Forum.Models.ViewModels.ComponentViewModels.ThreadOptionsViewModels;
-using Forum.Models.ViewModels.SharedViewModels.PaginationViewModels;
 using Forum.Models.ViewModels.ThreadViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -64,7 +64,7 @@ namespace Forum.Models.Services {
       var topicFromDb = await _db.Topic.Where(t => t.Id == topicId).FirstOrDefaultAsync();
 
       var threadsIndexVm = new ThreadsIndexVm {
-        Pagination = await GetPaginationVmForThreads(topicId, currentPage, pageSize),
+        Pager = await GetPaginationVmForThreads(topicId, currentPage, pageSize),
         TopicId = topicFromDb.Id,
         TopicText = topicFromDb.ContentText,
         IsTopicLocked = topicFromDb.LockedBy != null,
@@ -81,12 +81,9 @@ namespace Forum.Models.Services {
       return threadsIndexVm;
     }
 
-    private async Task<PaginationVm> GetPaginationVmForThreads(int topicId, int currentPage, int pageSize) {
-      return new PaginationVm {
-        Count = await _db.Thread.Where(t => t.Topic == topicId).CountAsync(),
-        CurrentPage = currentPage,
-        PageSize = pageSize
-      };
+    private async Task<Pager> GetPaginationVmForThreads(int topicId, int currentPage, int pageSize) {
+      var totalItems = await _db.Thread.Where(t => t.Topic == topicId).CountAsync();
+      return new Pager(totalItems, currentPage, pageSize);
     }
 
     private async Task<ThreadsIndexThreadVm> GetThreadsIndexThreadVmAsync(Thread thread, ClaimsPrincipal user) {

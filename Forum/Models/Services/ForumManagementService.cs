@@ -5,8 +5,8 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Forum.Models.Context;
 using Forum.Models.Entities;
+using Forum.Models.Pagination;
 using Forum.Models.ViewModels.ForumManagementViewModels;
-using Forum.Models.ViewModels.SharedViewModels.PaginationViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -199,19 +199,16 @@ namespace Forum.Models.Services {
       }
 
       return new ForumManagementLockedTopicsVm {
-        Pagination = await GetPaginationVmForLockedTopics(currentPage, pageSize),
+        Pager = await GetPaginationVmForLockedTopics(currentPage, pageSize),
         UserName = identityUser?.UserName ?? user.Identity.Name,
         Statistics = await GetForumManagementStatisticsVmAsync(identityUser?.UserName ?? user.Identity.Name),
         LockedTopics = await GetForumManagementLockedTopicVmsAsync(lockedTopics, user)
       };
     }
 
-    private async Task<PaginationVm> GetPaginationVmForLockedTopics(int currentPage, int pageSize) {
-      return new PaginationVm {
-        Count = await _db.Topic.Where(t => t.LockedBy != null).CountAsync(),
-        CurrentPage = currentPage,
-        PageSize = pageSize
-      };
+    private async Task<Pager> GetPaginationVmForLockedTopics(int currentPage, int pageSize) {
+      var totalItems = await _db.Topic.Where(t => t.LockedBy != null).CountAsync();
+      return new Pager(totalItems, currentPage, pageSize);
     }
 
     public async Task<ForumManagementLockedThreadsVm> GetForumManagementLockedThreadsVmAsync(ClaimsPrincipal user, int currentPage, string username = null, int pageSize = 20) {
@@ -226,19 +223,16 @@ namespace Forum.Models.Services {
       }
 
       return new ForumManagementLockedThreadsVm {
-        Pagination = await GetPaginationVmForLockedThreads(currentPage, pageSize),
+        Pager = await GetPaginationVmForLockedThreads(currentPage, pageSize),
         UserName = identityUser?.UserName ?? user.Identity.Name,
         Statistics = await GetForumManagementStatisticsVmAsync(identityUser?.UserName ?? user.Identity.Name),
         LockedThreads = await GetForumManagementLockedThreadVmsAsync(lockedThreads, user)
       };
     }
 
-    private async Task<PaginationVm> GetPaginationVmForLockedThreads(int currentPage, int pageSize) {
-      return new PaginationVm {
-        Count = await _db.Thread.Where(t => t.LockedBy != null).CountAsync(),
-        CurrentPage = currentPage,
-        PageSize = pageSize
-      };
+    private async Task<Pager> GetPaginationVmForLockedThreads(int currentPage, int pageSize) {
+      var totalItems = await _db.Thread.Where(t => t.LockedBy != null).CountAsync();
+      return new Pager(totalItems, currentPage, pageSize);
     }
 
     public async Task<ForumManagementLockedPostsVm> GetForumManagementLockedPostsVmAsync(ClaimsPrincipal user, int currentPage, string username = null, int pageSize = 20) {
@@ -253,19 +247,16 @@ namespace Forum.Models.Services {
       }
 
       return new ForumManagementLockedPostsVm {
-        Pagination = await GetPaginationVmForLockedPosts(currentPage, pageSize),
+        Pager = await GetPaginationVmForLockedPosts(currentPage, pageSize),
         UserName = identityUser?.UserName ?? user.Identity.Name,
         Statistics = await GetForumManagementStatisticsVmAsync(identityUser?.UserName ?? user.Identity.Name),
         LockedPosts = await GetForumManagementLockedPostVmsAsync(lockedPosts, user)
       };
     }
 
-    private async Task<PaginationVm> GetPaginationVmForLockedPosts(int currentPage, int pageSize) {
-      return new PaginationVm {
-        Count = await _db.Post.Where(p => p.LockedBy != null).CountAsync(),
-        CurrentPage = currentPage,
-        PageSize = pageSize
-      };
+    private async Task<Pager> GetPaginationVmForLockedPosts(int currentPage, int pageSize) {
+      var totalItems = await _db.Post.Where(p => p.LockedBy != null).CountAsync();
+      return new Pager(totalItems, currentPage, pageSize);
     }
 
     public async Task<ForumManagementBlockedMembersVm> GetForumManagementBlockedMembersVmAsync(ClaimsPrincipal user, int currentPage, string username = null, int pageSize = 20) {
@@ -280,19 +271,16 @@ namespace Forum.Models.Services {
       }
 
       return new ForumManagementBlockedMembersVm {
-        Pagination = await GetPaginationVmForBlockedMembers(currentPage, pageSize),
+        Pager = await GetPaginationVmForBlockedMembers(currentPage, pageSize),
         UserName = identityUser?.UserName ?? user.Identity.Name,
         Statistics = await GetForumManagementStatisticsVmAsync(identityUser?.UserName ?? user.Identity.Name),
         BlockedMembers = await GetForumManagementBlockedMemberVmsAsync(blockedMembers, user)
       };
     }
 
-    private async Task<PaginationVm> GetPaginationVmForBlockedMembers(int currentPage, int pageSize) {
-      return new PaginationVm {
-        Count = await _db.Member.Where(m => m.BlockedBy != null).CountAsync(),
-        CurrentPage = currentPage,
-        PageSize = pageSize
-      };
+    private async Task<Pager> GetPaginationVmForBlockedMembers(int currentPage, int pageSize) {
+      var totalItems = await _db.Member.Where(m => m.BlockedBy != null).CountAsync();
+      return new Pager(totalItems, currentPage, pageSize);
     }
   }
 }

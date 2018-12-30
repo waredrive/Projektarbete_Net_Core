@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Forum.Attributes;
+using Forum.Models.Identity;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.PostViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -25,6 +26,7 @@ namespace Forum.Controllers {
     public async Task<IActionResult> Index(int threadId, int page = 1) {
       if (!_threadService.DoesThreadExist(threadId))
         return NotFound();
+      // TODO: Add post id to search
 
       return View(await _postService.GetPostsIndexVmAsync(User, threadId, page));
     }

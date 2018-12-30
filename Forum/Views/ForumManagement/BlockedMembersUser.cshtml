@@ -9,7 +9,7 @@
         <div class="col-md-12">
           <h4 class="text-center text-light mb-3">Members Blocked By @Model.UserName @if (Model.UserName == User.Identity.Name) {<span>(You)</span>}</h4>
           <partial name="_BlockedMembersTablePartial" for="@Model.BlockedMembers" />
-          <partial name="_PaginationPartial" for="@Model.Pagination"/>
+          <partial name="_PaginationPartial" for="@Model.Pager"/>
         </div>
       </div>
     </div>

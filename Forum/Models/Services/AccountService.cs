@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Forum.Attributes;
 using Forum.Models.Context;
 using Forum.Models.Entities;
+using Forum.Models.Identity;
 using Forum.Models.ViewModels.AccountViewModels;
 using Forum.Validations;
 using Microsoft.AspNetCore.Hosting;

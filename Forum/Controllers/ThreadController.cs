@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Forum.Attributes;
+using Forum.Models.Identity;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.ThreadViewModels;
 using Microsoft.AspNetCore.Authorization;

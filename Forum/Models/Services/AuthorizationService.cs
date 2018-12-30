@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Forum.Attributes;
 using Forum.Models.Context;
 using Forum.Models.Entities;
+using Forum.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

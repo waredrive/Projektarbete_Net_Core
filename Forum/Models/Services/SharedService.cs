@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Forum.Models.Context;
 using Forum.Models.ViewModels.ComponentViewModels.FooterViewModels;
-using Forum.Models.ViewModels.SharedViewModels.PaginationViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

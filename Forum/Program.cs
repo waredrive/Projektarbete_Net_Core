@@ -9,8 +9,9 @@ namespace Forum {
 
     //TODO: Add visual indicator in Topic/Thread/Post that it is blocked. - beside the name
     //TODO: Relocate the edit/lock/delete buttons that are showing beside the thread/topic names.
-    //TODO: Create Partial views.
     //TODO: When going to specific post id, make it so you go there with pagination enabled. Now you can only go to the first page.
+    //TODO: Allow bigger pictures but must be square.
+    //TODO: Create Partial views.
     //TODO: Add confirmations when adding, deleting, editing, etc. Maybe modal?
     //TODO: Add custom messages to AccessDenied (Use TempData).
     //TODO: There are som redundant ReturnUrl in code. Remove or use!
@@ -19,7 +20,7 @@ namespace Forum {
     //TODO: Add Typeahead with ajax call for searching.
     //TODO: Add seed of Default deleted user if possible?
     //TODO: Add deletion timeout for posts and threads?
-    //TODO: Add SuperAdmin?
+    //TODO: Add SuperAdmin? - if so Admin cannot add SuperAdmin role
     //TODO: Add areas?
     //TODO: REFACTORING!!! - Check if all async methods are ending with Async
 
