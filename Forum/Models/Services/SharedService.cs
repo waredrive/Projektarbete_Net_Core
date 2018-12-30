@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Forum.Models.Context;
+using Forum.Models.Identity;
 using Forum.Models.ViewModels.ComponentViewModels.FooterViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -39,17 +40,21 @@ namespace Forum.Models.Services {
     }
 
     public async Task<FooterVm> GetFooterVmAsync() {
-      var mostActiveMemberId = _db.Member.Where(m => !m.IsInternal).OrderByDescending(m =>
-          m.PostCreatedByNavigation.Count + m.ThreadCreatedByNavigation.Count + m.TopicCreatedByNavigation.Count)
-        .Select(m => m.Id).First();
-      var newestMemberId = _db.Member.OrderByDescending(m => m.CreatedOn).First().Id;
+      var mostActiveMembersUsername = await _db.Member.Include(m => m.IdNavigation).OrderByDescending(m =>
+          m.PostCreatedByNavigation.Count + m.ThreadCreatedByNavigation.Count + m.TopicCreatedByNavigation.Count).Where(m => !IsDeletedMember(m.IdNavigation.UserName)).Select(m => m.IdNavigation.UserName).FirstOrDefaultAsync();
+
+      var newestMemberUserName = await _db.Member.Include(m => m.IdNavigation).OrderByDescending(m => m.CreatedOn).Select(m =>m.IdNavigation.UserName).FirstOrDefaultAsync();
 
       return new FooterVm {
         TotalMembers = _userManager.Users.Count(),
         TotalPosts = _db.Post.Count(),
-        MostActiveMember = (await _userManager.FindByIdAsync(mostActiveMemberId)).UserName,
-        NewestMember = (await _userManager.FindByIdAsync(newestMemberId)).UserName
+        MostActiveMember = mostActiveMembersUsername,
+        NewestMember = newestMemberUserName
       };
+    }
+
+    public bool IsDeletedMember(string username) {
+      return string.Equals(username, DeletedMember.Username, StringComparison.CurrentCultureIgnoreCase);
     }
   }
 }

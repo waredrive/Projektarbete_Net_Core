@@ -5,12 +5,14 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Forum.Models.Context;
+using Forum.Models.Identity;
 using Forum.Models.ViewModels.ComponentViewModels.MemberOptionsViewModels;
 using Forum.Models.ViewModels.ComponentViewModels.NavbarViewModels;
 using Forum.Models.ViewModels.ProfileViewModels;
 using Forum.Validations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 
 namespace Forum.Models.Services {
@@ -41,7 +43,7 @@ namespace Forum.Models.Services {
       var roles = await _userManager.GetRolesAsync(identityUser);
 
       return new ProfileDetailsVm {
-        ProfileImage = Convert.ToBase64String(memberFromDb.ProfileImage),
+        ProfileImage = await  _sharedService.GetProfileImageStringByMemberIdAsync(memberFromDb.Id),
         Username = identityUser.UserName,
         Roles = roles.ToArray(),
         CreatedOn = memberFromDb.CreatedOn,
@@ -52,6 +54,15 @@ namespace Forum.Models.Services {
         TotalPosts = memberFromDb.PostCreatedByNavigation.Count
       };
     }
+
+    public async Task<ProfileRemovedVm>GetProfileRemovedVmAsync() {
+      return new ProfileRemovedVm {
+        ProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(DeletedMember.Username),
+        Username = DeletedMember.Username,
+        Message = "This profile has been removed"
+      };
+    }
+
 
     public async Task<ProfileEditVm> GetProfileEditVmAsync(string oldUsername) {
       var identityUser = await _userManager.FindByNameAsync(oldUsername);
@@ -66,7 +77,7 @@ namespace Forum.Models.Services {
       var oldUserName = identityUser.UserName;
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
 
-      if (memberFromDb.IsInternal)
+      if (_sharedService.IsDeletedMember(identityUser.UserName))
         return IdentityResult.Failed(new IdentityError {Description = "This member cannot be edited"});
 
       var result = await _userManager.SetUserNameAsync(identityUser, profileEditVm.NewUsername);
@@ -125,7 +136,7 @@ namespace Forum.Models.Services {
       var identityUser = await _userManager.FindByNameAsync(username);
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
 
-      if (memberFromDb.IsInternal) {
+      if (_sharedService.IsDeletedMember(identityUser.UserName)) {
         validationResult.Errors.Add("This profile cannot be blocked.");
         return validationResult;
       }
@@ -162,7 +173,7 @@ namespace Forum.Models.Services {
       };
     }
 
-    public async Task UnblockAsync(string username, ProfileUnblockVm profileUnblockVm, ClaimsPrincipal user) {
+    public async Task UnblockAsync(string username) {
       var identityUser = await _userManager.FindByNameAsync(username);
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
 
@@ -175,11 +186,10 @@ namespace Forum.Models.Services {
 
     public async Task UpdateProfileRoleAsync(string username, ProfileRoleEditVm profileRoleEditVm) {
       var identityUser = await _userManager.FindByNameAsync(username);
-      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
       var oldRoles = await _userManager.GetRolesAsync(identityUser);
 
       try {
-        if (!string.IsNullOrEmpty(profileRoleEditVm.Role) && !memberFromDb.IsInternal) {
+        if (!string.IsNullOrEmpty(profileRoleEditVm.Role) && !_sharedService.IsDeletedMember(identityUser.UserName)) {
           await _userManager.RemoveFromRolesAsync(identityUser, oldRoles.ToArray());
           await _userManager.AddToRoleAsync(identityUser, profileRoleEditVm.Role);
           await _db.SaveChangesAsync();
@@ -215,7 +225,7 @@ namespace Forum.Models.Services {
     }
 
     public async Task RemoveAsync(ProfileDeleteVm profileDeleteVm) {
-      var customDeletedIdentityUser = await _userManager.FindByNameAsync("[Deleted]");
+      var customDeletedIdentityUser = await _userManager.FindByNameAsync(DeletedMember.Username);
 
       var identityUser = await _userManager.FindByNameAsync(profileDeleteVm.Username);
       var memberFromDb = await _db.Member.Include(m => m.InverseBlockedByNavigation)
@@ -225,7 +235,7 @@ namespace Forum.Models.Services {
         .Include(p => p.PostEditedByNavigation).Include(p => p.PostLockedByNavigation)
         .Include(p => p.PostCreatedByNavigation).FirstOrDefaultAsync(m => m.Id == identityUser.Id);
 
-      if (memberFromDb.IsInternal)
+      if (identityUser.UserName == DeletedMember.Username)
         return;
 
       foreach (var member in memberFromDb.InverseBlockedByNavigation) member.BlockedBy = customDeletedIdentityUser.Id;

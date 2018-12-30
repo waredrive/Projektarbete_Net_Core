@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Forum.Extensions;
+using Forum.Models.Identity;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.ProfileViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -23,10 +24,16 @@ namespace Forum.Controllers {
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
-      if (await _authorizationService.IsProfileInternalAsync(username))
-        return RedirectToAction("AccessDenied", "Account");
+      if (_sharedService.IsDeletedMember(username))
+        return RedirectToAction(nameof(ProfileRemoved));
 
       return View(await _profileService.GetProfileDetailsVmAsync(username, User));
+    }
+
+    [Route("Details/ProfileRemoved")]
+    [HttpGet]
+    public async Task<IActionResult> ProfileRemoved() {
+      return View(await _profileService.GetProfileRemovedVmAsync());
     }
 
     [Route("Update/{username}")]
@@ -178,7 +185,7 @@ namespace Forum.Controllers {
       if (!await _authorizationService.IsProfileBlockedAsync(username))
         return RedirectToAction(nameof(Details), new {username});
 
-      await _profileService.UnblockAsync(username, profileUnblockVm, User);
+      await _profileService.UnblockAsync(username);
 
       return RedirectToAction(nameof(Details));
     }

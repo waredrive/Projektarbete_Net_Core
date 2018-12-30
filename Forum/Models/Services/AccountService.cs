@@ -84,7 +84,7 @@ namespace Forum.Models.Services {
       if (!_sharedService.DoesUserAccountExist(accountLoginVm.UserName))
         return SignInResult.Failed;
 
-      if (await _authorizationService.IsProfileInternalAsync(accountLoginVm.UserName))
+      if (_sharedService.IsDeletedMember(accountLoginVm.UserName))
         return SignInResult.Failed;
 
       var result = await _signInManager.PasswordSignInAsync(accountLoginVm.UserName, accountLoginVm.Password,

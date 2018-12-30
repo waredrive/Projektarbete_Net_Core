@@ -244,7 +244,7 @@ namespace Forum.Models.Services {
     }
 
     public async Task<bool> IsAuthorizedForAccountDetailsViewAsync(string username, ClaimsPrincipal user) {
-      if (await IsProfileInternalAsync(username))
+      if (_sharedService.IsDeletedMember(username))
         return false;
 
       if (await IsProfileInRoleAsync(username, Roles.Admin) &&
@@ -261,7 +261,7 @@ namespace Forum.Models.Services {
     }
 
     public async Task<bool> IsAuthorizedForAccountAndProfileEditAsync(string username, ClaimsPrincipal user) {
-      if (!user.Identity.IsAuthenticated || await IsProfileInternalAsync(username) ||
+      if (!user.Identity.IsAuthenticated || _sharedService.IsDeletedMember(username) ||
           await IsProfileBlockedAsync(user.Identity.Name))
         return false;
 
@@ -277,8 +277,7 @@ namespace Forum.Models.Services {
         return false;
 
       var identityUser = await _userManager.FindByNameAsync(username);
-      var memberFromDb = await _db.Member.Where(m => m.Id == identityUser.Id).FirstOrDefaultAsync();
-      if (memberFromDb.IsInternal)
+      if (_sharedService.IsDeletedMember(username))
         return false;
 
       if (await IsProfileInRoleAsync(username, Roles.Admin) &&
@@ -290,7 +289,7 @@ namespace Forum.Models.Services {
     }
 
     public async Task<bool> IsAuthorizedProfileChangeRoleAsync(string username, ClaimsPrincipal user) {
-      if (!user.Identity.IsAuthenticated || await IsProfileInternalAsync(username) ||
+      if (!user.Identity.IsAuthenticated || _sharedService.IsDeletedMember(username) ||
           await IsProfileBlockedAsync(user.Identity.Name))
         return false;
 
@@ -299,7 +298,7 @@ namespace Forum.Models.Services {
 
 
     public async Task<bool> IsAuthorizedProfileBlockAsync(string username, ClaimsPrincipal user) {
-      if (!user.Identity.IsAuthenticated || await IsProfileInternalAsync(username) ||
+      if (!user.Identity.IsAuthenticated || _sharedService.IsDeletedMember(username) ||
           await IsProfileBlockedAsync(user.Identity.Name))
         return false;
 
@@ -310,13 +309,6 @@ namespace Forum.Models.Services {
         return false;
 
       return user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator);
-    }
-
-    public async Task<bool> IsProfileInternalAsync(string username) {
-      var profileIdentityFromDb = await _userManager.FindByNameAsync(username);
-      var profilMemberMemberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == profileIdentityFromDb.Id);
-
-      return profilMemberMemberFromDb.IsInternal;
     }
 
     public async Task<bool> IsProfileBlockedAsync(string username) {

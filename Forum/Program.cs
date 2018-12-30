@@ -7,8 +7,8 @@ namespace Forum {
       CreateWebHostBuilder(args).Build().Run();
     }
 
-    //TODO: Allow bigger pictures but must be square.
     //TODO: Go to specific Deleted page when clicking on deleted username.
+    //TODO: A member can include idnavigation! Change all redundant searches for identityuser.
     //TODO: Create Partial views.
     //TODO: Add confirmations when adding, deleting, editing, etc. Maybe modal?
     //TODO: Add custom messages to AccessDenied (Use TempData).
@@ -17,7 +17,7 @@ namespace Forum {
     //TODO: Add Typeahead with ajax call for searching.
     //TODO: Add seed of Default deleted user if possible?
     //TODO: Add deletion timeout for posts and threads?
-    //TODO: Add SuperAdmin? - if so Admin cannot add SuperAdmin role
+    //TODO: Add SuperAdmin? - if so Admin cannot add SuperAdmin role and manipulate SuperAdmin.
     //TODO: Add areas?
     //TODO: REFACTORING!!! - Check if all async methods are ending with Async
 

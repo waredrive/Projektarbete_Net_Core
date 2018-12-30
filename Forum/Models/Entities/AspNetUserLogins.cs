@@ -1,10 +1,15 @@
-﻿namespace Forum.Models.Entities {
-  public class AspNetUserLogins {
-    public string LoginProvider { get; set; }
-    public string ProviderKey { get; set; }
-    public string ProviderDisplayName { get; set; }
-    public string UserId { get; set; }
+﻿using System;
+using System.Collections.Generic;
 
-    public virtual AspNetUsers User { get; set; }
-  }
+namespace Forum.Models.Entities
+{
+    public partial class AspNetUserLogins
+    {
+        public string LoginProvider { get; set; }
+        public string ProviderKey { get; set; }
+        public string ProviderDisplayName { get; set; }
+        public string UserId { get; set; }
+
+        public virtual AspNetUsers User { get; set; }
+    }
 }
