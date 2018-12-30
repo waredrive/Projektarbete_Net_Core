@@ -3,7 +3,10 @@ using Forum.Extensions;
 using Forum.Models.Identity;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.ProfileViewModels;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Session;
 
 namespace Forum.Controllers {
   [Route("Profile")]
@@ -20,14 +23,16 @@ namespace Forum.Controllers {
 
     [Route("Details/{username}")]
     [HttpGet]
-    public async Task<IActionResult> Details(string username) {
+    public async Task<IActionResult> Details(string username, string returnUrl = null) {
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
       if (_sharedService.IsDeletedMember(username))
         return RedirectToAction(nameof(ProfileRemoved));
 
-      return View(await _profileService.GetProfileDetailsVmAsync(username, User));
+      return View(await _profileService.GetProfileDetailsVmAsync(username));
     }
 
     [Route("Details/ProfileRemoved")]
@@ -38,7 +43,9 @@ namespace Forum.Controllers {
 
     [Route("Update/{username}")]
     [HttpGet]
-    public async Task<IActionResult> Edit(string username) {
+    public async Task<IActionResult> Edit(string username, string returnUrl = null) {
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -51,7 +58,7 @@ namespace Forum.Controllers {
     [Route("Update/{username}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(string username, ProfileEditVm profileEditVm) {
+    public async Task<IActionResult> Edit(string username, ProfileEditVm profileEditVm, string returnUrl) {
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -78,12 +85,13 @@ namespace Forum.Controllers {
         return View(await _profileService.GetProfileEditVmAsync(username));
       }
 
-      return RedirectToAction(nameof(Details), new {username = profileEditVm.NewUsername});
+      return RedirectToAction(nameof(Details), new {username = profileEditVm.NewUsername, returnUrl});
     }
 
     [Route("Role/{username}")]
     [HttpGet]
-    public async Task<IActionResult> EditRole(string username) {
+    public async Task<IActionResult> EditRole(string username, string returnUrl = null) {
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -96,7 +104,7 @@ namespace Forum.Controllers {
     [Route("Role/{username}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> EditRole(string username, ProfileRoleEditVm profileRoleEditVm) {
+    public async Task<IActionResult> EditRole(string username, ProfileRoleEditVm profileRoleEditVm, string returnUrl) {
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -108,12 +116,14 @@ namespace Forum.Controllers {
 
       await _profileService.UpdateProfileRoleAsync(username, profileRoleEditVm);
 
-      return RedirectToAction(nameof(Details), new {username});
+      return RedirectToAction(nameof(Details), new {username, returnUrl});
     }
 
     [Route("Block/{username}")]
     [HttpGet]
-    public async Task<IActionResult> Block(string username) {
+    public async Task<IActionResult> Block(string username, string returnUrl = null) {
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -121,7 +131,7 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (await _authorizationService.IsProfileBlockedAsync(username))
-        return RedirectToAction(nameof(Unblock));
+        return RedirectToAction(nameof(Unblock), new {returnUrl});
 
       return View(await _profileService.GetProfileBlockVmAsync(username));
     }
@@ -129,7 +139,7 @@ namespace Forum.Controllers {
     [Route("Block/{username}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Block(string username, ProfileBlockVm profileBlockVm) {
+    public async Task<IActionResult> Block(string username, ProfileBlockVm profileBlockVm, string returnUrl) {
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -140,7 +150,7 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (await _authorizationService.IsProfileBlockedAsync(username))
-        return RedirectToAction(nameof(Details), new {username});
+        return RedirectToAction(nameof(Details), new {username, returnUrl});
 
       var result = await _profileService.BlockAsync(username, profileBlockVm, User);
 
@@ -150,12 +160,13 @@ namespace Forum.Controllers {
         return View(await _profileService.GetProfileBlockVmAsync(username));
       }
 
-      return RedirectToAction(nameof(Details));
+      return RedirectToAction(nameof(Details), new {returnUrl});
     }
 
     [Route("Unblock/{username}")]
     [HttpGet]
-    public async Task<IActionResult> Unblock(string username) {
+    public async Task<IActionResult> Unblock(string username, string returnUrl = null) {
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -164,7 +175,7 @@ namespace Forum.Controllers {
 
 
       if (!await _authorizationService.IsProfileBlockedAsync(username))
-        return RedirectToAction(nameof(Unblock));
+        return RedirectToAction(nameof(Unblock), new {returnUrl});
 
       return View(await _profileService.GetProfileUnblockVmAsync(username));
     }
@@ -172,7 +183,7 @@ namespace Forum.Controllers {
     [Route("Unblock/{username}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Unblock(string username, ProfileUnblockVm profileUnblockVm) {
+    public async Task<IActionResult> Unblock(string username, ProfileUnblockVm profileUnblockVm, string returnUrl) {
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -183,16 +194,17 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (!await _authorizationService.IsProfileBlockedAsync(username))
-        return RedirectToAction(nameof(Details), new {username});
+        return RedirectToAction(nameof(Details), new {username, returnUrl});
 
       await _profileService.UnblockAsync(username);
 
-      return RedirectToAction(nameof(Details));
+      return RedirectToAction(nameof(Details), new {returnUrl});
     }
 
     [Route("Delete/{username}")]
     [HttpGet]
-    public async Task<IActionResult> Delete(string username) {
+    public async Task<IActionResult> Delete(string username, string returnUrl = null) {
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -205,7 +217,7 @@ namespace Forum.Controllers {
     [Route("Delete/{username}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(string username, ProfileDeleteVm profileDeleteVm) {
+    public async Task<IActionResult> Delete(string username, ProfileDeleteVm profileDeleteVm, string returnUrl) {
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -216,7 +228,7 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       await _profileService.RemoveAsync(profileDeleteVm);
-      return RedirectToAction("Index", "Topic");
+      return Redirect(returnUrl);
     }
   }
 }

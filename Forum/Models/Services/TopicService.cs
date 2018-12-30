@@ -222,9 +222,10 @@ namespace Forum.Models.Services {
       await _db.SaveChangesAsync();
     }
 
-    public async Task<TopicOptionsVm> GetTopicOptionsVmAsync(int topicId, IPrincipal user) {
+    public async Task<TopicOptionsVm> GetTopicOptionsVmAsync(int topicId, IPrincipal user, string returnUrl) {
       var topic = await _db.Topic.Where(t => t.Id == topicId).FirstOrDefaultAsync();
       return new TopicOptionsVm {
+        ReturnUrl = returnUrl,
         LockedOn = topic.LockedOn,
         TopicId = topic.Id,
         IsAuthorizedForTopicEditLockAndDelete =

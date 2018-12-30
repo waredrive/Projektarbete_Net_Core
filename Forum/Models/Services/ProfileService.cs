@@ -35,10 +35,10 @@ namespace Forum.Models.Services {
       _sharedService = sharedService;
     }
 
-    public async Task<ProfileDetailsVm> GetProfileDetailsVmAsync(string username, ClaimsPrincipal user) {
+    public async Task<ProfileDetailsVm> GetProfileDetailsVmAsync(string username) {
       var identityUser = await _userManager.FindByNameAsync(username);
-      var memberFromDb = await _db.Member.Include(p => p.PostCreatedByNavigation)
-        .Include(p => p.ThreadCreatedByNavigation).FirstOrDefaultAsync(m => m.Id == identityUser.Id);
+      var memberFromDb = await _db.Member.Include(m => m.PostCreatedByNavigation)
+        .Include(m => m.ThreadCreatedByNavigation).FirstOrDefaultAsync(m => m.Id == identityUser.Id);
       var blockedBy = await _userManager.FindByIdAsync(memberFromDb.BlockedBy);
       var roles = await _userManager.GetRolesAsync(identityUser);
 
@@ -275,7 +275,7 @@ namespace Forum.Models.Services {
       };
     }
 
-    public async Task<MemberOptionsVm> GetMemberOptionsVmAsync(string username, IPrincipal user) {
+    public async Task<MemberOptionsVm> GetMemberOptionsVmAsync(string username, IPrincipal user, string returnUrl) {
       var identityUser = await _userManager.FindByNameAsync(username);
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
       var claimsPrincipalUser = user as ClaimsPrincipal;
@@ -288,6 +288,7 @@ namespace Forum.Models.Services {
         await _authorizationService.IsAuthorizedProfileChangeRoleAsync(username, claimsPrincipalUser);
 
       return new MemberOptionsVm {
+        ReturnUrl = returnUrl,
         BlockedOn = memberFromDb.BlockedOn,
         Username = identityUser.UserName,
         IsAuthorizedForProfileDelete = isAuthorizedForProfileDelete,

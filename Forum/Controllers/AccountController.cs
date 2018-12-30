@@ -78,7 +78,8 @@ namespace Forum.Controllers {
 
     [Route("Update/{username}")]
     [HttpGet]
-    public async Task<IActionResult> EditAccount(string username) {
+    public async Task<IActionResult> EditAccount(string username, string returnUrl = null) {
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -91,7 +92,7 @@ namespace Forum.Controllers {
     [Route("Update/{username}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> EditAccount(string username, AccountEditVm accountEditVm) {
+    public async Task<IActionResult> EditAccount(string username, AccountEditVm accountEditVm, string returnUrl) {
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -117,12 +118,13 @@ namespace Forum.Controllers {
         return View(accountEditVm);
       }
 
-      return RedirectToAction(nameof(Details));
+      return RedirectToAction(nameof(Details), new { returnUrl });
     }
 
     [Route("Update/Password/{username}")]
     [HttpGet]
-    public async Task<IActionResult> EditPassword(string username) {
+    public async Task<IActionResult> EditPassword(string username, string returnUrl= null) {
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -135,7 +137,7 @@ namespace Forum.Controllers {
     [Route("Update/Password/{username}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> EditPassword(string username, AccountPasswordEditVm accountPasswordEditVm) {
+    public async Task<IActionResult> EditPassword(string username, AccountPasswordEditVm accountPasswordEditVm, string returnUrl) {
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -153,13 +155,13 @@ namespace Forum.Controllers {
         return View(accountPasswordEditVm);
       }
 
-      return RedirectToAction(nameof(Details));
+      return RedirectToAction(nameof(Details), new { username });
     }
 
     [Route("Details/{username}")]
     [HttpGet]
     public async Task<IActionResult> Details(string username, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? "/";
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
 
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
@@ -174,8 +176,8 @@ namespace Forum.Controllers {
     [HttpGet]
     [Route("AccessDenied")]
     public IActionResult AccessDenied(string returnUrl = null) {
-      var accountAccessDeniedVm = new AccountAccessDeniedVm {ReturnUrl = returnUrl};
-      return View(accountAccessDeniedVm);
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      return View();
     }
 
     [Route("Logout")]

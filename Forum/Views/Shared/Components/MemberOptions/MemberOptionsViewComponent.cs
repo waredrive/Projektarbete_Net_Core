@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Forum.Models.Services;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.Views.Shared.Components.MemberOptions
@@ -15,8 +16,8 @@ namespace Forum.Views.Shared.Components.MemberOptions
         _profileService = profileService;
       }
 
-    public async Task<IViewComponentResult> InvokeAsync(string username) {
-      return View(await _profileService.GetMemberOptionsVmAsync(username, User));
+    public async Task<IViewComponentResult> InvokeAsync(string username, string returnUrl = null) {
+      return View(await _profileService.GetMemberOptionsVmAsync(username, User, returnUrl ?? Request.GetDisplayUrl()));
     }
   }
 }

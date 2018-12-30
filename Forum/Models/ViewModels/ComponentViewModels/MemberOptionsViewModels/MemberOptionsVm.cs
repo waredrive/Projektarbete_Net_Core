@@ -7,6 +7,7 @@ namespace Forum.Models.ViewModels.ComponentViewModels.MemberOptionsViewModels
 {
     public class MemberOptionsVm
     {
+      public string ReturnUrl { get; set; }
       public string Username { get; set; }
       public DateTime? BlockedOn { get; set; }
       public bool IsUserOwner { get; set; }

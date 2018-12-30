@@ -2,12 +2,12 @@
 
 @if (@Model.IsAuthorizedForTopicEditLockAndDelete) {
   <div class="btn-group">
-    <a asp-controller="Topic" asp-action="Edit" asp-route-id="@Model.TopicId" class="btn btn-primary btn-sm">Edit</a>
+    <a asp-controller="Topic" asp-action="Edit" asp-route-id="@Model.TopicId" asp-route-returnUrl="@Model.ReturnUrl" class="btn btn-primary btn-sm">Edit</a>
     @if (Model.LockedOn == null) {
-      <a asp-controller="Topic" asp-action="Lock" asp-route-id="@Model.TopicId" class="btn btn-warning btn-sm">Lock</a>
+      <a asp-controller="Topic" asp-action="Lock" asp-route-id="@Model.TopicId" asp-route-returnUrl="@Model.ReturnUrl" class="btn btn-warning btn-sm">Lock</a>
     } else {
-      <a asp-controller="Topic" asp-action="Unlock" asp-route-id="@Model.TopicId" class="btn btn-warning btn-sm">Unlock</a>
+      <a asp-controller="Topic" asp-action="Unlock" asp-route-id="@Model.TopicId" asp-route-returnUrl="@Model.ReturnUrl" class="btn btn-warning btn-sm">Unlock</a>
     }
-    <a asp-controller="Topic" asp-action="Delete" asp-route-id="@Model.TopicId" class="btn btn-danger btn-sm">Delete</a>
+    <a asp-controller="Topic" asp-action="Delete" asp-route-id="@Model.TopicId" asp-route-returnUrl="@Model.ReturnUrl" class="btn btn-danger btn-sm">Delete</a>
   </div>
 }

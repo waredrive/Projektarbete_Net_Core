@@ -2,16 +2,16 @@
 
 <div class="btn-group">
   @if (@Model.IsAuthorizedForPostEditAndDelete) {
-    <a asp-controller="Post" asp-action="Edit" asp-route-id="@Model.PostId" asp-route-threadId="@Model.ThreadId" class="btn btn-primary btn-sm">Edit</a>
+    <a asp-controller="Post" asp-action="Edit" asp-route-id="@Model.PostId" asp-route-threadId="@Model.ThreadId" asp-route-returnUrl="@Model.ReturnUrl" class="btn btn-primary btn-sm">Edit</a>
   }
   @if (Model.IsAuthorizedForPostLock) {
     if (Model.LockedOn == null) {
-      <a asp-controller="Post" asp-action="Lock" asp-route-id="@Model.PostId" asp-route-threadId="@Model.ThreadId" class="btn btn-warning btn-sm">Lock</a>
+      <a asp-controller="Post" asp-action="Lock" asp-route-id="@Model.PostId" asp-route-threadId="@Model.ThreadId" asp-route-returnUrl="@Model.ReturnUrl" class="btn btn-warning btn-sm">Lock</a>
     } else {
-      <a asp-controller="Post" asp-action="Unlock" asp-route-id="@Model.PostId" asp-route-threadId="@Model.ThreadId" class="btn btn-warning btn-sm">Unlock</a>
+      <a asp-controller="Post" asp-action="Unlock" asp-route-id="@Model.PostId" asp-route-threadId="@Model.ThreadId" asp-route-returnUrl="@Model.ReturnUrl" class="btn btn-warning btn-sm">Unlock</a>
     }
   }
   @if (Model.IsAuthorizedForPostEditAndDelete) {
-    <a asp-controller="Post" asp-action="Delete" asp-route-id="@Model.PostId" asp-route-threadId="@Model.ThreadId" class="btn btn-danger btn-sm">Delete</a>
+    <a asp-controller="Post" asp-action="Delete" asp-route-id="@Model.PostId" asp-route-threadId="@Model.ThreadId" asp-route-returnUrl="@Model.ReturnUrl" class="btn btn-danger btn-sm">Delete</a>
   }
 </div>

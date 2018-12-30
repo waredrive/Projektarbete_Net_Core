@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Forum.Models.Services;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.Views.Shared.Components.TopicManageOptions {
@@ -10,8 +11,8 @@ namespace Forum.Views.Shared.Components.TopicManageOptions {
       _topicService = topicService;
     }
 
-    public async Task<IViewComponentResult> InvokeAsync(int topicId) {
-      return View(await _topicService.GetTopicOptionsVmAsync(topicId, User));
+    public async Task<IViewComponentResult> InvokeAsync(int topicId, string returnUrl = null) {
+      return View(await _topicService.GetTopicOptionsVmAsync(topicId, User, returnUrl ?? Request.GetDisplayUrl()));
     }
   }
 }

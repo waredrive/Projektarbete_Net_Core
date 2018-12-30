@@ -197,7 +197,7 @@ namespace Forum.Models.Services {
       await _db.SaveChangesAsync();
     }
 
-    public async Task<ThreadOptionsVm> GetThreadOptionsVmAsync(int threadId, IPrincipal user) {
+    public async Task<ThreadOptionsVm> GetThreadOptionsVmAsync(int threadId, IPrincipal user, string returnUrl) {
       var claimsPrincipalUser = user as ClaimsPrincipal;
       var threadFromDb = await _db.Thread.FirstOrDefaultAsync(t => t.Id == threadId);
 
@@ -209,6 +209,7 @@ namespace Forum.Models.Services {
         await _authorizationService.IsAuthorizedForThreadDeleteAsync(threadId, claimsPrincipalUser);
 
       return new ThreadOptionsVm {
+        ReturnUrl = returnUrl,
         TopicId = threadFromDb.Topic,
         ThreadId = threadId,
         LockedOn = threadFromDb.LockedOn,

@@ -57,7 +57,7 @@
                 </div>
                 <div class="card-footer">
                   @if (post.CreatedBy != User.Identity.Name) {
-                    @await Component.InvokeAsync("MemberOptions", post.CreatedBy)
+                    @await Component.InvokeAsync("MemberOptions", new{ username = @post.CreatedBy})
                   }
                 </div>
               </div>

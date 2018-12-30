@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace Forum.Models.ViewModels.ComponentViewModels.ThreadOptionsViewModels {
   public class ThreadOptionsVm {
+    public string ReturnUrl { get; set; }
     public DateTime? LockedOn { get; set; }
     public int TopicId { get; set; }
     public int ThreadId { get; set; }

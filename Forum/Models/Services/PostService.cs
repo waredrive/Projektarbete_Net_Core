@@ -192,7 +192,7 @@ namespace Forum.Models.Services {
       return _db.Post.Any(p => p.Id == id);
     }
 
-    public async Task<PostOptionsVm> GetPostOptionsVmAsync(int postId, IPrincipal user) {
+    public async Task<PostOptionsVm> GetPostOptionsVmAsync(int postId, IPrincipal user, string returnUrl) {
       var claimsPrincipalUser = user as ClaimsPrincipal;
       var postFromDb = await _db.Post.FirstOrDefaultAsync(p => p.Id == postId);
 
@@ -200,6 +200,7 @@ namespace Forum.Models.Services {
       var isAuthorizedForPostLock = await _authorizationService.IsAuthorizedForPostLockAsync(postFromDb, claimsPrincipalUser);
 
       return new PostOptionsVm {
+        ReturnUrl = returnUrl,
         ThreadId = postFromDb.Thread,
         PostId = postFromDb.Id,
         LockedOn = postFromDb.LockedOn,

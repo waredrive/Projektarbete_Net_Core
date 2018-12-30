@@ -1,22 +1,26 @@
 ﻿@model ProfileRoleEditVm
 
-  <div class="container">
-    <div class="col-12 rounded my-5 bg-secondary p-5 text-light">
-      <h1>Edit Role For: @Model.Username</h1>
-      <form asp-controller="Profile" asp-action="EditRole" asp-route-username="@Model.Username" class="mt-5"  autocomplete="off">
-        <h4>Current role: @Model.Role</h4>
-        <br/>
-        <div asp-validation-summary="ModelOnly"  class="text-danger bg-white rounded py-1"></div>
-        <div class="form-group">
-          <label asp-for="Role" class="control-label"></label>
-          <select asp-for="Role" asp-items="Model.Roles" class="form-control"></select>
-          <span asp-validation-for="Role"  class="text-danger bg-white rounded-bottom py-1"></span>
-        </div>
-        <br/>
-        <div class="btn-group float-right">
-          <button type="submit" class="btn btn-warning">Change Role</button>
-          <a href="javascript:history.back()" class="btn btn-primary">Back</a>
-        </div>
-      </form>
-    </div>
+<div class="container">
+  <div class="col-12 rounded my-5 bg-secondary p-5 text-light">
+    <h1>Edit Role For: @Model.Username</h1>
+    <form asp-controller="Profile" asp-action="EditRole" asp-route-username="@Model.Username" asp-route-returnUrl="@ViewBag.ReturnUrl" class="mt-5" autocomplete="off">
+      <h4>Current role: @Model.Role</h4>
+      <br />
+      <div asp-validation-summary="ModelOnly" class="text-danger bg-white rounded py-1"></div>
+      <div class="form-group">
+        <label asp-for="Role" class="control-label"></label>
+        <select asp-for="Role" asp-items="Model.Roles" class="form-control"></select>
+        <span asp-validation-for="Role" class="text-danger bg-white rounded-bottom py-1"></span>
+      </div>
+      <br />
+      <div class="btn-group float-right">
+        <button type="submit" class="btn btn-warning">Change Role</button>
+        <a href="javascript:history.back()" class="btn btn-primary">Back</a>
+      </div>
+    </form>
   </div>
+</div>
+
+@section scripts {
+  <partial name="_NoPushToBrowserHistoryScriptPartial"/>
+}

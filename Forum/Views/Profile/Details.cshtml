@@ -26,14 +26,14 @@
           }
         </div>
         <br />
-        @await Component.InvokeAsync("MemberOptions", @Model.Username)
+        @await Component.InvokeAsync("MemberOptions", new {username = @Model.Username, returnUrl = @ViewBag.ReturnUrl})
       </div>
     </div>
     <div class="row py-3">
       <div class="col-12">
         <br />
         <div class="btn-group float-right">
-          <a href="javascript:history.back()" class="btn btn-primary">Back</a>
+          <a href="@ViewBag.ReturnUrl" class="btn btn-primary">Back</a>
         </div>
       </div>
     </div>

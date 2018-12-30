@@ -23,7 +23,8 @@ namespace Forum.Controllers {
     [AllowAnonymous]
     [Route("")]
     [HttpGet]
-    public async Task<IActionResult> Index(int topicId, int page = 1) {
+    public async Task<IActionResult> Index(int topicId, int page = 1, string returnUrl = null) {
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
       if (!await _topicService.DoesTopicExist(topicId))
         return NotFound();
 
