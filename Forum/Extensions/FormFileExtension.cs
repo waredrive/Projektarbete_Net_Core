@@ -39,7 +39,8 @@ namespace Forum.Extensions {
 
       //  Attempt to read the file and check the first bytes
       try {
-        if (!postedFile.OpenReadStream().CanRead) return result.DefaultError();
+        if (!postedFile.OpenReadStream().CanRead)
+          return result.DefaultError();
 
         //check if the image size exceeds the limits
         if (postedFile.Length > ImageMaxBytes) {

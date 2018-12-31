@@ -7,10 +7,9 @@ namespace Forum {
       CreateWebHostBuilder(args).Build().Run();
     }
 
-    //TODO: Add min input length to fields.
+    //TODO: Add Typeahead with ajax call for searching.
     //TODO: Don't show headlines in forum management if tables are empty.
     //TODO: Add confirmations when adding, deleting, editing, etc. Maybe modal?
-    //TODO: Add Typeahead with ajax call for searching.
     //TODO: Add seed of Default deleted user if possible?
     //TODO: Add partial views.
     //TODO: Add SuperAdmin? - if so Admin cannot add SuperAdmin role and manipulate SuperAdmin.
