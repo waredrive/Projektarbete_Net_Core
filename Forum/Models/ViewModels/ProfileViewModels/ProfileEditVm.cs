@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 
 namespace Forum.Models.ViewModels.ProfileViewModels {
   public class ProfileEditVm {
+    public string Username { get; set; }
+
     [Required]
     [StringLength(18)]
     [Display(Name = "Username")]

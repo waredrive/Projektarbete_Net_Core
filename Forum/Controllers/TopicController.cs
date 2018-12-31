@@ -42,6 +42,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(TopicCreateVm topicCreateVm, string returnUrl) {
+      ViewBag.ReturnUrl = returnUrl;
       if (!ModelState.IsValid)
         return View(topicCreateVm);
 
@@ -49,6 +50,9 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       await _topicService.AddAsync(topicCreateVm, User);
+
+      TempData["ModalHeader"] = "Success";
+      TempData["ModalMessage"] = "The Topic has been created!";
       return Redirect(returnUrl);
     }
 
@@ -71,6 +75,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, TopicEditVm topicEditVm, string returnUrl) {
+      ViewBag.ReturnUrl = returnUrl;
       if (!await _topicService.DoesTopicExist(id))
         return NotFound();
 
@@ -81,6 +86,9 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       await _topicService.UpdateAsync(topicEditVm, User);
+
+      TempData["ModalHeader"] = "Success";
+      TempData["ModalMessage"] = "The Topic has been updated!";
       return Redirect(returnUrl);
     }
 
@@ -103,6 +111,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id, TopicDeleteVm topicDeleteVm, string returnUrl) {
+      ViewBag.ReturnUrl = returnUrl;
       if (!await _topicService.DoesTopicExist(id))
         return NotFound();
 
@@ -113,6 +122,9 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       await _topicService.RemoveAsync(topicDeleteVm);
+
+      TempData["ModalHeader"] = "Success";
+      TempData["ModalMessage"] = "The Topic has been deleted!";
       return Redirect(returnUrl);
     }
 
@@ -127,8 +139,11 @@ namespace Forum.Controllers {
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      if (await _topicService.IsTopicLocked(id))
+      if (await _topicService.IsTopicLocked(id)) {
+        TempData["ModalHeader"] = "Warning";
+        TempData["ModalMessage"] = "The Topic is already locked!";
         return RedirectToAction(nameof(Unlock), new {returnUrl});
+      }
 
       return View(await _topicService.GetTopicLockVmAsync(id));
     }
@@ -138,6 +153,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Lock(int id, TopicLockVm topicLockVm, string returnUrl) {
+      ViewBag.ReturnUrl = returnUrl;
       if (!await _topicService.DoesTopicExist(id))
         return NotFound();
 
@@ -147,10 +163,15 @@ namespace Forum.Controllers {
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      if (await _topicService.IsTopicLocked(topicLockVm.TopicId))
+      if (await _topicService.IsTopicLocked(topicLockVm.TopicId)) {
+        TempData["ModalHeader"] = "Failed";
+        TempData["ModalMessage"] = "The Topic is already locked!";
         return Redirect(returnUrl);
+      }
 
       await _topicService.LockAsync(topicLockVm, User);
+      TempData["ModalHeader"] = "Success";
+      TempData["ModalMessage"] = "The Topic has been locked!";
       return Redirect(returnUrl);
     }
 
@@ -165,8 +186,11 @@ namespace Forum.Controllers {
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      if (!await _topicService.IsTopicLocked(id))
+      if (!await _topicService.IsTopicLocked(id)) {
+        TempData["ModalHeader"] = "Warning";
+        TempData["ModalMessage"] = "The Topic is already unlocked!";
         return RedirectToAction(nameof(Lock), new {returnUrl});
+      }
 
       return View(await _topicService.GetTopicUnlockVmAsync(id));
     }
@@ -176,6 +200,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Unlock(int id, TopicUnlockVm topicUnlockVm, string returnUrl) {
+      ViewBag.ReturnUrl = returnUrl;
       if (!await _topicService.DoesTopicExist(id))
         return NotFound();
 
@@ -185,10 +210,15 @@ namespace Forum.Controllers {
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      if (!await _topicService.IsTopicLocked(topicUnlockVm.TopicId))
+      if (!await _topicService.IsTopicLocked(topicUnlockVm.TopicId)) {
+        TempData["ModalHeader"] = "Failed";
+        TempData["ModalMessage"] = "The Topic is already unlocked";
         return Redirect(returnUrl);
+      }
 
       await _topicService.UnlockAsync(topicUnlockVm, User);
+      TempData["ModalHeader"] = "Success";
+      TempData["ModalMessage"] = "The Topic has been unlocked!";
       return Redirect(returnUrl);
     }
   }

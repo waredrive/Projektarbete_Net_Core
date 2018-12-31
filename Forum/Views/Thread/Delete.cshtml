@@ -23,7 +23,7 @@
           <div class="btn-group float-right">
             @Html.HiddenFor(m => m.ThreadId)
             <input type="submit" class="btn btn-danger rounded-left" value="Delete Thread" />
-            <a href="javascript:history.back()" class="btn btn-primary">Back</a>
+            <a href="@ViewBag.ReturnUrl" class="btn btn-primary">Back</a>
           </div>
         </form>
       </div>

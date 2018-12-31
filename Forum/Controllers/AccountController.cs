@@ -44,13 +44,14 @@ namespace Forum.Controllers {
 
       var result = await _accountService.AddAsync(accountRegisterVm);
 
-
       if (result.Succeeded)
         return RedirectToAction(nameof(Login));
 
       foreach (var error in result.Errors)
         ModelState.AddModelError(string.Empty, error.Description);
 
+      TempData["ModalHeader"] = "Success";
+      TempData["ModalMessage"] = "Your Account has been registered!";
       return View(accountRegisterVm);
     }
 
@@ -97,6 +98,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditAccount(string username, AccountEditVm accountEditVm, string returnUrl) {
+      ViewBag.ReturnUrl = returnUrl;
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -122,6 +124,8 @@ namespace Forum.Controllers {
         return View(accountEditVm);
       }
 
+      TempData["ModalHeader"] = "Success";
+      TempData["ModalMessage"] = "Your Account has been updated!";
       return RedirectToAction(nameof(Details), new {returnUrl});
     }
 
@@ -135,7 +139,7 @@ namespace Forum.Controllers {
       if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAsync(username, User))
         return RedirectToAction(nameof(AccessDenied));
 
-      return View();
+      return View(new AccountPasswordEditVm(){ Username = username });
     }
 
     [Route("Update/Password/{username}")]
@@ -143,6 +147,7 @@ namespace Forum.Controllers {
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditPassword(string username, AccountPasswordEditVm accountPasswordEditVm,
       string returnUrl) {
+      ViewBag.ReturnUrl = returnUrl;
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -160,6 +165,8 @@ namespace Forum.Controllers {
         return View(accountPasswordEditVm);
       }
 
+      TempData["ModalHeader"] = "Success";
+      TempData["ModalMessage"] = "Your password has been updated!";
       return RedirectToAction(nameof(Details), new {username});
     }
 

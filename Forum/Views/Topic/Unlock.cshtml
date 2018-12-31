@@ -26,7 +26,7 @@
           <div class="btn-group float-right">
             @Html.HiddenFor(m => m.TopicId)
             <input type="submit" class="btn btn-warning rounded-left" value="Unlock Topic" />
-            <a href="javascript:history.back()" class="btn btn-primary">Back</a>
+            <a href="@ViewBag.ReturnUrl" class="btn btn-primary">Back</a>
           </div>
         </form>
       </div>

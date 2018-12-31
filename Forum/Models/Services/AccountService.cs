@@ -114,6 +114,7 @@ namespace Forum.Models.Services {
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
 
       return new AccountEditVm {
+        Username = identityUser.UserName,
         Birthdate = memberFromDb.BirthDate,
         Email = identityUser.Email,
         FirstName = memberFromDb.FirstName,

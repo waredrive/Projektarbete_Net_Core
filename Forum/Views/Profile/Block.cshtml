@@ -17,7 +17,7 @@
       <br />
       <div class="btn-group float-right">
         <button type="submit" class="btn btn-warning">Block User</button>
-        <a href="javascript:history.back()" class="btn btn-primary">Back</a>
+        <a asp-controller="Profile" asp-action="Details" asp-route-returnUrl="@ViewBag.ReturnUrl" asp-route-username="@Model.Username"  class="btn btn-primary">Back</a>
       </div>
     </form>
   </div>

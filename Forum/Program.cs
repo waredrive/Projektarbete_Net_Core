@@ -7,9 +7,10 @@ namespace Forum {
       CreateWebHostBuilder(args).Build().Run();
     }
 
-    //TODO: Add confirmations when adding, deleting, editing, etc. Maybe modal?
+    //TODO: Add modal also to not found and maybe add a method for creating tempdata easier.
+    //TODO: Still problems with back button if form wrong more than two times. maybe on back, go to details and pass the returnUrl...
+    //TODO: Do not update if sending no new data. All edits/updates.
     //TODO: Add seed of Default deleted user if possible?
-    //TODO: Add partial views.
     //TODO: Add SuperAdmin? - if so Admin cannot add SuperAdmin role and manipulate SuperAdmin.
     //TODO: Add areas?
     //TODO: A member can include idnavigation! Change all redundant searches for identityuser.

@@ -5,8 +5,14 @@
 }
 
 body {
+  padding-right: 0px !important;
   margin-bottom: 60px;
 }
+
+.modal-open {
+  overflow-y: auto;
+}
+
 
 footer {
   bottom: 0;

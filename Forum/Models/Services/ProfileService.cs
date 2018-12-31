@@ -71,6 +71,7 @@ namespace Forum.Models.Services {
       var identityUser = await _userManager.FindByNameAsync(oldUsername);
 
       return new ProfileEditVm {
+        Username = identityUser.UserName,
         NewUsername = identityUser.UserName
       };
     }

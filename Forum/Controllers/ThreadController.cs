@@ -47,6 +47,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(ThreadCreateVm threadCreateVm, string returnUrl) {
+      ViewBag.ReturnUrl = returnUrl;
       if (!ModelState.IsValid)
         return View(threadCreateVm);
 
@@ -54,6 +55,8 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       await _threadService.AddAsync(threadCreateVm, User);
+      TempData["ModalHeader"] = "Success";
+      TempData["ModalMessage"] = "The Thread has been created!";
       return Redirect(returnUrl);
     }
 
@@ -74,6 +77,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, ThreadEditVm threadEditVm, string returnUrl) {
+      ViewBag.ReturnUrl = returnUrl;
       if (!_threadService.DoesThreadExist(id))
         return NotFound();
 
@@ -84,6 +88,9 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       await _threadService.UpdateAsync(threadEditVm, User);
+
+      TempData["ModalHeader"] = "Success";
+      TempData["ModalMessage"] = "The Thread has been updated!";
       return Redirect(returnUrl);
     }
 
@@ -104,6 +111,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id, ThreadDeleteVm threadDeleteVm, string returnUrl) {
+      ViewBag.ReturnUrl = returnUrl;
       if (!_threadService.DoesThreadExist(id))
         return NotFound();
 
@@ -114,6 +122,9 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       await _threadService.RemoveAsync(threadDeleteVm);
+
+      TempData["ModalHeader"] = "Success";
+      TempData["ModalMessage"] = "The Thread has been deleted!";
       return Redirect(returnUrl);
     }
 
@@ -128,8 +139,11 @@ namespace Forum.Controllers {
       if (!await _authorizationService.IsAuthorizedForThreadLockAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      if (_threadService.IsThreadLocked(id))
+      if (_threadService.IsThreadLocked(id)) {
+        TempData["ModalHeader"] = "Warning";
+        TempData["ModalMessage"] = "The Thread is already locked!";
         return RedirectToAction(nameof(Unlock), new {returnUrl});
+      }
 
       return View(await _threadService.GetThreadLockVm(id));
     }
@@ -139,6 +153,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Lock(int id, ThreadLockVm threadLockVm, string returnUrl) {
+      ViewBag.ReturnUrl = returnUrl;
       if (!_threadService.DoesThreadExist(id))
         return NotFound();
 
@@ -148,10 +163,15 @@ namespace Forum.Controllers {
       if (!await _authorizationService.IsAuthorizedForThreadLockAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      if (_threadService.IsThreadLocked(threadLockVm.ThreadId))
+      if (_threadService.IsThreadLocked(threadLockVm.ThreadId)) {
+        TempData["ModalHeader"] = "Failed";
+        TempData["ModalMessage"] = "The Thread is already locked!";
         return Redirect(returnUrl);
+      }
 
       await _threadService.LockAsync(threadLockVm, User);
+      TempData["ModalHeader"] = "Success";
+      TempData["ModalMessage"] = "The Thread has been locked!";
       return Redirect(returnUrl);
     }
 
@@ -166,8 +186,11 @@ namespace Forum.Controllers {
       if (!await _authorizationService.IsAuthorizedForThreadLockAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      if (!_threadService.IsThreadLocked(id))
+      if (!_threadService.IsThreadLocked(id)) {
+        TempData["ModalHeader"] = "Warning";
+        TempData["ModalMessage"] = "The Thread is already unlocked!";
         return RedirectToAction(nameof(Lock), new {returnUrl});
+      }
 
       return View(await _threadService.GetThreadUnlockVm(id));
     }
@@ -177,6 +200,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Unlock(int id, ThreadUnlockVm threadUnlockVm, string returnUrl) {
+      ViewBag.ReturnUrl = returnUrl;
       if (!_threadService.DoesThreadExist(id))
         return NotFound();
 
@@ -186,10 +210,16 @@ namespace Forum.Controllers {
       if (!await _authorizationService.IsAuthorizedForThreadLockAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      if (!_threadService.IsThreadLocked(threadUnlockVm.ThreadId))
+      if (!_threadService.IsThreadLocked(threadUnlockVm.ThreadId)) {
+        TempData["ModalHeader"] = "Failed";
+        TempData["ModalMessage"] = "The Thread is already unlocked!";
         return Redirect(returnUrl);
+      }
 
       await _threadService.UnlockAsync(threadUnlockVm, User);
+
+      TempData["ModalHeader"] = "Success";
+      TempData["ModalMessage"] = "The Thread has been unlocked!";
       return Redirect(returnUrl);
     }
   }

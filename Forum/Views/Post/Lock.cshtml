@@ -27,7 +27,7 @@
           <div class="btn-group float-right">
             @Html.HiddenFor(m => m.PostId)
             <input type="submit" class="btn btn-warning rounded-left" value="Lock Post" />
-            <a href="javascript:history.back()" class="btn btn-primary">Back</a>
+            <a href="@ViewBag.ReturnUrl" class="btn btn-primary">Back</a>
           </div>
         </form>
       </div>

@@ -57,6 +57,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(string username, ProfileEditVm profileEditVm, string returnUrl) {
+      ViewBag.ReturnUrl = returnUrl;
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -83,6 +84,8 @@ namespace Forum.Controllers {
         return View(await _profileService.GetProfileEditVmAsync(username));
       }
 
+      TempData["ModalHeader"] = "Success";
+      TempData["ModalMessage"] = "The Profile has been updated!";
       return RedirectToAction(nameof(Details), new {username = profileEditVm.NewUsername, returnUrl});
     }
 
@@ -103,6 +106,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditRole(string username, ProfileRoleEditVm profileRoleEditVm, string returnUrl) {
+      ViewBag.ReturnUrl = returnUrl;
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -114,6 +118,8 @@ namespace Forum.Controllers {
 
       await _profileService.UpdateProfileRoleAsync(username, profileRoleEditVm);
 
+      TempData["ModalHeader"] = "Success";
+      TempData["ModalMessage"] = $"The Role has been updated to {profileRoleEditVm.Role}!";
       return RedirectToAction(nameof(Details), new {username, returnUrl});
     }
 
@@ -128,8 +134,11 @@ namespace Forum.Controllers {
       if (!await _authorizationService.IsAuthorizedProfileBlockAsync(username, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      if (await _authorizationService.IsProfileBlockedAsync(username))
+      if (await _authorizationService.IsProfileBlockedAsync(username)) {
+        TempData["ModalHeader"] = "Warning";
+        TempData["ModalMessage"] = "The Profile is already blocked!";
         return RedirectToAction(nameof(Unblock), new {returnUrl});
+      }
 
       return View(await _profileService.GetProfileBlockVmAsync(username));
     }
@@ -138,6 +147,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Block(string username, ProfileBlockVm profileBlockVm, string returnUrl) {
+      ViewBag.ReturnUrl = returnUrl;
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -147,8 +157,11 @@ namespace Forum.Controllers {
       if (!await _authorizationService.IsAuthorizedProfileBlockAsync(username, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      if (await _authorizationService.IsProfileBlockedAsync(username))
+      if (await _authorizationService.IsProfileBlockedAsync(username)) {
+        TempData["ModalHeader"] = "Failed";
+        TempData["ModalMessage"] = "The Profile is already blocked!";
         return RedirectToAction(nameof(Details), new {username, returnUrl});
+      }
 
       var result = await _profileService.BlockAsync(username, profileBlockVm, User);
 
@@ -158,6 +171,8 @@ namespace Forum.Controllers {
         return View(await _profileService.GetProfileBlockVmAsync(username));
       }
 
+      TempData["ModalHeader"] = "Success";
+      TempData["ModalMessage"] = "The Profile has been blocked!";
       return RedirectToAction(nameof(Details), new {returnUrl});
     }
 
@@ -172,8 +187,11 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
 
-      if (!await _authorizationService.IsProfileBlockedAsync(username))
-        return RedirectToAction(nameof(Unblock), new {returnUrl});
+      if (!await _authorizationService.IsProfileBlockedAsync(username)) {
+        TempData["ModalHeader"] = "Warning";
+        TempData["ModalMessage"] = "The Profile is already unblocked!";
+        return RedirectToAction(nameof(Block), new {returnUrl});
+      }
 
       return View(await _profileService.GetProfileUnblockVmAsync(username));
     }
@@ -182,6 +200,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Unblock(string username, ProfileUnblockVm profileUnblockVm, string returnUrl) {
+      ViewBag.ReturnUrl = returnUrl;
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -191,11 +210,16 @@ namespace Forum.Controllers {
       if (!await _authorizationService.IsAuthorizedProfileBlockAsync(username, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      if (!await _authorizationService.IsProfileBlockedAsync(username))
+      if (!await _authorizationService.IsProfileBlockedAsync(username)) {
+        TempData["ModalHeader"] = "Failed";
+        TempData["ModalMessage"] = "The Profile is already unblocked!";
         return RedirectToAction(nameof(Details), new {username, returnUrl});
+      }
 
       await _profileService.UnblockAsync(username);
 
+      TempData["ModalHeader"] = "Success";
+      TempData["ModalMessage"] = "The Profile has been ublocked!";
       return RedirectToAction(nameof(Details), new {returnUrl});
     }
 
@@ -216,6 +240,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(string username, ProfileDeleteVm profileDeleteVm, string returnUrl) {
+      ViewBag.ReturnUrl = returnUrl;
       if (!_sharedService.DoesUserAccountExist(username))
         return NotFound();
 
@@ -226,6 +251,9 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       await _profileService.RemoveAsync(profileDeleteVm);
+
+      TempData["ModalHeader"] = "Success";
+      TempData["ModalMessage"] = "The Profile has been deleted!";
       return Redirect(returnUrl);
     }
 
