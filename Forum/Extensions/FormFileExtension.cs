@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Http;
 namespace Forum.Extensions {
   public static class FormFileExtension {
     public const int ImageMaxBytes = 100000;
-    public const int ImageMinBytes = 5000;
+    public const int ImageMinBytes = 3000;
     public const int ImageMinPixelWidth = 240;
     public const int ImageMinPixelHeight = 240;
     public const int ImageMaxPixelWidth = 480;

@@ -15,15 +15,19 @@
     {
       name: "members",
       display: "username",
-      source: searchResults
+      source: searchResults,
+      templates: {
+        empty: function (context) {
+          $(".tt-dataset").text("No such member");
+        }
+      }
     });
 
   $("#memberSearch .typeahead").bind("typeahead:select", (ev, suggestion) => {
-    var url = window.location.href;
-    var returnUrl = `${window.location.href}`;
+    var returnUrl = window.location.href;
 
-    if (url.indexOf("?returnUrl=") !== -1) {
-      returnUrl = url.split("?returnUrl=").pop();
+    if (returnUrl.indexOf("?returnUrl=") !== -1) {
+      returnUrl = returnUrl.split("?returnUrl=").pop();
     }
 
     window.location.href = `/profile/details/${suggestion["username"]}/?returnUrl=${returnUrl}`;

@@ -7,7 +7,6 @@ namespace Forum {
       CreateWebHostBuilder(args).Build().Run();
     }
 
-    //TODO: Add Typeahead with ajax call for searching.
     //TODO: see if not change how images are passed to client.
     //TODO: Don't show headlines in forum management if tables are empty.
     //TODO: Add confirmations when adding, deleting, editing, etc. Maybe modal?
