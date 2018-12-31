@@ -33,7 +33,7 @@
     }
     <br />
     <div class="btn-group float-right">
-      @if (@ViewBag.FromProfile) {
+      @if (ViewBag.FromProfile) {
         <a asp-controller="Profile" asp-action="Details" asp-route-username="@Model.UserName" asp-route-returnUrl="@ViewBag.ReturnUrl" class="btn btn-primary">Back</a>
       } else {
         <a href="@ViewBag.ReturnUrl" class="btn btn-primary">Back</a>

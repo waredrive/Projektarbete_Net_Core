@@ -2,6 +2,11 @@
 
 namespace Forum.Models.Pagination {
   public class Pager {
+    public int CurrentPage { get; }
+    public int TotalPages { get; }
+    public int StartPage { get; }
+    public int EndPage { get; }
+
     public Pager(int totalItems, int? page, int pageSize = 15) {
       var totalPages = (int) Math.Ceiling(decimal.Divide(totalItems, pageSize));
       var currentPage = page ?? 1;
@@ -17,19 +22,10 @@ namespace Forum.Models.Pagination {
         if (endPage > 10) startPage = endPage - 9;
       }
 
-      TotalItems = totalItems;
       CurrentPage = currentPage;
-      PageSize = pageSize;
       TotalPages = totalPages;
       StartPage = startPage;
       EndPage = endPage;
     }
-
-    public int TotalItems { get; }
-    public int CurrentPage { get; }
-    public int PageSize { get; }
-    public int TotalPages { get; }
-    public int StartPage { get; }
-    public int EndPage { get; }
   }
 }

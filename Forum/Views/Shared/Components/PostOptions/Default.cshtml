@@ -1,7 +1,7 @@
 ﻿@model PostOptionsVm
 
 <div class="btn-group">
-  @if (@Model.IsAuthorizedForPostEditAndDelete) {
+  @if (Model.IsAuthorizedForPostEditAndDelete) {
     <a asp-controller="Post" asp-action="Edit" asp-route-id="@Model.PostId" asp-route-threadId="@Model.ThreadId" asp-route-returnUrl="@Model.ReturnUrl" class="btn btn-primary btn-sm">Edit</a>
   }
   @if (Model.IsAuthorizedForPostLock) {

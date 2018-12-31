@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -14,16 +13,13 @@ namespace Forum.Models.Services {
   public class ForumManagementService {
     private readonly AuthorizationService _authorizationService;
     private readonly ForumDbContext _db;
-    private readonly SharedService _sharedService;
     private readonly UserManager<IdentityUser> _userManager;
 
     public ForumManagementService(
-      UserManager<IdentityUser> userManager, ForumDbContext db, AuthorizationService authorizationService,
-      SharedService sharedService) {
+      UserManager<IdentityUser> userManager, ForumDbContext db, AuthorizationService authorizationService) {
       _userManager = userManager;
       _db = db;
       _authorizationService = authorizationService;
-      _sharedService = sharedService;
     }
 
     public async Task<ForumManagementIndexVm> GetForumManagementIndexVmAsync(ClaimsPrincipal user) {
@@ -186,7 +182,7 @@ namespace Forum.Models.Services {
 
     public async Task<ForumManagementLockedTopicsVm> GetForumManagementLockedTopicsVmAsync(ClaimsPrincipal user,
       int currentPage, string username = null, int pageSize = 20) {
-      var lockedTopics = new List<Topic>();
+      List<Topic> lockedTopics;
       IdentityUser identityUser = null;
 
       if (username != null) {
@@ -213,7 +209,7 @@ namespace Forum.Models.Services {
 
     public async Task<ForumManagementLockedThreadsVm> GetForumManagementLockedThreadsVmAsync(ClaimsPrincipal user,
       int currentPage, string username = null, int pageSize = 20) {
-      var lockedThreads = new List<Thread>();
+      List<Thread> lockedThreads;
       IdentityUser identityUser = null;
 
       if (username != null) {
@@ -240,7 +236,7 @@ namespace Forum.Models.Services {
 
     public async Task<ForumManagementLockedPostsVm> GetForumManagementLockedPostsVmAsync(ClaimsPrincipal user,
       int currentPage, string username = null, int pageSize = 20) {
-      var lockedPosts = new List<Post>();
+      List<Post> lockedPosts;
       IdentityUser identityUser = null;
 
       if (username != null) {
@@ -267,7 +263,7 @@ namespace Forum.Models.Services {
 
     public async Task<ForumManagementBlockedMembersVm> GetForumManagementBlockedMembersVmAsync(ClaimsPrincipal user,
       int currentPage, string username = null, int pageSize = 20) {
-      var blockedMembers = new List<Member>();
+      List<Member> blockedMembers;
       IdentityUser identityUser = null;
 
       if (username != null) {

@@ -25,7 +25,7 @@
       <td class="align-middle">
         @await Component.InvokeAsync("ThreadOptions", new { threadId = thread.ThreadId })
       </td>
-      @if (@thread.LatestPoster != null) {
+      @if (thread.LatestPoster != null) {
         <td style="width: 50px;" class="align-middle pr-0">
           <img class="rounded float-left" src="@Url.Action("ProfileImage", "Profile", new{username = thread.LatestPoster})" alt="Profile picture" style="width: 50px; height: 50px" />
         </td>

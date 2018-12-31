@@ -1,6 +1,6 @@
 ﻿@model TopicOptionsVm
 
-@if (@Model.IsAuthorizedForTopicEditLockAndDelete) {
+@if (Model.IsAuthorizedForTopicEditLockAndDelete) {
   <div class="btn-group">
     <a asp-controller="Topic" asp-action="Edit" asp-route-id="@Model.TopicId" asp-route-returnUrl="@Model.ReturnUrl" class="btn btn-primary btn-sm">Edit</a>
     @if (Model.LockedOn == null) {

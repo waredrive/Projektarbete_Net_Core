@@ -97,7 +97,7 @@ namespace Forum.Models.Services {
         ThreadId = mostRecentPostInTopic.ThreadNavigation.Id,
         ThreadText = mostRecentPostInTopic.ThreadNavigation.ContentText,
         LatestCommenter = latestPostInThreadCreator?.UserName,
-        LatestCommentTime = mostRecentPostInTopic?.CreatedOn
+        LatestCommentTime = mostRecentPostInTopic.CreatedOn
       };
     }
 
@@ -200,7 +200,7 @@ namespace Forum.Models.Services {
         ThreadCount = topic.Thread.Count,
         PostCount = _db.Post.Count(p => p.ThreadNavigation.Topic == topic.Id),
         LockedBy = lockedBy.UserName,
-        LockedOn = (DateTime) topic.LockedOn,
+        LockedOn = topic.LockedOn,
         TopicId = topic.Id,
         TopicText = topic.ContentText
       };

@@ -16,15 +16,13 @@ namespace Forum.Models.Services {
   public class ThreadService {
     private readonly AuthorizationService _authorizationService;
     private readonly ForumDbContext _db;
-    private readonly SharedService _sharedService;
     private readonly UserManager<IdentityUser> _userManager;
 
     public ThreadService(ForumDbContext db, AuthorizationService authorizationService,
-      UserManager<IdentityUser> userManager, SharedService sharedService) {
+      UserManager<IdentityUser> userManager) {
       _db = db;
       _authorizationService = authorizationService;
       _userManager = userManager;
-      _sharedService = sharedService;
     }
 
     public async Task AddAsync(ThreadCreateVm threadCreateVm, ClaimsPrincipal user) {

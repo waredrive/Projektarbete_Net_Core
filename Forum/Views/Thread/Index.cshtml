@@ -1,6 +1,6 @@
 ﻿@model ThreadsIndexVm
 @{
-  ViewBag.Title = @Model.TopicText;
+  ViewBag.Title = Model.TopicText;
 }
 <div class="container-fluid">
   <div class="col-md-12">
@@ -13,10 +13,10 @@
       </h3>
     </div>
     <div class="my-auto row pt-2">
-      @await Component.InvokeAsync("TopicOptions", new{ topicId = @Model.TopicId })
+      @await Component.InvokeAsync("TopicOptions", new{ topicId = Model.TopicId })
     </div>
   </div>
-  @if (@Model.IsAuthorizedForThreadCreate) {
+  @if (Model.IsAuthorizedForThreadCreate) {
     <div class="col-md-12 py-3">
       <div class="row">
         <a asp-controller="Thread" asp-action="Create" class="btn btn-primary">Add new thread</a>

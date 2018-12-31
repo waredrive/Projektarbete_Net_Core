@@ -112,10 +112,9 @@ namespace Forum.Models.Services {
       if (user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator))
         return true;
 
-      return threadFromDb?.LockedOn == null && threadFromDb?.CreatedBy == userId &&
+      return threadFromDb.LockedOn == null && threadFromDb.CreatedBy == userId &&
              threadFromDb.Post.Where(p => p.Thread == threadFromDb.Id).All(p => p.CreatedBy == userId) &&
-             threadFromDb?.TopicNavigation.LockedOn == null && threadFromDb.CreatedOn >= DateTime.UtcNow.AddMinutes(-MinutesToAllowEditAndDelete);
-      ;
+             threadFromDb.TopicNavigation.LockedOn == null && threadFromDb.CreatedOn >= DateTime.UtcNow.AddMinutes(-MinutesToAllowEditAndDelete);
     }
 
     // The user is authorized as long as he is the only one that posted on the thread,
@@ -155,7 +154,7 @@ namespace Forum.Models.Services {
 
       return threadFromDb.LockedOn == null && threadFromDb.CreatedBy == userId &&
              threadFromDb.Post.Where(p => p.Thread == threadFromDb.Id).All(p => p.CreatedBy == userId) &&
-             threadFromDb?.TopicNavigation.LockedOn == null && threadFromDb.CreatedOn >= DateTime.UtcNow.AddMinutes(-MinutesToAllowEditAndDelete);
+             threadFromDb.TopicNavigation.LockedOn == null && threadFromDb.CreatedOn >= DateTime.UtcNow.AddMinutes(-MinutesToAllowEditAndDelete);
     }
 
     public async Task<bool> IsAuthorizedForPostCreateInThreadAsync(int threadId, ClaimsPrincipal user) {
@@ -219,7 +218,7 @@ namespace Forum.Models.Services {
         return true;
 
       return postFromDb.LockedOn == null && postFromDb.CreatedBy == userId &&
-             postFromDb?.ThreadNavigation.LockedOn == null && postFromDb.CreatedOn >= DateTime.UtcNow.AddMinutes(-MinutesToAllowEditAndDelete);
+             postFromDb.ThreadNavigation.LockedOn == null && postFromDb.CreatedOn >= DateTime.UtcNow.AddMinutes(-MinutesToAllowEditAndDelete);
     }
 
     public async Task<bool> IsAuthorizedForPostLockAsync(int postId, ClaimsPrincipal user) {

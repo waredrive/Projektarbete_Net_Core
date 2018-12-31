@@ -1,7 +1,7 @@
 ﻿@model ThreadOptionsVm
 
 <div class="btn-group">
-  @if (@Model.IsAuthorizedForThreadEdit) {
+  @if (Model.IsAuthorizedForThreadEdit) {
     <a asp-controller="Thread" asp-action="Edit" asp-route-id="@Model.ThreadId" asp-route-topicId="@Model.TopicId" asp-route-returnUrl="@Model.ReturnUrl" class="btn btn-primary btn-sm">Edit</a>
   }
   @if (Model.IsAuthorizedForThreadLock) {
