@@ -17,7 +17,7 @@
       display: "username",
       source: searchResults,
       templates: {
-        empty: function (context) {
+        empty: function () {
           $(".tt-dataset").text("No such member");
         }
       }

@@ -111,7 +111,7 @@ namespace Forum.Models.Services {
       if (user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator))
         return true;
 
-      return threadFromDb.LockedOn == null && threadFromDb.CreatedBy == userId &&
+      return threadFromDb?.LockedOn == null && threadFromDb?.CreatedBy == userId &&
              threadFromDb.Post.Where(p => p.Thread == threadFromDb.Id).All(p => p.CreatedBy == userId) &&
              threadFromDb?.TopicNavigation.LockedOn == null;
     }
@@ -275,7 +275,6 @@ namespace Forum.Models.Services {
       if (!_sharedService.DoesUserAccountExist(username))
         return false;
 
-      var identityUser = await _userManager.FindByNameAsync(username);
       if (_sharedService.IsDeletedMember(username))
         return false;
 

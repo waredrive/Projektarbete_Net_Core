@@ -4,7 +4,6 @@ namespace Forum.Models.ViewModels.ProfileViewModels {
   public class ProfileDetailsVm {
     public string Username { get; set; }
     public string[] Roles { get; set; }
-    public string ProfileImage { get; set; }
     public DateTime CreatedOn { get; set; }
     public DateTime? BlockedOn { get; set; }
     public string BlockedBy { get; set; }

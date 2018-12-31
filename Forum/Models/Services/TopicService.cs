@@ -15,15 +15,13 @@ namespace Forum.Models.Services {
   public class TopicService {
     private readonly AuthorizationService _authorizationService;
     private readonly ForumDbContext _db;
-    private readonly SharedService _sharedService;
     private readonly UserManager<IdentityUser> _userManager;
 
     public TopicService(ForumDbContext db, UserManager<IdentityUser> userManager,
-      AuthorizationService authorizationService, SharedService sharedService) {
+      AuthorizationService authorizationService) {
       _db = db;
       _userManager = userManager;
       _authorizationService = authorizationService;
-      _sharedService = sharedService;
     }
 
     public async Task AddAsync(TopicCreateVm topicCreateVm, ClaimsPrincipal user) {
@@ -51,7 +49,7 @@ namespace Forum.Models.Services {
 
       var topics = await _db.Topic.Include(t => t.Thread).ToListAsync();
       foreach (var topic in topics)
-        topicsIndexVm.Topics.Add(await GetTopicsIndexTopicVmAsync(topic, user));
+        topicsIndexVm.Topics.Add(await GetTopicsIndexTopicVmAsync(topic));
 
       var latestThreads =
         await _db.Thread.Include(t => t.Post).OrderByDescending(t => t.CreatedOn).Take(10).ToListAsync();
@@ -64,7 +62,7 @@ namespace Forum.Models.Services {
       return topicsIndexVm;
     }
 
-    private async Task<TopicsIndexTopicVm> GetTopicsIndexTopicVmAsync(Topic topic, ClaimsPrincipal user) {
+    private async Task<TopicsIndexTopicVm> GetTopicsIndexTopicVmAsync(Topic topic) {
       var lockedBy = await _userManager.FindByIdAsync(topic.LockedBy);
       var mostRecentPostInTopic = await _db.Post.Where(p => p.ThreadNavigation.Topic == topic.Id)
         .OrderByDescending(p => p.CreatedOn).FirstOrDefaultAsync();
@@ -85,7 +83,6 @@ namespace Forum.Models.Services {
       var createdBy = await _userManager.FindByIdAsync(thread.CreatedBy);
 
       return new TopicsIndexLatestThreadVm {
-        CreatorProfileImage = await _sharedService.GetProfileImageStringByMemberIdAsync(thread.CreatedBy),
         ThreadId = thread.Id,
         ThreadText = thread.ContentText,
         CreatedOn = thread.CreatedOn,
@@ -97,8 +94,6 @@ namespace Forum.Models.Services {
       var latestPostInThreadCreator = await _userManager.FindByIdAsync(mostRecentPostInTopic.CreatedBy);
 
       return new TopicsIndexThreadVm {
-        LatestCommenterProfileImage =
-          await _sharedService.GetProfileImageStringByMemberIdAsync(mostRecentPostInTopic.CreatedBy),
         ThreadId = mostRecentPostInTopic.ThreadNavigation.Id,
         ThreadText = mostRecentPostInTopic.ThreadNavigation.ContentText,
         LatestCommenter = latestPostInThreadCreator?.UserName,
@@ -110,7 +105,6 @@ namespace Forum.Models.Services {
       var createdBy = await _userManager.FindByIdAsync(post.CreatedBy);
 
       return new TopicsIndexPostVm {
-        CreatorProfileImage = await _sharedService.GetProfileImageStringByMemberIdAsync(post.CreatedBy),
         PostId = post.Id,
         ThreadId = post.Thread,
         ThreadText = post.ThreadNavigation.ContentText,

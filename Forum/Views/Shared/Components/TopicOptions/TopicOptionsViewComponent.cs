@@ -3,7 +3,7 @@ using Forum.Models.Services;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Forum.Views.Shared.Components.TopicManageOptions {
+namespace Forum.Views.Shared.Components.TopicOptions {
   public class TopicOptionsViewComponent : ViewComponent {
     private readonly TopicService _topicService;
 

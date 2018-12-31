@@ -45,7 +45,6 @@ namespace Forum.Models.Services {
       var roles = await _userManager.GetRolesAsync(identityUser);
 
       return new ProfileDetailsVm {
-        ProfileImage = await _sharedService.GetProfileImageStringByMemberIdAsync(memberFromDb.Id),
         Username = identityUser.UserName,
         Roles = roles.ToArray(),
         CreatedOn = memberFromDb.CreatedOn,
@@ -60,9 +59,8 @@ namespace Forum.Models.Services {
       };
     }
 
-    public async Task<ProfileRemovedVm> GetProfileRemovedVmAsync() {
+    public ProfileRemovedVm GetProfileRemovedVmAsync() {
       return new ProfileRemovedVm {
-        ProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(DeletedMember.Username),
         Username = DeletedMember.Username,
         Message = "This profile has been removed"
       };
@@ -283,7 +281,6 @@ namespace Forum.Models.Services {
 
     public async Task<NavbarVm> GetNavbarVmAsync(IPrincipal user) {
       return new NavbarVm {
-        ProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(user.Identity.Name),
         IsAuthorizedForForumManagement =
           await _authorizationService.IsAuthorizedForForumManagementAsync(user as ClaimsPrincipal)
       };
@@ -318,6 +315,13 @@ namespace Forum.Models.Services {
       var searchResult = _userManager.Users.Where(u => u.UserName.StartsWith(query))
         .Select(u => new { username = u.UserName}).ToArrayAsync();
       return await searchResult;
+    }
+
+    public async Task<byte[]> GetProfileImage(string username) {
+      if (!_sharedService.DoesUserAccountExist(username))
+        return null;
+      return await _db.Member.Include(m => m.IdNavigation).Where(m => m.IdNavigation.UserName == username)
+        .Select(m => m.ProfileImage).FirstOrDefaultAsync();
     }
   }
 }

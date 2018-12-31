@@ -92,7 +92,6 @@ namespace Forum.Models.Services {
         PostId = post.Id,
         CreatedOn = post.CreatedOn,
         CreatedBy = createdBy.UserName,
-        CreatorsProfileImage = await _sharedService.GetProfileImageStringByMemberIdAsync(createdBy.Id),
         CreatorsTotalposts = await _db.Post.CountAsync(p => p.CreatedBy == post.CreatedBy),
         CreatorsRoles = (await _userManager.GetRolesAsync(createdBy)).ToArray(),
         PostText = post.ContentText,

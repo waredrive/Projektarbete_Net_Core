@@ -5,7 +5,7 @@
     <tr>
       
       <td style="width: 50px;" class="align-middle pr-0">
-        <img class="rounded float-left" src="data:image;base64,@thread.CreatorProfileImage" alt="Profile picture" style="width: 50px; height: 50px" />
+        <img class="rounded float-left" src="@Url.Action("ProfileImage", "Profile", new{username = thread.CreatedBy})" alt="Profile picture" style="width: 50px; height: 50px" />
       </td>
       <td class="align-middle">
         <p class="pb-0 mb-0 small"><a asp-controller="Post" asp-action="index" asp-route-threadId="@thread.ThreadId" class="light">@thread.ThreadText</a></p>

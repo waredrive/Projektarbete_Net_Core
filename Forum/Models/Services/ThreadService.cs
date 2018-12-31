@@ -77,7 +77,7 @@ namespace Forum.Models.Services {
       var threads = _db.Thread.Include(t => t.TopicNavigation).Include(t => t.Post).OrderByDescending(t => t.CreatedOn)
         .Where(t => t.Topic == topicId).Skip((currentPage - 1) * pageSize).Take(pageSize);
 
-      foreach (var thread in threads) threadsIndexVm.Threads.Add(await GetThreadsIndexThreadVmAsync(thread, user));
+      foreach (var thread in threads) threadsIndexVm.Threads.Add(await GetThreadsIndexThreadVmAsync(thread));
 
       return threadsIndexVm;
     }
@@ -87,7 +87,7 @@ namespace Forum.Models.Services {
       return new Pager(totalItems, currentPage, pageSize);
     }
 
-    private async Task<ThreadsIndexThreadVm> GetThreadsIndexThreadVmAsync(Thread thread, ClaimsPrincipal user) {
+    private async Task<ThreadsIndexThreadVm> GetThreadsIndexThreadVmAsync(Thread thread) {
       var createdBy = await _userManager.FindByIdAsync(thread.CreatedBy);
       var latestPostInThread = thread.Post.OrderByDescending(p => p.CreatedOn).FirstOrDefault();
       var latestPoster = latestPostInThread != null
@@ -96,7 +96,6 @@ namespace Forum.Models.Services {
 
       return new ThreadsIndexThreadVm {
         LatestPoster = latestPoster?.UserName,
-        LatestPosterProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(latestPoster?.UserName),
         LatestPostedOn = latestPostInThread?.CreatedOn,
         ThreadId = thread.Id,
         CreatedOn = thread.CreatedOn,

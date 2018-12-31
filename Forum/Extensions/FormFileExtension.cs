@@ -8,12 +8,12 @@ using Microsoft.AspNetCore.Http;
 
 namespace Forum.Extensions {
   public static class FormFileExtension {
-    public const int ImageMaxBytes = 100000;
-    public const int ImageMinBytes = 3000;
-    public const int ImageMinPixelWidth = 240;
-    public const int ImageMinPixelHeight = 240;
-    public const int ImageMaxPixelWidth = 480;
-    public const int ImageMaxPixelHeight = 480;
+    private const int ImageMaxBytes = 100000;
+    private const int ImageMinBytes = 3000;
+    private const int ImageMinPixelWidth = 240;
+    private const int ImageMinPixelHeight = 240;
+    private const int ImageMaxPixelWidth = 480;
+    private const int ImageMaxPixelHeight = 480;
 
     public static ImageCustomValidationResult IsValidImage(this IFormFile postedFile) {
       var result = new ImageCustomValidationResult();

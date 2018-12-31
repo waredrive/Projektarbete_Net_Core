@@ -25,6 +25,5 @@ namespace Forum.Models.ViewModels.PostViewModels {
     public DateTime? EditedOn { get; set; }
     public string[] CreatorsRoles { get; set; }
     public int CreatorsTotalposts { get; set; }
-    public string CreatorsProfileImage { get; set; }
   }
 }

@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Forum.Extensions;
-using Forum.Models;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.ProfileViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -36,8 +35,8 @@ namespace Forum.Controllers {
 
     [Route("Details/ProfileRemoved")]
     [HttpGet]
-    public async Task<IActionResult> ProfileRemoved() {
-      return View(await _profileService.GetProfileRemovedVmAsync());
+    public IActionResult ProfileRemoved() {
+      return View(_profileService.GetProfileRemovedVmAsync());
     }
 
     [Route("Update/{username}")]
@@ -228,6 +227,13 @@ namespace Forum.Controllers {
 
       await _profileService.RemoveAsync(profileDeleteVm);
       return Redirect(returnUrl);
+    }
+
+    [AllowAnonymous]
+    [HttpGet]
+    [Route("ProfileImage/{username}")]
+    public async Task<IActionResult> ProfileImage(string username) {
+      return File(await _profileService.GetProfileImage(username), "image/*");
     }
 
     [HttpGet("Search") ]

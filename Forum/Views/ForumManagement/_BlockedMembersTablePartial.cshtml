@@ -4,7 +4,7 @@
   @foreach (var member in Model) {
     <tr>
       <td style="width: 1%;" class="align-middle pr-0">
-        <img class="rounded float-left" src="data:image;base64,@member.CreatorProfileImage" alt="Profile picture" style="height: 50px; width: 50px;" />
+        <img class="rounded float-left" src="@Url.Action("ProfileImage", "Profile", new{username = member.Username})" alt="Profile picture" style="height: 50px; width: 50px;" />
       </td>
       <td style="width: 29%" class="align-middle">
         <p class="pb-0 mb-0">
@@ -15,7 +15,7 @@
         <p class="pb-0 mb-0 small">Created on: @member.CreatedOn</p>
         <p class="pb-0 mb-0 small">Roles: @string.Join(", ", member.Roles)</p>
       <td style="width: 1%;" class="align-middle pr-0">
-        <img class="rounded float-left" src="data:image;base64,@member.BlockerProfileImage" alt="Profile picture" style="height: 50px; width: 50px;" />
+        <img class="rounded float-left" src="@Url.Action("ProfileImage", "Profile", new{username = member.Username})" alt="Profile picture" style="height: 50px; width: 50px;" />
       </td>
       <td style="width: 19%" class="align-middle">
         <p class="pb-0 mb-0 small">

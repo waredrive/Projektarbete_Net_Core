@@ -15,7 +15,6 @@ namespace Forum.Models.ViewModels.ThreadViewModels {
   public class ThreadsIndexThreadVm {
     public string LatestPoster { get; set; }
     public DateTime? LatestPostedOn { get; set; }
-    public string LatestPosterProfileImage { get; set; }
     public int ThreadId { get; set; }
     public string ThreadText { get; set; }
     public string CreatedBy { get; set; }

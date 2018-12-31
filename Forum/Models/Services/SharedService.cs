@@ -18,19 +18,6 @@ namespace Forum.Models.Services {
       _db = db;
     }
 
-    public async Task<string> GetProfileImageStringByUsernameAsync(string username) {
-      if (!DoesUserAccountExist(username))
-        return null;
-
-      var identityUser = await _userManager.FindByNameAsync(username);
-      return await GetProfileImageStringByMemberIdAsync(identityUser.Id);
-    }
-
-    public async Task<string> GetProfileImageStringByMemberIdAsync(string id) {
-      var imageByteArr = await _db.Member.Where(m => m.Id == id).Select(m => m.ProfileImage).FirstOrDefaultAsync();
-      return imageByteArr != null ? Convert.ToBase64String(imageByteArr) : null;
-    }
-
     public bool DoesUserAccountExist(string username) {
       if (username == null)
         return false;

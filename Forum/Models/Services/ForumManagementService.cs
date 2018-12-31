@@ -87,8 +87,6 @@ namespace Forum.Models.Services {
         var createdBy = await _userManager.FindByIdAsync(topic.CreatedBy);
 
         topics.Add(new ForumManagementLockedTopicVm {
-          LockerProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(lockedBy.UserName),
-          CreatorProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(createdBy.UserName),
           TopicId = topic.Id,
           CreatedOn = topic.CreatedOn,
           LockedBy = lockedBy.UserName,
@@ -113,8 +111,6 @@ namespace Forum.Models.Services {
         var createdBy = await _userManager.FindByIdAsync(thread.CreatedBy);
 
         threads.Add(new ForumManagementLockedThreadVm {
-          LockerProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(lockedBy.UserName),
-          CreatorProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(createdBy.UserName),
           TopicId = thread.Topic,
           ThreadId = thread.Id,
           CreatedOn = thread.CreatedOn,
@@ -140,8 +136,6 @@ namespace Forum.Models.Services {
         var createdBy = await _userManager.FindByIdAsync(post.CreatedBy);
 
         posts.Add(new ForumManagementLockedPostVm {
-          LockerProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(lockedBy.UserName),
-          CreatorProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(createdBy.UserName),
           ThreadId = post.Thread,
           PostId = post.Id,
           CreatedOn = post.CreatedOn,
@@ -169,8 +163,6 @@ namespace Forum.Models.Services {
         var roles = await _userManager.GetRolesAsync(identityUser);
 
         members.Add(new ForumManagementBlockedMemberVm {
-          BlockerProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(blockedBy.UserName),
-          CreatorProfileImage = await _sharedService.GetProfileImageStringByUsernameAsync(identityUser.UserName),
           MemberId = member.Id,
           CreatedOn = member.CreatedOn,
           BlockedBy = blockedBy.UserName,
