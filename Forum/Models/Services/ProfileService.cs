@@ -278,13 +278,6 @@ namespace Forum.Models.Services {
       return string.Equals(username, user.Identity.Name, StringComparison.CurrentCultureIgnoreCase);
     }
 
-    public async Task<NavbarVm> GetNavbarVmAsync(IPrincipal user) {
-      return new NavbarVm {
-        IsAuthorizedForForumManagement =
-          await _authorizationService.IsAuthorizedForForumManagementAsync(user as ClaimsPrincipal)
-      };
-    }
-
     public async Task<MemberOptionsVm> GetMemberOptionsVmAsync(string username, IPrincipal user, string returnUrl) {
       var identityUser = await _userManager.FindByNameAsync(username);
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
@@ -321,6 +314,13 @@ namespace Forum.Models.Services {
         return null;
       return await _db.Member.Include(m => m.IdNavigation).Where(m => m.IdNavigation.UserName == username)
         .Select(m => m.ProfileImage).FirstOrDefaultAsync();
+    }
+
+    public async Task<NavbarVm> GetNavbarVmAsync(IPrincipal user) {
+      return new NavbarVm {
+        IsAuthorizedForForumManagement =
+          await _authorizationService.IsAuthorizedForForumManagementAsync(user as ClaimsPrincipal)
+      };
     }
   }
 }
