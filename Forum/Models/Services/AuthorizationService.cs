@@ -234,6 +234,9 @@ namespace Forum.Models.Services {
       var userId = _userManager.GetUserId(user);
       var profileUser = await _userManager.FindByIdAsync(postFromDb.CreatedBy);
 
+      if (postFromDb.CreatedBy == userId)
+        return false;
+
       if (await IsProfileInRoleAsync(profileUser.UserName, Roles.Admin) && postFromDb.CreatedBy != userId)
         return false;
 
