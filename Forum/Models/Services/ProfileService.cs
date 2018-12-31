@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ using Forum.Validations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace Forum.Models.Services {
   public class ProfileService {
@@ -52,7 +54,8 @@ namespace Forum.Models.Services {
         BlockedEnd = memberFromDb.BlockedEnd,
         TotalThreads = memberFromDb.ThreadCreatedByNavigation.Count,
         TotalPosts = memberFromDb.PostCreatedByNavigation.Count,
-        IsAuthorizedForAccountView = await _authorizationService.IsAuthorizedForAccountDetailsViewAsync(identityUser.UserName, user),
+        IsAuthorizedForAccountView =
+          await _authorizationService.IsAuthorizedForAccountDetailsViewAsync(identityUser.UserName, user),
         IsUserOwner = IsUserOwner(identityUser.UserName, user)
       };
     }
@@ -80,7 +83,7 @@ namespace Forum.Models.Services {
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
 
       if (_sharedService.IsDeletedMember(identityUser.UserName))
-        return IdentityResult.Failed(new IdentityError {Description = "This member cannot be edited"});
+        return IdentityResult.Failed(new IdentityError { Description = "This member cannot be edited" });
 
       var result = await _userManager.SetUserNameAsync(identityUser, profileEditVm.NewUsername);
 
@@ -98,8 +101,7 @@ namespace Forum.Models.Services {
 
         await _signInManager.SignOutAsync();
         await _signInManager.SignInAsync(identityUser, false, identityUser.Id);
-      }
-      catch (Exception) {
+      } catch (Exception) {
         await _userManager.SetUserNameAsync(identityUser, oldUserName);
         throw;
       }
@@ -197,8 +199,7 @@ namespace Forum.Models.Services {
           await _userManager.AddToRoleAsync(identityUser, profileRoleEditVm.Role);
           await _db.SaveChangesAsync();
         }
-      }
-      catch (Exception) {
+      } catch (Exception) {
         var roles = await _userManager.GetRolesAsync(identityUser);
         await _userManager.RemoveFromRolesAsync(identityUser, roles.ToArray());
         await _userManager.AddToRolesAsync(identityUser, roles);
@@ -241,25 +242,35 @@ namespace Forum.Models.Services {
       if (identityUser.UserName == DeletedMember.Username)
         return;
 
-      foreach (var member in memberFromDb.InverseBlockedByNavigation) member.BlockedBy = customDeletedIdentityUser.Id;
+      foreach (var member in memberFromDb.InverseBlockedByNavigation)
+        member.BlockedBy = customDeletedIdentityUser.Id;
 
-      foreach (var topic in memberFromDb.TopicCreatedByNavigation) topic.CreatedBy = customDeletedIdentityUser.Id;
+      foreach (var topic in memberFromDb.TopicCreatedByNavigation)
+        topic.CreatedBy = customDeletedIdentityUser.Id;
 
-      foreach (var topic in memberFromDb.TopicEditedByNavigation) topic.EditedBy = customDeletedIdentityUser.Id;
+      foreach (var topic in memberFromDb.TopicEditedByNavigation)
+        topic.EditedBy = customDeletedIdentityUser.Id;
 
-      foreach (var topic in memberFromDb.TopicLockedByNavigation) topic.LockedBy = customDeletedIdentityUser.Id;
+      foreach (var topic in memberFromDb.TopicLockedByNavigation)
+        topic.LockedBy = customDeletedIdentityUser.Id;
 
-      foreach (var thread in memberFromDb.ThreadCreatedByNavigation) thread.CreatedBy = customDeletedIdentityUser.Id;
+      foreach (var thread in memberFromDb.ThreadCreatedByNavigation)
+        thread.CreatedBy = customDeletedIdentityUser.Id;
 
-      foreach (var thread in memberFromDb.ThreadEditedByNavigation) thread.EditedBy = customDeletedIdentityUser.Id;
+      foreach (var thread in memberFromDb.ThreadEditedByNavigation)
+        thread.EditedBy = customDeletedIdentityUser.Id;
 
-      foreach (var thread in memberFromDb.ThreadLockedByNavigation) thread.LockedBy = customDeletedIdentityUser.Id;
+      foreach (var thread in memberFromDb.ThreadLockedByNavigation)
+        thread.LockedBy = customDeletedIdentityUser.Id;
 
-      foreach (var post in memberFromDb.PostEditedByNavigation) post.EditedBy = customDeletedIdentityUser.Id;
+      foreach (var post in memberFromDb.PostEditedByNavigation)
+        post.EditedBy = customDeletedIdentityUser.Id;
 
-      foreach (var post in memberFromDb.PostLockedByNavigation) post.LockedBy = customDeletedIdentityUser.Id;
+      foreach (var post in memberFromDb.PostLockedByNavigation)
+        post.LockedBy = customDeletedIdentityUser.Id;
 
-      foreach (var post in memberFromDb.PostCreatedByNavigation) post.CreatedBy = customDeletedIdentityUser.Id;
+      foreach (var post in memberFromDb.PostCreatedByNavigation)
+        post.CreatedBy = customDeletedIdentityUser.Id;
 
       _db.Member.Remove(memberFromDb);
       await _db.SaveChangesAsync();
@@ -301,6 +312,12 @@ namespace Forum.Models.Services {
         IsAuthorizedProfileChangeRole = isAuthorizedProfileChangeRole,
         IsUserOwner = IsUserOwner(username, claimsPrincipalUser)
       };
+    }
+
+    public async Task<object> GetSearchResultJsonAsync(string query) {
+      var searchResult = _userManager.Users.Where(u => u.UserName.StartsWith(query))
+        .Select(u => new { username = u.UserName}).ToArrayAsync();
+      return await searchResult;
     }
   }
 }

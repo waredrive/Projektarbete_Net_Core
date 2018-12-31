@@ -13,12 +13,12 @@
       <div asp-validation-summary="ModelOnly" class="text-danger bg-white rounded py-1"></div>
       <div class="form-group">
         <label asp-for="UserName" class="control-label"></label>
-        <input asp-for="UserName" class="form-control"/>
+        <input asp-for="UserName" class="form-control" autocomplete="username"/>
         <span asp-validation-for="UserName" class="text-danger bg-white rounded-bottom py-1"></span>
       </div>
       <div class="form-group">
         <label asp-for="Password" class="control-label"></label>
-        <input asp-for="Password" class="form-control"/>
+        <input asp-for="Password" class="form-control" autocomplete="password"/>
         <span asp-validation-for="Password" class="text-danger bg-white rounded-bottom py-1"></span>
       </div>
       <div class="form-check">

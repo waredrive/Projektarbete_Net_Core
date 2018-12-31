@@ -8,10 +8,12 @@ namespace Forum {
     }
 
     //TODO: Add Typeahead with ajax call for searching.
+    //TODO: see if not change how images are passed to client.
     //TODO: Don't show headlines in forum management if tables are empty.
     //TODO: Add confirmations when adding, deleting, editing, etc. Maybe modal?
     //TODO: Add seed of Default deleted user if possible?
     //TODO: Add partial views.
+    //TODO: Add timeout on edit and delete posts, threads.
     //TODO: Add SuperAdmin? - if so Admin cannot add SuperAdmin role and manipulate SuperAdmin.
     //TODO: Add areas?
     //TODO: A member can include idnavigation! Change all redundant searches for identityuser.

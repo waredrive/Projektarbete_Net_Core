@@ -3,6 +3,7 @@ using Forum.Extensions;
 using Forum.Models;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.ProfileViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.Controllers {
@@ -227,6 +228,12 @@ namespace Forum.Controllers {
 
       await _profileService.RemoveAsync(profileDeleteVm);
       return Redirect(returnUrl);
+    }
+
+    [HttpGet("Search") ]
+    public async Task<JsonResult> Search(string query) {
+      var result = _profileService.GetSearchResultJsonAsync(query);
+      return Json(await result);
     }
   }
 }
