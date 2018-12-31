@@ -7,9 +7,13 @@
     <div class="col-md-10">
       <div class="row mt-4">
         <div class="col-md-12">
+          @if (Model.UserName != null) {
+            <h4 class="text-center text-light mb-3">Topics Locked By @Model.UserName @if (Model.UserName == User.Identity.Name) {<span>(You)</span>}</h4>
+          } else {
           <h4 class="text-center text-light mb-3">All Locked Topics</h4>
-          <partial name="_LockedTopicsTablePartial" for="@Model.LockedTopics" />
-          <partial name="_PaginationPartial" for="@Model.Pager" />
+          }
+          <partial name="_LockedTopicsTablePartial" for="@Model.LockedTopics"/>
+          <partial name="_PaginationPartial" for="@Model.Pager"/>
         </div>
       </div>
     </div>

@@ -208,7 +208,7 @@ namespace Forum.Models.Services {
 
       return new ForumManagementLockedTopicsVm {
         Pager = await GetPaginationVmForLockedTopics(currentPage, pageSize),
-        UserName = identityUser?.UserName ?? user.Identity.Name,
+        UserName = identityUser?.UserName,
         Statistics = await GetForumManagementStatisticsVmAsync(identityUser?.UserName ?? user.Identity.Name),
         LockedTopics = await GetForumManagementLockedTopicVmsAsync(lockedTopics, user)
       };
@@ -235,7 +235,7 @@ namespace Forum.Models.Services {
 
       return new ForumManagementLockedThreadsVm {
         Pager = await GetPaginationVmForLockedThreads(currentPage, pageSize),
-        UserName = identityUser?.UserName ?? user.Identity.Name,
+        UserName = identityUser?.UserName,
         Statistics = await GetForumManagementStatisticsVmAsync(identityUser?.UserName ?? user.Identity.Name),
         LockedThreads = await GetForumManagementLockedThreadVmsAsync(lockedThreads, user)
       };
@@ -262,7 +262,7 @@ namespace Forum.Models.Services {
 
       return new ForumManagementLockedPostsVm {
         Pager = await GetPaginationVmForLockedPosts(currentPage, pageSize),
-        UserName = identityUser?.UserName ?? user.Identity.Name,
+        UserName = identityUser?.UserName,
         Statistics = await GetForumManagementStatisticsVmAsync(identityUser?.UserName ?? user.Identity.Name),
         LockedPosts = await GetForumManagementLockedPostVmsAsync(lockedPosts, user)
       };
@@ -289,7 +289,7 @@ namespace Forum.Models.Services {
 
       return new ForumManagementBlockedMembersVm {
         Pager = await GetPaginationVmForBlockedMembers(currentPage, pageSize),
-        UserName = identityUser?.UserName ?? user.Identity.Name,
+        UserName = identityUser?.UserName,
         Statistics = await GetForumManagementStatisticsVmAsync(identityUser?.UserName ?? user.Identity.Name),
         BlockedMembers = await GetForumManagementBlockedMemberVmsAsync(blockedMembers, user)
       };

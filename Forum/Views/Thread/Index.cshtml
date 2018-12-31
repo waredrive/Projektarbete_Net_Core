@@ -49,7 +49,7 @@
               <a asp-controller="Post" asp-action="index" asp-route-threadId="@thread.ThreadId" class="light">
                 <p class="pb-0 mb-0">@thread.ThreadText</p>
               </a>
-              <small>Started by <a asp-controller="Profile" asp-action="Details" asp-route-returnurl="@ViewBag.ReturnUrl" asp-route-username="@thread.CreatedBy" class="light">@thread.CreatedBy</a>, @thread.CreatedOn</small>
+              <small>Started by <a asp-controller="Profile" asp-action="Details" asp-route-username="@thread.CreatedBy" class="light">@thread.CreatedBy</a>, @thread.CreatedOn</small>
             </td>
             <td class="align-middle">
               <p class="small pb-0 mb-0">
