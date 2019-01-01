@@ -59,25 +59,25 @@ namespace Forum.Controllers {
     [Route("Login")]
     [HttpGet]
     public IActionResult Login(string returnUrl = null) {
+      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
       if (User.Identity.IsAuthenticated) {
         return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
       }
-      return View(new AccountLoginVm { ReturnUrl = returnUrl });
+      return View();
     }
 
     [AllowAnonymous]
     [Route("Login")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(AccountLoginVm accountLoginVm) {
+    public async Task<IActionResult> Login(AccountLoginVm accountLoginVm, string returnUrl) {
       if (!ModelState.IsValid)
         return View(accountLoginVm);
 
       var result = await _accountService.LoginAsync(accountLoginVm);
       if (result.Succeeded) {
-        var returnUrl = Url.IsLocalUrl(accountLoginVm.ReturnUrl) ? accountLoginVm.ReturnUrl : "/";
-        returnUrl += $"?returnUrl={returnUrl}";
-        return Redirect(returnUrl);
+        var retUrl = Url.IsLocalUrl(returnUrl) ? returnUrl : "/";
+        return Redirect(retUrl);
       }
       ModelState.AddModelError(string.Empty, "Invalid login attempt.");
 

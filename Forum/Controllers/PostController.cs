@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Forum.Attributes;
 using Forum.Extensions;
 using Forum.Models.Identity;

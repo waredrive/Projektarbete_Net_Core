@@ -8,8 +8,7 @@
   <div class="col-12 rounded my-5 bg-secondary p-5 text-light">
     <h1>Log in</h1>
     <br/>
-    <form asp-controller="Account" asp-action="Login" autocomplete="off">
-      @Html.HiddenFor(m => m.ReturnUrl)
+    <form asp-controller="Account" asp-action="Login" asp-action-returnUrl="@ViewBag.ReturnUrl" autocomplete="off">
       <div asp-validation-summary="ModelOnly" class="text-danger bg-white rounded py-1"></div>
       <div class="form-group">
         <label asp-for="UserName" class="control-label"></label>
