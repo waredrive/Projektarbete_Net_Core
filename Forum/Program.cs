@@ -7,10 +7,7 @@ namespace Forum {
       CreateWebHostBuilder(args).Build().Run();
     }
 
-   // TODO: CHeck if all redirections work after change.
-    //TODO: Check if access denied page works, inc. redirections.
     //TODO: Add not found to thread and posts to check if topic and thread exist. Use modal to display fail.
-    //TODO: Maybe add isauthorized as route access attributes instead of checking in action?
     //TODO: Return values from services to act upon in controllers (i.e. if an entity is not added, display modal failed), can use savechangesasync for this.
     //TODO: https://www.smarterasp.net
     //TODO: Do not update if sending no new data. All edits/updates.
