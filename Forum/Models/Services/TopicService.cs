@@ -35,7 +35,7 @@ namespace Forum.Models.Services {
         CreatedOn = DateTime.UtcNow
       };
 
-      await _db.Topic.AddAsync(topic);
+      _db.Topic.Add(topic);
       await _db.SaveChangesAsync();
     }
 

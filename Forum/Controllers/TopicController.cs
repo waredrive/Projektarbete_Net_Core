@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Forum.Attributes;
+using Forum.Extensions;
 using Forum.Models.Identity;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.TopicViewModels;
@@ -51,8 +52,7 @@ namespace Forum.Controllers {
 
       await _topicService.AddAsync(topicCreateVm, User);
 
-      TempData["ModalHeader"] = "Success";
-      TempData["ModalMessage"] = "The Topic has been created!";
+      TempData.ModalSuccess("The Topic has been created!");
       return Redirect(returnUrl);
     }
 
@@ -61,8 +61,10 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Edit(int id, string returnUrl = null) {
       ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
-      if (!await _topicService.DoesTopicExist(id))
-        return NotFound();
+      if (!await _topicService.DoesTopicExist(id)) {
+        TempData.ModalFailed("Topic does not exist!");
+        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      }
 
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
@@ -76,8 +78,10 @@ namespace Forum.Controllers {
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, TopicEditVm topicEditVm, string returnUrl) {
       ViewBag.ReturnUrl = returnUrl;
-      if (!await _topicService.DoesTopicExist(id))
-        return NotFound();
+      if (!await _topicService.DoesTopicExist(id)) {
+        TempData.ModalFailed("Topic does not exist!");
+        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      }
 
       if (!ModelState.IsValid)
         return View(topicEditVm);
@@ -87,8 +91,7 @@ namespace Forum.Controllers {
 
       await _topicService.UpdateAsync(topicEditVm, User);
 
-      TempData["ModalHeader"] = "Success";
-      TempData["ModalMessage"] = "The Topic has been updated!";
+      TempData.ModalSuccess("The Topic has been updated!");
       return Redirect(returnUrl);
     }
 
@@ -97,8 +100,10 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Delete(int id, string returnUrl = null) {
       ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
-      if (!await _topicService.DoesTopicExist(id))
-        return NotFound();
+      if (!await _topicService.DoesTopicExist(id)) {
+        TempData.ModalFailed("Topic does not exist!");
+        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      }
 
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
@@ -112,8 +117,10 @@ namespace Forum.Controllers {
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id, TopicDeleteVm topicDeleteVm, string returnUrl) {
       ViewBag.ReturnUrl = returnUrl;
-      if (!await _topicService.DoesTopicExist(id))
-        return NotFound();
+      if (!await _topicService.DoesTopicExist(id)) {
+        TempData.ModalFailed("Topic does not exist!");
+        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      }
 
       if (!ModelState.IsValid)
         return View(topicDeleteVm);
@@ -123,8 +130,7 @@ namespace Forum.Controllers {
 
       await _topicService.RemoveAsync(topicDeleteVm);
 
-      TempData["ModalHeader"] = "Success";
-      TempData["ModalMessage"] = "The Topic has been deleted!";
+      TempData.ModalSuccess("The Topic has been deleted!");
       return Redirect(returnUrl);
     }
 
@@ -133,16 +139,17 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Lock(int id, string returnUrl = null) {
       ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
-      if (!await _topicService.DoesTopicExist(id))
-        return NotFound();
+      if (!await _topicService.DoesTopicExist(id)) {
+        TempData.ModalFailed("Topic does not exist!");
+        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      }
 
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
       if (await _topicService.IsTopicLocked(id)) {
-        TempData["ModalHeader"] = "Warning";
-        TempData["ModalMessage"] = "The Topic is already locked!";
-        return RedirectToAction(nameof(Unlock), new {returnUrl});
+        TempData.ModalWarning("The Topic is already locked!");
+        return RedirectToAction(nameof(Unlock), new { returnUrl = ViewBag.ReturnUrl });
       }
 
       return View(await _topicService.GetTopicLockVmAsync(id));
@@ -154,8 +161,10 @@ namespace Forum.Controllers {
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Lock(int id, TopicLockVm topicLockVm, string returnUrl) {
       ViewBag.ReturnUrl = returnUrl;
-      if (!await _topicService.DoesTopicExist(id))
-        return NotFound();
+      if (!await _topicService.DoesTopicExist(id)) {
+        TempData.ModalFailed("Topic does not exist!");
+        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      }
 
       if (!ModelState.IsValid)
         return View(topicLockVm);
@@ -164,14 +173,12 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (await _topicService.IsTopicLocked(topicLockVm.TopicId)) {
-        TempData["ModalHeader"] = "Failed";
-        TempData["ModalMessage"] = "The Topic is already locked!";
+        TempData.ModalFailed("The Topic is already locked!");
         return Redirect(returnUrl);
       }
 
       await _topicService.LockAsync(topicLockVm, User);
-      TempData["ModalHeader"] = "Success";
-      TempData["ModalMessage"] = "The Topic has been locked!";
+      TempData.ModalSuccess("The Topic has been locked!");
       return Redirect(returnUrl);
     }
 
@@ -180,16 +187,17 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Unlock(int id, string returnUrl = null) {
       ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
-      if (!await _topicService.DoesTopicExist(id))
-        return NotFound();
+      if (!await _topicService.DoesTopicExist(id)) {
+        TempData.ModalFailed("Topic does not exist!");
+        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      }
 
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
       if (!await _topicService.IsTopicLocked(id)) {
-        TempData["ModalHeader"] = "Warning";
-        TempData["ModalMessage"] = "The Topic is already unlocked!";
-        return RedirectToAction(nameof(Lock), new {returnUrl});
+        TempData.ModalWarning("The Topic is already unlocked!");
+        return RedirectToAction(nameof(Lock), new { returnUrl = ViewBag.ReturnUrl });
       }
 
       return View(await _topicService.GetTopicUnlockVmAsync(id));
@@ -201,8 +209,10 @@ namespace Forum.Controllers {
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Unlock(int id, TopicUnlockVm topicUnlockVm, string returnUrl) {
       ViewBag.ReturnUrl = returnUrl;
-      if (!await _topicService.DoesTopicExist(id))
-        return NotFound();
+      if (!await _topicService.DoesTopicExist(id)) {
+        TempData.ModalFailed("Topic does not exist!");
+        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      }
 
       if (!ModelState.IsValid)
         return View(topicUnlockVm);
@@ -211,14 +221,12 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (!await _topicService.IsTopicLocked(topicUnlockVm.TopicId)) {
-        TempData["ModalHeader"] = "Failed";
-        TempData["ModalMessage"] = "The Topic is already unlocked";
+        TempData.ModalFailed("The Topic is already unlocked");
         return Redirect(returnUrl);
       }
 
       await _topicService.UnlockAsync(topicUnlockVm, User);
-      TempData["ModalHeader"] = "Success";
-      TempData["ModalMessage"] = "The Topic has been unlocked!";
+      TempData.ModalSuccess("The Topic has been unlocked!");
       return Redirect(returnUrl);
     }
   }

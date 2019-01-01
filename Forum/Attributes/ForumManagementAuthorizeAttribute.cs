@@ -15,7 +15,7 @@ namespace Forum.Attributes {
       if (authorizationService.IsAuthorizedForForumManagementAsync(user).Result)
         return;
 
-      context.Result = new RedirectResult("Account/AccessDenied");
+      context.Result = new RedirectResult("/Account/AccessDenied");
     }
   }
 }

@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using Forum.Extensions
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -43,9 +44,9 @@
     }
     <script>
   $(document).ready(function() {
-    var msg = '@TempData["ModalMessage"]';
+    var msg = '@TempData.GetModalMessage()';
     if (msg !== "") {
-      $("#ModalHeader").text('@TempData["ModalHeader"]');
+      $("#ModalHeader").text('@TempData.GetModalHeader()');
       $("#ModalMessage").text(msg);
       $('#Modal').modal("show");
     }

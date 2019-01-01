@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Forum.Attributes;
+using Forum.Extensions;
 using Forum.Models.Identity;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.PostViewModels;
@@ -34,8 +35,10 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Create(int threadId, string returnUrl = null) {
       ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
-      if (!_threadService.DoesThreadExist(threadId))
-        return NotFound();
+      if (!_threadService.DoesThreadExist(threadId)) {
+        TempData.ModalFailed("Thread does not exist!");
+        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      }
 
       if (!await _authorizationService.IsAuthorizedForPostCreateInThreadAsync(threadId, User))
         return RedirectToAction("AccessDenied", "Account");
@@ -48,15 +51,21 @@ namespace Forum.Controllers {
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(PostCreateVm postCreateVm, string returnUrl) {
       ViewBag.ReturnUrl = returnUrl;
+
       if (!ModelState.IsValid)
         return View(postCreateVm);
+
+      if (!_threadService.DoesThreadExist(postCreateVm.ThreadId)) {
+        TempData.ModalFailed("Thread does not exist!");
+        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      }
 
       if (!await _authorizationService.IsAuthorizedForPostCreateInThreadAsync(postCreateVm.ThreadId, User))
         return RedirectToAction("AccessDenied", "Account");
 
       await _postService.AddAsync(postCreateVm, User);
-      TempData["ModalHeader"] = "Success";
-      TempData["ModalMessage"] = "The Post has been created!";
+
+      TempData.ModalSuccess("The Post has been created!");
       return Redirect(returnUrl);
     }
 
@@ -64,8 +73,10 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Edit(int id, string returnUrl = null) {
       ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
-      if (!_postService.DoesPostExist(id))
-        return NotFound();
+      if (!_postService.DoesPostExist(id)) {
+        TempData.ModalFailed("Post does not exist!");
+        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      }
 
       if (!await _authorizationService.IsAuthorizedForPostEditAndDeleteAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
@@ -78,8 +89,10 @@ namespace Forum.Controllers {
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, PostEditVm postEditVm, string returnUrl) {
       ViewBag.ReturnUrl = returnUrl;
-      if (!_postService.DoesPostExist(id))
-        return NotFound();
+      if (!_postService.DoesPostExist(id)) {
+        TempData.ModalFailed("Post does not exist!");
+        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      }
 
       if (!ModelState.IsValid)
         return View(postEditVm);
@@ -88,8 +101,7 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       await _postService.UpdateAsync(postEditVm, User);
-      TempData["ModalHeader"] = "Success";
-      TempData["ModalMessage"] = "The Post has been updated!";
+      TempData.ModalSuccess("The Post has been updated!");
       return Redirect(returnUrl);
     }
 
@@ -97,8 +109,10 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Delete(int id, string returnUrl = null) {
       ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
-      if (!_postService.DoesPostExist(id))
-        return NotFound();
+      if (!_postService.DoesPostExist(id)) {
+        TempData.ModalFailed("Post does not exist!");
+        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      }
 
       if (!await _authorizationService.IsAuthorizedForPostEditAndDeleteAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
@@ -111,8 +125,10 @@ namespace Forum.Controllers {
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id, PostDeleteVm postDeleteVm, string returnUrl) {
       ViewBag.ReturnUrl = returnUrl;
-      if (!_postService.DoesPostExist(id))
-        return NotFound();
+      if (!_postService.DoesPostExist(id)) {
+        TempData.ModalFailed("Post does not exist!");
+        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      }
 
       if (!ModelState.IsValid)
         return View(postDeleteVm);
@@ -121,8 +137,7 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       await _postService.RemoveAsync(postDeleteVm);
-      TempData["ModalHeader"] = "Success";
-      TempData["ModalMessage"] = "The Post has been deleted!";
+      TempData.ModalSuccess("The Post has been deleted!");
       return Redirect(returnUrl);
     }
 
@@ -131,16 +146,17 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Lock(int id, string returnUrl = null) {
       ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
-      if (!_postService.DoesPostExist(id))
-        return NotFound();
+      if (!_postService.DoesPostExist(id)) {
+        TempData.ModalFailed("Post does not exist!");
+        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      }
 
       if (!await _authorizationService.IsAuthorizedForPostLockAsync(id, User))
         return RedirectToAction("AccessDenied", "Account");
 
       if (_postService.IsPostLocked(id)) {
-        TempData["ModalHeader"] = "Warning";
-        TempData["ModalMessage"] = "The Post is already locked!";
-        return RedirectToAction(nameof(Unlock), new {returnUrl});
+        TempData.ModalWarning("The Post is already locked!");
+        return RedirectToAction(nameof(Unlock), new { returnUrl = ViewBag.ReturnUrl });
       }
 
       return View(await _postService.GetPostLockVm(id));
@@ -152,8 +168,10 @@ namespace Forum.Controllers {
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Lock(int id, PostLockVm postLockVm, string returnUrl) {
       ViewBag.ReturnUrl = returnUrl;
-      if (!_postService.DoesPostExist(id))
-        return NotFound();
+      if (!_postService.DoesPostExist(id)) {
+        TempData.ModalFailed("Post does not exist!");
+        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      }
 
       if (!ModelState.IsValid)
         return View(postLockVm);
@@ -162,14 +180,12 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (_postService.IsPostLocked(postLockVm.PostId)) {
-        TempData["ModalHeader"] = "Failed";
-        TempData["ModalMessage"] = "The Post is already locked!";
+        TempData.ModalFailed("The Post is already locked!");
         return Redirect(returnUrl);
       }
 
       await _postService.LockAsync(postLockVm, User);
-      TempData["ModalHeader"] = "Success";
-      TempData["ModalMessage"] = "The Post has been Locked!";
+      TempData.ModalSuccess("The Post has been Locked!");
       return Redirect(returnUrl);
     }
 
@@ -178,16 +194,17 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Unlock(int id, string returnUrl = null) {
       ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
-      if (!_postService.DoesPostExist(id))
-        return NotFound();
+      if (!_postService.DoesPostExist(id)) {
+        TempData.ModalFailed("Post does not exist!");
+        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      }
 
       if (!await _authorizationService.IsAuthorizedForPostLockAsync(id, User)) 
         return RedirectToAction("AccessDenied", "Account");
 
       if (!_postService.IsPostLocked(id)) {
-        TempData["ModalHeader"] = "Warning";
-        TempData["ModalMessage"] = "The Post is already unlocked!";
-        return RedirectToAction(nameof(Lock), new {returnUrl});
+        TempData.ModalWarning("The Post is already unlocked!");
+        return RedirectToAction(nameof(Lock), new { returnUrl = ViewBag.ReturnUrl });
       }
 
       return View(await _postService.GetPostUnlockVm(id));
@@ -199,8 +216,10 @@ namespace Forum.Controllers {
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Unlock(int id, PostUnlockVm postUnlockVm, string returnUrl) {
       ViewBag.ReturnUrl = returnUrl;
-      if (!_postService.DoesPostExist(id))
-        return NotFound();
+      if (!_postService.DoesPostExist(id)) {
+        TempData.ModalFailed("Post does not exist!");
+        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      }
 
       if (!ModelState.IsValid)
         return View(postUnlockVm);
@@ -209,14 +228,12 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (!_postService.IsPostLocked(postUnlockVm.PostId)) {
-        TempData["ModalHeader"] = "Failed";
-        TempData["ModalMessage"] = "The Post is already unlocked!";
+        TempData.ModalFailed("The Post is already unlocked!");
         return Redirect(returnUrl);
       }
 
       await _postService.UnlockAsync(postUnlockVm, User);
-      TempData["ModalHeader"] = "Success";
-      TempData["ModalMessage"] = "The Post has been unlocked!";
+      TempData.ModalSuccess("The Post has been unlocked!");
       return Redirect(returnUrl);
     }
   }

@@ -69,7 +69,7 @@ namespace Forum.Models.Services {
           CreatedOn = DateTime.UtcNow
         };
 
-        await _db.Member.AddAsync(member);
+        _db.Member.Add(member);
         await _db.SaveChangesAsync();
       }
       catch (Exception) {

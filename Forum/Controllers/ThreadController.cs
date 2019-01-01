@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Forum.Attributes;
+using Forum.Extensions;
 using Forum.Models.Identity;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.ThreadViewModels;
@@ -55,8 +56,7 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       await _threadService.AddAsync(threadCreateVm, User);
-      TempData["ModalHeader"] = "Success";
-      TempData["ModalMessage"] = "The Thread has been created!";
+      TempData.ModalSuccess("The Thread has been created!");
       return Redirect(returnUrl);
     }
 
@@ -89,8 +89,7 @@ namespace Forum.Controllers {
 
       await _threadService.UpdateAsync(threadEditVm, User);
 
-      TempData["ModalHeader"] = "Success";
-      TempData["ModalMessage"] = "The Thread has been updated!";
+      TempData.ModalSuccess("The Thread has been updated!");
       return Redirect(returnUrl);
     }
 
@@ -123,8 +122,7 @@ namespace Forum.Controllers {
 
       await _threadService.RemoveAsync(threadDeleteVm);
 
-      TempData["ModalHeader"] = "Success";
-      TempData["ModalMessage"] = "The Thread has been deleted!";
+      TempData.ModalSuccess("The Thread has been deleted!");
       return Redirect(returnUrl);
     }
 
@@ -140,9 +138,8 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (_threadService.IsThreadLocked(id)) {
-        TempData["ModalHeader"] = "Warning";
-        TempData["ModalMessage"] = "The Thread is already locked!";
-        return RedirectToAction(nameof(Unlock), new {returnUrl});
+        TempData.ModalWarning("The Thread is already locked!");
+        return RedirectToAction(nameof(Unlock), new { returnUrl = ViewBag.ReturnUrl });
       }
 
       return View(await _threadService.GetThreadLockVm(id));
@@ -164,14 +161,12 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (_threadService.IsThreadLocked(threadLockVm.ThreadId)) {
-        TempData["ModalHeader"] = "Failed";
-        TempData["ModalMessage"] = "The Thread is already locked!";
+        TempData.ModalFailed("The Thread is already locked!");
         return Redirect(returnUrl);
       }
 
       await _threadService.LockAsync(threadLockVm, User);
-      TempData["ModalHeader"] = "Success";
-      TempData["ModalMessage"] = "The Thread has been locked!";
+      TempData.ModalSuccess("The Thread has been locked!");
       return Redirect(returnUrl);
     }
 
@@ -187,9 +182,8 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (!_threadService.IsThreadLocked(id)) {
-        TempData["ModalHeader"] = "Warning";
-        TempData["ModalMessage"] = "The Thread is already unlocked!";
-        return RedirectToAction(nameof(Lock), new {returnUrl});
+        TempData.ModalWarning("The Thread is already unlocked!");
+        return RedirectToAction(nameof(Lock), new { returnUrl = ViewBag.ReturnUrl });
       }
 
       return View(await _threadService.GetThreadUnlockVm(id));
@@ -211,15 +205,13 @@ namespace Forum.Controllers {
         return RedirectToAction("AccessDenied", "Account");
 
       if (!_threadService.IsThreadLocked(threadUnlockVm.ThreadId)) {
-        TempData["ModalHeader"] = "Failed";
-        TempData["ModalMessage"] = "The Thread is already unlocked!";
+        TempData.ModalFailed("The Thread is already unlocked!");
         return Redirect(returnUrl);
       }
 
       await _threadService.UnlockAsync(threadUnlockVm, User);
 
-      TempData["ModalHeader"] = "Success";
-      TempData["ModalMessage"] = "The Thread has been unlocked!";
+      TempData.ModalSuccess("The Thread has been unlocked!");
       return Redirect(returnUrl);
     }
   }
