@@ -42,7 +42,7 @@
       <script src="~/js/typeahead.js/typeahead.bundle.min.js"></script>
       <script src="~/js/custom/membersearch.js"></script>
     }
-    <script>
+      <script>
   $(document).ready(function() {
     var msg = '@TempData.GetModalMessage()';
     if (msg !== "") {
@@ -51,7 +51,7 @@
       $('#Modal').modal("show");
     }
   });
-    </script>
+      </script>
     @await RenderSectionAsync("scripts", false)
 </body>
 </html>
