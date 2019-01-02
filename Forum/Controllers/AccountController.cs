@@ -51,8 +51,7 @@ namespace Forum.Controllers {
 
       foreach (var error in result.Errors)
         ModelState.AddModelError(string.Empty, error.Description);
-      TempData["ModalHeader"] = "Success";
-      TempData["ModalMessage"] = "Your Account has been registered!";
+      TempData.ModalSuccess("Your Account has been registered!");
       return View(accountRegisterVm);
     }
 
