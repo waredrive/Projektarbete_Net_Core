@@ -43,7 +43,9 @@
       <script src="~/js/custom/membersearch.js"></script>
     }
       <script>
-  $(document).ready(function() {
+        $(document).ready(function () {
+          console.log('@TempData.GetModalMessage()');
+          console.log('@TempData.GetModalHeader()');
     var msg = '@TempData.GetModalMessage()';
     if (msg !== "") {
       $("#ModalHeader").text('@TempData.GetModalHeader()');

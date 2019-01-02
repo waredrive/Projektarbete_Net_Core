@@ -6,6 +6,7 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Forum.Models.Context;
 using Forum.Models.Entities;
+using Forum.Models.Identity;
 using Forum.Models.Pagination;
 using Forum.Models.ViewModels.ComponentViewModels.PostOptionsViewModels;
 using Forum.Models.ViewModels.PostViewModels;
@@ -90,8 +91,8 @@ namespace Forum.Models.Services {
         PostId = post.Id,
         CreatedOn = post.CreatedOn,
         CreatedBy = createdBy.UserName,
-        CreatorsTotalposts = await _db.Post.CountAsync(p => p.CreatedBy == post.CreatedBy),
-        CreatorsRoles = (await _userManager.GetRolesAsync(createdBy)).ToArray(),
+        CreatorsTotalposts = createdBy.UserName == DeletedMember.Username ? 0 : await _db.Post.CountAsync(p => p.CreatedBy == post.CreatedBy),
+        CreatorsRoles = createdBy.UserName == DeletedMember.Username ? new string[0] : (await _userManager.GetRolesAsync(createdBy)).ToArray(),
         PostText = post.ContentText,
         LockedBy = lockedBy?.UserName,
         LockedOn = post.LockedOn,

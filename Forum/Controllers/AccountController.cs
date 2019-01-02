@@ -201,7 +201,7 @@ namespace Forum.Controllers {
     public IActionResult AccessDenied(){
       ViewBag.ReturnUrl = Request.Headers["Referer"].ToString();
       TempData.ModalNoPermission();
-      Thread.Sleep(1000);
+      //Thread.Sleep(1000);
       return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
     }
 
@@ -210,7 +210,8 @@ namespace Forum.Controllers {
     public async Task<IActionResult> Logout() {
       await _accountService.SignOut();
       TempData.ModalSuccess("You have been logged out!");
-      return RedirectToAction("Index", "Topic");
+
+      return RedirectToAction(nameof(TopicController.Index), nameof(TopicController).Replace("Controller", string.Empty));
     }
   }
 }
