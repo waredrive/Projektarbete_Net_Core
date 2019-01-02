@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -44,7 +45,8 @@ namespace Forum {
     }
 
     public void Configure(IApplicationBuilder app, IHostingEnvironment env) {
-      if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
+      if (env.IsDevelopment())
+        app.UseDeveloperExceptionPage();
 
       app.UseHttpsRedirection();
       app.UseAuthentication();

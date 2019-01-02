@@ -47,73 +47,43 @@ namespace Forum.Models.Services {
         IsAuthorizedForTopicCreate = await _authorizationService.IsAuthorizedForCreateTopicAsync(user)
       };
 
-      var topics = await _db.Topic.Include(t => t.Thread).ToListAsync();
-      foreach (var topic in topics)
-        topicsIndexVm.Topics.Add(await GetTopicsIndexTopicVmAsync(topic));
+      topicsIndexVm.Topics.AddRange(_db.Topic.Select(t => new TopicsIndexTopicVm {
+        LatestThreadPostedTo = t.Thread.SelectMany(th => th.Post).OrderByDescending(p => p.CreatedOn).Select(th =>
+          new TopicsIndexThreadVm {
+            ThreadId = th.ThreadNavigation.Id,
+            ThreadText = th.ThreadNavigation.ContentText,
+            LatestCommenter = th.CreatedByNavigation.IdNavigation.UserName,
+            LatestCommentTime = th.CreatedOn
+          }).FirstOrDefault(),
+        TopicId = t.Id,
+        TopicText = t.ContentText,
+        ThreadCount = t.Thread.Count,
+        PostCount = t.Thread.SelectMany(p => p.Post).Count(),
+        LockedBy = t.LockedByNavigation.IdNavigation.UserName
+      }));
 
-      var latestThreads =
-        await _db.Thread.Include(t => t.Post).OrderByDescending(t => t.CreatedOn).Take(10).ToListAsync();
-      foreach (var thread in latestThreads)
-        topicsIndexVm.LatestThreads.Add(await GetTopicIndexLatestThreadVmAsync(thread));
+      topicsIndexVm.LatestThreads.AddRange(_db.Thread.OrderByDescending(t => t.CreatedOn).Take(10).Select(t =>
+        new TopicsIndexLatestThreadVm {
+          ThreadId = t.Id,
+          ThreadText = t.ContentText,
+          CreatedOn = t.CreatedOn,
+          CreatedBy = t.CreatedByNavigation.IdNavigation.UserName
+        }));
 
-      var latestPosts = await _db.Post.OrderByDescending(p => p.CreatedOn).Take(10).ToListAsync();
-      foreach (var post in latestPosts) topicsIndexVm.LatestPosts.Add(await GetTopicIndexPostVmAsync(post));
+      topicsIndexVm.LatestPosts.AddRange(_db.Post.OrderByDescending(p => p.CreatedOn).Take(10).Select(p => 
+        new TopicsIndexPostVm {
+          PostId = p.Id,
+          ThreadId = p.Thread,
+          ThreadText = p.ThreadNavigation.ContentText,
+          LatestCommentTime = p.CreatedOn,
+          LatestCommenter = p.CreatedByNavigation.IdNavigation.UserName
+        }
+      ));
 
       return topicsIndexVm;
     }
 
-    private async Task<TopicsIndexTopicVm> GetTopicsIndexTopicVmAsync(Topic topic) {
-      var lockedBy = await _userManager.FindByIdAsync(topic.LockedBy);
-      var mostRecentPostInTopic = await _db.Post.Where(p => p.ThreadNavigation.Topic == topic.Id)
-        .OrderByDescending(p => p.CreatedOn).FirstOrDefaultAsync();
-
-      return new TopicsIndexTopicVm {
-        LatestThreadPostedTo = mostRecentPostInTopic != null
-          ? await GetTopicIndexThreadVmAsync(mostRecentPostInTopic)
-          : null,
-        TopicId = topic.Id,
-        TopicText = topic.ContentText,
-        ThreadCount = topic.Thread.Count,
-        PostCount = _db.Post.Count(p => p.ThreadNavigation.Topic == topic.Id),
-        LockedBy = lockedBy?.UserName
-      };
-    }
-
-    private async Task<TopicsIndexLatestThreadVm> GetTopicIndexLatestThreadVmAsync(Thread thread) {
-      var createdBy = await _userManager.FindByIdAsync(thread.CreatedBy);
-
-      return new TopicsIndexLatestThreadVm {
-        ThreadId = thread.Id,
-        ThreadText = thread.ContentText,
-        CreatedOn = thread.CreatedOn,
-        CreatedBy = createdBy.UserName
-      };
-    }
-
-    private async Task<TopicsIndexThreadVm> GetTopicIndexThreadVmAsync(Post mostRecentPostInTopic) {
-      var latestPostInThreadCreator = await _userManager.FindByIdAsync(mostRecentPostInTopic.CreatedBy);
-
-      return new TopicsIndexThreadVm {
-        ThreadId = mostRecentPostInTopic.ThreadNavigation.Id,
-        ThreadText = mostRecentPostInTopic.ThreadNavigation.ContentText,
-        LatestCommenter = latestPostInThreadCreator?.UserName,
-        LatestCommentTime = mostRecentPostInTopic.CreatedOn
-      };
-    }
-
-    private async Task<TopicsIndexPostVm> GetTopicIndexPostVmAsync(Post post) {
-      var createdBy = await _userManager.FindByIdAsync(post.CreatedBy);
-
-      return new TopicsIndexPostVm {
-        PostId = post.Id,
-        ThreadId = post.Thread,
-        ThreadText = post.ThreadNavigation.ContentText,
-        LatestCommentTime = post.CreatedOn,
-        LatestCommenter = createdBy.UserName
-      };
-    }
-
-    public Task<TopicEditVm> GetTopicCreateVm(int id) {
+  public Task<TopicEditVm> GetTopicCreateVm(int id) {
       return _db.Topic.Where(t => t.Id == id).Select(t => new TopicEditVm {
         TopicId = t.Id,
         TopicText = t.ContentText
@@ -133,18 +103,15 @@ namespace Forum.Models.Services {
       await _db.SaveChangesAsync();
     }
 
-    public async Task<TopicDeleteVm> GetTopicDeleteVmAsync(int id) {
-      var topic = await _db.Topic.Include(t => t.Thread).Where(t => t.Id == id).FirstOrDefaultAsync();
-      var createdBy = await _userManager.FindByIdAsync(topic.CreatedBy);
-
-      return new TopicDeleteVm {
-        CreatedOn = topic.CreatedOn,
-        CreatedBy = createdBy.UserName,
-        ThreadCount = topic.Thread.Count,
-        PostCount = _db.Post.Count(p => p.ThreadNavigation.Topic == topic.Id),
-        TopicId = topic.Id,
-        TopicText = topic.ContentText
-      };
+    public Task<TopicDeleteVm> GetTopicDeleteVmAsync(int id) {
+      return _db.Topic.Where(t => t.Id == id).Select(t => new TopicDeleteVm {
+        CreatedOn = t.CreatedOn,
+        CreatedBy = t.CreatedByNavigation.IdNavigation.UserName,
+        ThreadCount = t.Thread.Count,
+        PostCount = t.Thread.SelectMany(th => th.Post).Count(),
+        TopicId = t.Id,
+        TopicText = t.ContentText
+      }).FirstOrDefaultAsync();
     }
 
     public async Task RemoveAsync(TopicDeleteVm topicDeleteVm) {
@@ -163,18 +130,15 @@ namespace Forum.Models.Services {
       }
     }
 
-    public async Task<TopicLockVm> GetTopicLockVmAsync(int id) {
-      var topic = await _db.Topic.Include(t => t.Thread).Where(t => t.Id == id).FirstOrDefaultAsync();
-      var createdBy = await _userManager.FindByIdAsync(topic.CreatedBy);
-
-      return new TopicLockVm {
-        CreatedOn = topic.CreatedOn,
-        CreatedBy = createdBy.UserName,
-        ThreadCount = topic.Thread.Count,
-        PostCount = _db.Post.Count(p => p.ThreadNavigation.Topic == topic.Id),
-        TopicId = topic.Id,
-        TopicText = topic.ContentText
-      };
+    public Task<TopicLockVm> GetTopicLockVmAsync(int id) {
+      return _db.Topic.Where(t => t.Id == id).Select(t => new TopicLockVm {
+        CreatedOn = t.CreatedOn,
+        CreatedBy = t.CreatedByNavigation.IdNavigation.UserName,
+        ThreadCount = t.Thread.Count,
+        PostCount = t.Thread.SelectMany(th => th.Post).Count(),
+        TopicId = t.Id,
+        TopicText = t.ContentText
+      }).FirstOrDefaultAsync();
     }
 
     public async Task LockAsync(TopicLockVm topicLockVm, ClaimsPrincipal user) {
@@ -189,28 +153,20 @@ namespace Forum.Models.Services {
       await _db.SaveChangesAsync();
     }
 
-    public async Task<TopicUnlockVm> GetTopicUnlockVmAsync(int id) {
-      var topic = await _db.Topic.Include(t => t.Thread).Where(t => t.Id == id).FirstOrDefaultAsync();
-      var createdBy = await _userManager.FindByIdAsync(topic.CreatedBy);
-      var lockedBy = await _userManager.FindByIdAsync(topic.LockedBy);
-
-      return new TopicUnlockVm {
-        CreatedOn = topic.CreatedOn,
-        CreatedBy = createdBy.UserName,
-        ThreadCount = topic.Thread.Count,
-        PostCount = _db.Post.Count(p => p.ThreadNavigation.Topic == topic.Id),
-        LockedBy = lockedBy.UserName,
-        LockedOn = topic.LockedOn,
-        TopicId = topic.Id,
-        TopicText = topic.ContentText
-      };
+    public Task<TopicUnlockVm> GetTopicUnlockVmAsync(int id) {
+      return _db.Topic.Where(t => t.Id == id).Select(t => new TopicUnlockVm {
+        CreatedOn = t.CreatedOn,
+        CreatedBy = t.CreatedByNavigation.IdNavigation.UserName,
+        ThreadCount = t.Thread.Count,
+        PostCount = t.Thread.SelectMany(th => th.Post).Count(),
+        LockedBy = t.LockedByNavigation.IdNavigation.UserName,
+        LockedOn = t.LockedOn,
+        TopicId = t.Id,
+        TopicText = t.ContentText
+      }).FirstOrDefaultAsync();
     }
 
-    public async Task UnlockAsync(TopicUnlockVm topicUnlockVm, ClaimsPrincipal user) {
-      var currentUserId = _userManager.GetUserId(user);
-      if (currentUserId == null)
-        return;
-
+    public async Task UnlockAsync(TopicUnlockVm topicUnlockVm) {
       var topicFromDb = await _db.Topic.FirstOrDefaultAsync(t => t.Id == topicUnlockVm.TopicId);
       topicFromDb.LockedBy = null;
       topicFromDb.LockedOn = null;
@@ -219,14 +175,14 @@ namespace Forum.Models.Services {
     }
 
     public async Task<TopicOptionsVm> GetTopicOptionsVmAsync(int topicId, IPrincipal user, string returnUrl) {
-      var topic = await _db.Topic.Where(t => t.Id == topicId).FirstOrDefaultAsync();
-      return new TopicOptionsVm {
+      var isAuthorizedForTopicEditLockAndDelete =
+        await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(topicId, user as ClaimsPrincipal);
+      return await _db.Topic.Where(t => t.Id == topicId).Select(t => new TopicOptionsVm {
         ReturnUrl = returnUrl,
-        LockedOn = topic.LockedOn,
-        TopicId = topic.Id,
-        IsAuthorizedForTopicEditLockAndDelete =
-          await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(topic.Id, user as ClaimsPrincipal)
-      };
+        LockedOn = t.LockedOn,
+        TopicId = t.Id,
+        IsAuthorizedForTopicEditLockAndDelete = isAuthorizedForTopicEditLockAndDelete
+      }).FirstOrDefaultAsync();
     }
 
     public Task<bool> IsTopicLocked(int id) {

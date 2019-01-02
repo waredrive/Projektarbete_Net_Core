@@ -225,7 +225,7 @@ namespace Forum.Controllers {
         return Redirect(returnUrl);
       }
 
-      await _topicService.UnlockAsync(topicUnlockVm, User);
+      await _topicService.UnlockAsync(topicUnlockVm);
       TempData.ModalSuccess("The Topic has been unlocked!");
       return Redirect(returnUrl);
     }

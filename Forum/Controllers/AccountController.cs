@@ -198,10 +198,9 @@ namespace Forum.Controllers {
     [AllowAnonymous]
     [HttpGet]
     [Route("AccessDenied")]
-    public IActionResult AccessDenied(){
+    public IActionResult AccessDenied() {
       ViewBag.ReturnUrl = Request.Headers["Referer"].ToString();
       TempData.ModalNoPermission();
-      //Thread.Sleep(1000);
       return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
     }
 
