@@ -210,7 +210,8 @@ namespace Forum.Controllers {
     [HttpPost]
     public async Task<IActionResult> Logout() {
       await _accountService.SignOut();
-      return Redirect("/");
+      TempData.ModalSuccess("You have been logged out!");
+      return RedirectToAction("Index", "Topic");
     }
   }
 }
