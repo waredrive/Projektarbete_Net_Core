@@ -7,6 +7,8 @@ namespace Forum {
       CreateWebHostBuilder(args).Build().Run();
     }
 
+    //TODO: Add topic options VM to every topic VM for checking is methods directly in ef linq query.
+    //TODO: Save profileimage directly to vm for less sql I/O.
     //TODO: Change deleted members view of posts and roles in posts.
     //TODO: Replace magic string in returnToAction with something better.
     //TODO: Add not found to thread and posts to check if topic and thread exist. Use modal to display fail.
