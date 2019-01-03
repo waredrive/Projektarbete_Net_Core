@@ -1,9 +1,14 @@
-﻿namespace Forum.Models.Entities {
-  public class AspNetUserRoles {
-    public string UserId { get; set; }
-    public string RoleId { get; set; }
+﻿using System;
+using System.Collections.Generic;
 
-    public virtual AspNetRoles Role { get; set; }
-    public virtual AspNetUsers User { get; set; }
-  }
+namespace Forum.Models.Entities
+{
+    public partial class AspNetUserRoles
+    {
+        public string UserId { get; set; }
+        public string RoleId { get; set; }
+
+        public virtual AspNetRoles Role { get; set; }
+        public virtual AspNetUsers User { get; set; }
+    }
 }
