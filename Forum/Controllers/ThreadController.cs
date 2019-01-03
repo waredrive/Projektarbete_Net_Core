@@ -25,8 +25,10 @@ namespace Forum.Controllers {
     [Route("")]
     [HttpGet]
     public async Task<IActionResult> Index(int topicId, int page = 1) {
-      if (!await _topicService.DoesTopicExist(topicId))
-        return NotFound();
+      if (!await _topicService.DoesTopicExist(topicId)) {
+        TempData.ModalFailed("Profile does not exist!");
+        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      }
 
       return View(await _threadService.GetThreadsIndexVmAsync(User, topicId, page));
     }
@@ -35,8 +37,10 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Create(int topicId, string returnUrl = null) {
       ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
-      if (!await _topicService.DoesTopicExist(topicId))
-        return NotFound();
+      if (!await _topicService.DoesTopicExist(topicId)) {
+        TempData.ModalFailed("Profile does not exist!");
+        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      }
 
       if (!await _authorizationService.IsAuthorizedForThreadCreateInTopicAsync(topicId, User))
         return RedirectToAction("AccessDenied", "Account");
