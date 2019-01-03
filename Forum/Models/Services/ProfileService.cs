@@ -229,15 +229,15 @@ namespace Forum.Models.Services {
       var customDeletedIdentityUser = await _userManager.FindByNameAsync(DeletedMember.Username);
 
       var identityUser = await _userManager.FindByNameAsync(profileDeleteVm.Username);
+      if (identityUser.UserName == DeletedMember.Username)
+        return;
+
       var memberFromDb = await _db.Member.Include(m => m.InverseBlockedByNavigation)
         .Include(m => m.TopicCreatedByNavigation).Include(t => t.TopicEditedByNavigation)
         .Include(t => t.TopicLockedByNavigation).Include(t => t.ThreadCreatedByNavigation)
         .Include(t => t.ThreadEditedByNavigation).Include(t => t.ThreadLockedByNavigation)
         .Include(p => p.PostEditedByNavigation).Include(p => p.PostLockedByNavigation)
         .Include(p => p.PostCreatedByNavigation).FirstOrDefaultAsync(m => m.Id == identityUser.Id);
-
-      if (identityUser.UserName == DeletedMember.Username)
-        return;
 
       foreach (var member in memberFromDb.InverseBlockedByNavigation)
         member.BlockedBy = customDeletedIdentityUser.Id;

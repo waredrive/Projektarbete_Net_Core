@@ -10,42 +10,40 @@
   @if (User.Identity.IsAuthenticated) {
     <link href="~/css/typeaheadjs/typeaheadjs.css" rel="stylesheet">
   }
-  <link rel="stylesheet" href="~/css/custom/styles.css"/>
+  <link rel="stylesheet" href="~/css/custom/styles.css" />
 </head>
 <body class="bg-dark">
-    @await Component.InvokeAsync("Navbar")
-    @RenderBody()
-    <div class="modal fade" id="Modal">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title" id="ModalHeader"></h4>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-          </div>
-          <div class="modal-body">
-            <div id="ModalMessage"></div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-          </div>
+  @await Component.InvokeAsync("Navbar")
+  @RenderBody()
+  <div class="modal fade" id="Modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" id="ModalHeader"></h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div id="ModalMessage"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
-    @await RenderSectionAsync("footer", false)
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
-            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-            crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js"></script>
-    @if (User.Identity.IsAuthenticated) {
-      <script src="~/js/typeahead.js/typeahead.bundle.min.js"></script>
-      <script src="~/js/custom/membersearch.js"></script>
-    }
-      <script>
+  </div>
+  @await RenderSectionAsync("footer", false)
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+          integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+          crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js"></script>
+  @if (User.Identity.IsAuthenticated) {
+    <script src="~/js/typeahead.js/typeahead.bundle.min.js"></script>
+    <script src="~/js/custom/membersearch.js"></script>
+  }
+  <script>
         $(document).ready(function () {
-          console.log('@TempData.GetModalMessage()');
-          console.log('@TempData.GetModalHeader()');
     var msg = '@TempData.GetModalMessage()';
     if (msg !== "") {
       $("#ModalHeader").text('@TempData.GetModalHeader()');
@@ -53,7 +51,7 @@
       $('#Modal').modal("show");
     }
   });
-      </script>
-    @await RenderSectionAsync("scripts", false)
+  </script>
+  @await RenderSectionAsync("scripts", false)
 </body>
 </html>
