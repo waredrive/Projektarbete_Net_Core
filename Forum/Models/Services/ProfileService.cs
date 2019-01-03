@@ -57,14 +57,6 @@ namespace Forum.Models.Services {
       };
     }
 
-    public ProfileRemovedVm GetProfileRemovedVmAsync() {
-      return new ProfileRemovedVm {
-        Username = DeletedMember.Username,
-        Message = "This profile has been removed"
-      };
-    }
-
-
     public async Task<ProfileEditVm> GetProfileEditVmAsync(string oldUsername) {
       var identityUser = await _userManager.FindByNameAsync(oldUsername);
 
@@ -225,53 +217,36 @@ namespace Forum.Models.Services {
       };
     }
 
-    public async Task RemoveAsync(ProfileDeleteVm profileDeleteVm) {
-      var customDeletedIdentityUser = await _userManager.FindByNameAsync(DeletedMember.Username);
-
+    public async Task RemoveAsync(ProfileDeleteVm profileDeleteVm, ClaimsPrincipal user) {
       var identityUser = await _userManager.FindByNameAsync(profileDeleteVm.Username);
-      if (identityUser.UserName == DeletedMember.Username)
+      if (_sharedService.IsDeletedMember(identityUser.UserName))
         return;
 
-      var memberFromDb = await _db.Member.Include(m => m.InverseBlockedByNavigation)
-        .Include(m => m.TopicCreatedByNavigation).Include(t => t.TopicEditedByNavigation)
-        .Include(t => t.TopicLockedByNavigation).Include(t => t.ThreadCreatedByNavigation)
-        .Include(t => t.ThreadEditedByNavigation).Include(t => t.ThreadLockedByNavigation)
-        .Include(p => p.PostEditedByNavigation).Include(p => p.PostLockedByNavigation)
-        .Include(p => p.PostCreatedByNavigation).FirstOrDefaultAsync(m => m.Id == identityUser.Id);
+      var userIsOwner = IsUserOwner(profileDeleteVm.Username, user);
+      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
+      memberFromDb.BlockedBy = null;
+      memberFromDb.BirthDate = DeletedMember.BirthDate;
+      memberFromDb.BlockedOn = null;
+      memberFromDb.BlockedEnd = null;
+      memberFromDb.FirstName = DeletedMember.FirstName;
+      memberFromDb.LastName = DeletedMember.LastName;
+      memberFromDb.ProfileImage = await _sharedService.GetDefaultProfileImage();
 
-      foreach (var member in memberFromDb.InverseBlockedByNavigation)
-        member.BlockedBy = customDeletedIdentityUser.Id;
+      var roles = await _userManager.GetRolesAsync(identityUser);
+      await _userManager.RemoveFromRolesAsync(identityUser, roles.ToArray());
+      await _userManager.AddToRoleAsync(identityUser, Roles.User);
+      var userCount = _userManager.Users.Count(i => _sharedService.IsDeletedMember(i.UserName));
+      await _userManager.SetUserNameAsync(identityUser, DeletedMember.GetUsername(userCount));
+      await _userManager.SetEmailAsync(identityUser, DeletedMember.Email);
+      var passwordToken = await _userManager.GeneratePasswordResetTokenAsync(identityUser);
+      await _userManager.ResetPasswordAsync(identityUser, passwordToken, DeletedMember.GetPassword());
+      await _userManager.UpdateSecurityStampAsync(identityUser);
 
-      foreach (var topic in memberFromDb.TopicCreatedByNavigation)
-        topic.CreatedBy = customDeletedIdentityUser.Id;
-
-      foreach (var topic in memberFromDb.TopicEditedByNavigation)
-        topic.EditedBy = customDeletedIdentityUser.Id;
-
-      foreach (var topic in memberFromDb.TopicLockedByNavigation)
-        topic.LockedBy = customDeletedIdentityUser.Id;
-
-      foreach (var thread in memberFromDb.ThreadCreatedByNavigation)
-        thread.CreatedBy = customDeletedIdentityUser.Id;
-
-      foreach (var thread in memberFromDb.ThreadEditedByNavigation)
-        thread.EditedBy = customDeletedIdentityUser.Id;
-
-      foreach (var thread in memberFromDb.ThreadLockedByNavigation)
-        thread.LockedBy = customDeletedIdentityUser.Id;
-
-      foreach (var post in memberFromDb.PostEditedByNavigation)
-        post.EditedBy = customDeletedIdentityUser.Id;
-
-      foreach (var post in memberFromDb.PostLockedByNavigation)
-        post.LockedBy = customDeletedIdentityUser.Id;
-
-      foreach (var post in memberFromDb.PostCreatedByNavigation)
-        post.CreatedBy = customDeletedIdentityUser.Id;
-
-      _db.Member.Remove(memberFromDb);
       await _db.SaveChangesAsync();
-      await _userManager.DeleteAsync(identityUser);
+
+      if (userIsOwner) {
+      await Task.Delay(500);
+      }
     }
 
     private bool IsUserOwner(string username, ClaimsPrincipal user) {
@@ -309,8 +284,8 @@ namespace Forum.Models.Services {
       return await searchResult;
     }
 
-    public async Task<byte[]> GetProfileImage(string username) {
-      return await _db.Member.Where(m => m.IdNavigation.UserName == username)
+    public Task<byte[]> GetProfileImage(string username) {
+      return _db.Member.Where(m => m.IdNavigation.UserName == username)
         .Select(m => m.ProfileImage).FirstOrDefaultAsync();
     }
 

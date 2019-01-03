@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 using Forum.Extensions;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.ProfileViewModels;
@@ -29,17 +30,14 @@ namespace Forum.Controllers {
         return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
       }
 
-      if (_sharedService.IsDeletedMember(username))
-        return RedirectToAction(nameof(ProfileRemoved));
+      if (_sharedService.IsDeletedMember(username)) {
+        TempData.ModalFailed("This Profile has been removed!");
+        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      }
 
       return View(await _profileService.GetProfileDetailsVmAsync(username, User));
     }
 
-    [Route("Details/ProfileRemoved")]
-    [HttpGet]
-    public IActionResult ProfileRemoved() {
-      return View(_profileService.GetProfileRemovedVmAsync());
-    }
 
     [Route("Update/{username}")]
     [HttpGet]
@@ -264,8 +262,7 @@ namespace Forum.Controllers {
       if (!await _authorizationService.IsAuthorizedForProfileDeleteAsync(profileDeleteVm.Username, User))
         return RedirectToAction("AccessDenied", "Account");
 
-      await _profileService.RemoveAsync(profileDeleteVm);
-
+      await _profileService.RemoveAsync(profileDeleteVm, User);
       TempData.ModalSuccess("The Profile has been deleted!");
       return Redirect(returnUrl);
     }

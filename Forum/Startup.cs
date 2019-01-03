@@ -1,4 +1,5 @@
-﻿using Forum.Models.Context;
+﻿using System;
+using Forum.Models.Context;
 using Forum.Models.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -27,6 +28,7 @@ namespace Forum {
       services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<IdentityDbContext>()
         .AddDefaultTokenProviders();
       services.Configure<IdentityOptions>(o => o.User.RequireUniqueEmail = true);
+      services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.Zero);
       services.AddScoped<AuthorizationService>();
       services.AddScoped<AccountService>();
       services.AddScoped<TopicService>();

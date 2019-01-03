@@ -17,7 +17,6 @@ namespace Forum.Models.Services {
   public class AccountService {
     private readonly AuthorizationService _authorizationService;
     private readonly ForumDbContext _db;
-    private readonly IHostingEnvironment _env;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly SharedService _sharedService;
     private readonly SignInManager<IdentityUser> _signInManager;
@@ -25,14 +24,12 @@ namespace Forum.Models.Services {
 
     public AccountService(
       UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
-      RoleManager<IdentityRole> roleManager, ForumDbContext db, AuthorizationService authorizationService,
-      IHostingEnvironment env, SharedService sharedService) {
+      RoleManager<IdentityRole> roleManager, ForumDbContext db, AuthorizationService authorizationService, SharedService sharedService) {
       _userManager = userManager;
       _signInManager = signInManager;
       _roleManager = roleManager;
       _db = db;
       _authorizationService = authorizationService;
-      _env = env;
       _sharedService = sharedService;
     }
 
@@ -58,9 +55,7 @@ namespace Forum.Models.Services {
         await _userManager.AddToRoleAsync(user, Roles.User);
 
         var member = new Member {
-          ProfileImage =
-            await File.ReadAllBytesAsync(_env.WebRootFileProvider.GetFileInfo("img/profile/default_profile.jpg")
-              ?.PhysicalPath),
+          ProfileImage = await _sharedService.GetDefaultProfileImage(),
           Id = user.Id,
           BirthDate = accountRegisterVm.Birthdate,
           FirstName = accountRegisterVm.FirstName.Trim(),
@@ -79,7 +74,10 @@ namespace Forum.Models.Services {
       return result;
     }
 
+
+
     public async Task<SignInResult> LoginAsync(AccountLoginVm accountLoginVm) {
+
       if (!_sharedService.DoesUserAccountExist(accountLoginVm.UserName))
         return SignInResult.Failed;
 
