@@ -310,9 +310,7 @@ namespace Forum.Models.Services {
     }
 
     public async Task<byte[]> GetProfileImage(string username) {
-      if (!_sharedService.DoesUserAccountExist(username))
-        return null;
-      return await _db.Member.Include(m => m.IdNavigation).Where(m => m.IdNavigation.UserName == username)
+      return await _db.Member.Where(m => m.IdNavigation.UserName == username)
         .Select(m => m.ProfileImage).FirstOrDefaultAsync();
     }
 

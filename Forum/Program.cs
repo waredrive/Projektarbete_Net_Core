@@ -7,8 +7,8 @@ namespace Forum {
       CreateWebHostBuilder(args).Build().Run();
     }
 
+    //TODO: Change how the profile is being anonymized.
     //TODO: Add topic options VM to every topic VM for checking is methods directly in ef linq query.
-    //TODO: Save profileimage directly to vm for less sql I/O.
     //TODO: Change deleted members view of posts and roles in posts.
     //TODO: Replace magic string in returnToAction with something better.
     //TODO: Add not found to thread and posts to check if topic and thread exist. Use modal to display fail.
@@ -16,7 +16,7 @@ namespace Forum {
     //TODO: Don't show deleted users posts and role in profile.
     //TODO: Return values from services to act upon in controllers (i.e. if an entity is not added, display modal failed), can use savechangesasync for this.
     //TODO: https://www.smarterasp.net
-    //TODO: Do not update if sending no new data. All edits/updates.
+    //TODO: Do not update if sending no new data. All edits/updates. Use own validationattribute and an "old topic/ old thread/ old posts" properties.
     //TODO: Add seed of Default deleted user if possible?
     //TODO: Add SuperAdmin? - if so Admin cannot add SuperAdmin role and manipulate SuperAdmin.
     //TODO: Add areas?

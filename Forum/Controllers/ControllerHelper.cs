@@ -8,11 +8,9 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Forum.Controllers {
-  public static class ControllerHelper {
-
-    //public static RedirectToActionResult RedirectToController(this ControllerContext c, string controllerName) {
-    //  return RedirectToAction(actionName, controllerName.Replace("Controller", string.Empty));
-    //}
-
-  }
+  //protected internal RedirectToRouteResult RedirectToAction(
+  //string actionName,
+  //string controllerName,
+  //Object routeValues
+  //)
 }

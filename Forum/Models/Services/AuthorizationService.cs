@@ -313,10 +313,8 @@ namespace Forum.Models.Services {
       return user.IsInRole(Roles.Admin) || user.IsInRole(Roles.Moderator);
     }
 
-    public async Task<bool> IsProfileBlockedAsync(string username) {
-      var identityUser = await _userManager.FindByNameAsync(username);
-      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
-      return memberFromDb.BlockedBy != null;
+    public Task<bool> IsProfileBlockedAsync(string username) {
+      return _db.Member.Where(m => m.IdNavigation.UserName == username).AnyAsync(m => m.BlockedBy != null);
     }
 
     private async Task<bool> IsProfileInRoleAsync(string username, string role) {

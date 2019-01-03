@@ -44,7 +44,6 @@ namespace Forum.Models.Services {
 
     public async Task<IdentityResult> AddAsync(AccountRegisterVm accountRegisterVm) {
       await CreateRolesAsync();
-
       var user = new IdentityUser {
         Email = accountRegisterVm.Email,
         UserName = accountRegisterVm.UserName
