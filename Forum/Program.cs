@@ -9,6 +9,7 @@ namespace Forum {
 
     //TODO: CHECK IN PROFILESERVICE HOW TO DEAL WITH TRANSACTIONS ON PROFILE DELETE.
     //TODO: When user deletes itself, the tempdata model message is still persistant when navigating to "/".
+    //TODO: Write a method that sets ViewBag.ReturnUrl.
     //TODO: When topic gets deleted inside, the redirection points back to it and creates a not found page.
     //TODO: Add topic options VM to every topic VM for checking is methods directly in ef linq query.
     //TODO: Add not found to thread and posts to check if topic and thread exist. Use modal to display fail.
