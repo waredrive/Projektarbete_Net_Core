@@ -98,8 +98,9 @@ namespace Forum.Controllers {
     [RolesAuthorize(Roles.Admin)]
     [Route("Delete/{id}")]
     [HttpGet]
-    public async Task<IActionResult> Delete(int id, string returnUrl = null) {
+    public async Task<IActionResult> Delete(int id, string returnUrl = null, string onRemoveReturnUrl = null) {
       ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.OnRemoveReturnUrl = onRemoveReturnUrl ?? Request.Headers["Referer"].ToString();
       if (!await _topicService.DoesTopicExist(id)) {
         TempData.ModalFailed("Topic does not exist!");
         return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
@@ -115,8 +116,9 @@ namespace Forum.Controllers {
     [Route("Delete/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int id, TopicDeleteVm topicDeleteVm, string returnUrl) {
+    public async Task<IActionResult> Delete(int id, TopicDeleteVm topicDeleteVm, string returnUrl, string onRemoveReturnUrl) {
       ViewBag.ReturnUrl = returnUrl;
+      ViewBag.OnRemoveReturnUrl = onRemoveReturnUrl;
       if (!await _topicService.DoesTopicExist(id)) {
         TempData.ModalFailed("Topic does not exist!");
         return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
@@ -131,7 +133,7 @@ namespace Forum.Controllers {
       await _topicService.RemoveAsync(topicDeleteVm);
 
       TempData.ModalSuccess("The Topic has been deleted!");
-      return Redirect(returnUrl);
+      return Redirect(ViewBag.OnRemoveReturnUrl);
     }
 
     [RolesAuthorize(Roles.Admin)]

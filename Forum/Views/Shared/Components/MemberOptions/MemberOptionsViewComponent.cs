@@ -14,7 +14,8 @@ namespace Forum.Views.Shared.Components.MemberOptions
       }
 
     public async Task<IViewComponentResult> InvokeAsync(string username, string returnUrl = null) {
-      return View(await _profileService.GetMemberOptionsVmAsync(username, User, returnUrl ?? Request.GetDisplayUrl()));
+      var currentUrl = Request.GetDisplayUrl();
+      return View(await _profileService.GetMemberOptionsVmAsync(username, User, returnUrl ?? currentUrl));
     }
   }
 }

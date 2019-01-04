@@ -174,10 +174,11 @@ namespace Forum.Models.Services {
       await _db.SaveChangesAsync();
     }
 
-    public async Task<TopicOptionsVm> GetTopicOptionsVmAsync(int topicId, IPrincipal user, string returnUrl) {
+    public async Task<TopicOptionsVm> GetTopicOptionsVmAsync(int topicId, IPrincipal user, string returnUrl, string onRemoveReturnUrl) {
       var isAuthorizedForTopicEditLockAndDelete =
         await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(topicId, user as ClaimsPrincipal);
       return await _db.Topic.Where(t => t.Id == topicId).Select(t => new TopicOptionsVm {
+        OnRemoveReturnUrl = onRemoveReturnUrl,
         ReturnUrl = returnUrl,
         LockedOn = t.LockedOn,
         TopicId = t.Id,

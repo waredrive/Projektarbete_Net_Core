@@ -13,8 +13,9 @@ namespace Forum.Views.Shared.Components.ThreadOptions
         _threadService = threadService;
       }
 
-      public async Task<IViewComponentResult> InvokeAsync(int threadId, string returnUrl = null) {
-        return View(await _threadService.GetThreadOptionsVmAsync(threadId, User, returnUrl ?? Request.GetDisplayUrl()));
-      }
+      public async Task<IViewComponentResult> InvokeAsync(int threadId, string returnUrl = null, string onRemoveReturnUrl = null) {
+        var currentUrl = Request.GetDisplayUrl();
+      return View(await _threadService.GetThreadOptionsVmAsync(threadId, User, returnUrl ?? currentUrl, onRemoveReturnUrl ?? currentUrl));
+    }
   }
 }

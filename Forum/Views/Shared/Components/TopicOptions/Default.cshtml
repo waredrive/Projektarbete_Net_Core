@@ -8,6 +8,6 @@
     } else {
       <a asp-controller="Topic" asp-action="Unlock" asp-route-id="@Model.TopicId" asp-route-returnUrl="@Model.ReturnUrl" class="btn btn-warning btn-sm">Unlock</a>
     }
-    <a asp-controller="Topic" asp-action="Delete" asp-route-id="@Model.TopicId" asp-route-returnUrl="@Model.ReturnUrl" class="btn btn-danger btn-sm">Delete</a>
+    <a asp-controller="Topic" asp-action="Delete" asp-route-id="@Model.TopicId" asp-route-returnUrl="@Model.ReturnUrl" asp-route-onRemoveReturnUrl="@Model.OnRemoveReturnUrl" class="btn btn-danger btn-sm">Delete</a>
   </div>
 }

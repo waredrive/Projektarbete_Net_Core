@@ -6,7 +6,6 @@ using System.Security.Principal;
 using System.Threading.Tasks;
 using Forum.Models.Context;
 using Forum.Models.Entities;
-using Forum.Models.Identity;
 using Forum.Models.Pagination;
 using Forum.Models.ViewModels.ComponentViewModels.PostOptionsViewModels;
 using Forum.Models.ViewModels.PostViewModels;

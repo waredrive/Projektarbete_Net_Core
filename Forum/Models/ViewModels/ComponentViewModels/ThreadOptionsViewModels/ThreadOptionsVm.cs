@@ -2,6 +2,7 @@
 
 namespace Forum.Models.ViewModels.ComponentViewModels.ThreadOptionsViewModels {
   public class ThreadOptionsVm {
+    public string OnRemoveReturnUrl { get; set; }
     public string ReturnUrl { get; set; }
     public DateTime? LockedOn { get; set; }
     public int TopicId { get; set; }

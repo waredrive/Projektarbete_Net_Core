@@ -251,7 +251,7 @@ namespace Forum.Controllers {
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(string username, ProfileDeleteVm profileDeleteVm, string returnUrl) {
       ViewBag.ReturnUrl = returnUrl;
-      if (!_sharedService.DoesUserAccountExist(username)) {
+ if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Profile does not exist!");
         return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
       }
@@ -264,7 +264,7 @@ namespace Forum.Controllers {
 
       await _profileService.RemoveAsync(profileDeleteVm, User);
       TempData.ModalSuccess("The Profile has been deleted!");
-      return Redirect(returnUrl);
+      return Redirect(ViewBag.ReturnUrl);
     }
 
     [AllowAnonymous]

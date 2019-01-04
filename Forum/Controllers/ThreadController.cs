@@ -99,8 +99,9 @@ namespace Forum.Controllers {
 
     [Route("Delete/{id}")]
     [HttpGet]
-    public async Task<IActionResult> Delete(int id, string returnUrl = null) {
+    public async Task<IActionResult> Delete(int id, string returnUrl = null, string onRemoveReturnUrl = null) {
       ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.OnRemoveReturnUrl = onRemoveReturnUrl ?? Request.Headers["Referer"].ToString();
       if (!_threadService.DoesThreadExist(id))
         return NotFound();
 
@@ -113,8 +114,9 @@ namespace Forum.Controllers {
     [Route("Delete/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int id, ThreadDeleteVm threadDeleteVm, string returnUrl) {
+    public async Task<IActionResult> Delete(int id, ThreadDeleteVm threadDeleteVm, string returnUrl, string onRemoveReturnUrl) {
       ViewBag.ReturnUrl = returnUrl;
+      ViewBag.OnRemoveReturnUrl = onRemoveReturnUrl;
       if (!_threadService.DoesThreadExist(id))
         return NotFound();
 
@@ -127,7 +129,7 @@ namespace Forum.Controllers {
       await _threadService.RemoveAsync(threadDeleteVm);
 
       TempData.ModalSuccess("The Thread has been deleted!");
-      return Redirect(returnUrl);
+      return Redirect(ViewBag.OnRemoveReturnUrl);
     }
 
     [RolesAuthorize(Roles.Admin, Roles.Moderator)]

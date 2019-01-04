@@ -20,7 +20,7 @@
     </div>
     <div class="row py-3">
       <div class="col-12">
-        <form asp-controller="Topic" asp-action="Delete" asp-route-returnUrl="@ViewBag.ReturnUrl">
+        <form asp-controller="Topic" asp-action="Delete" asp-route-returnUrl="@ViewBag.ReturnUrl" asp-route-onRemoveReturnUrl="@ViewBag.OnRemoveReturnUrl">
           <div class="btn-group float-right">
             @Html.HiddenFor(m => m.TopicId)
             <input type="submit" class="btn btn-danger rounded-left" value="Delete Topic"/>
