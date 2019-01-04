@@ -20,6 +20,7 @@ namespace Forum.Controllers {
       _authorizationService = authorizationService;
     }
 
+    [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
     [AllowAnonymous]
     [Route("")]
     [HttpGet]

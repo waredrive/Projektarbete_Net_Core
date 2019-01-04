@@ -44,16 +44,11 @@
   }
   <script>
         $(document).ready(function () {
-    var msg = '@TempData.GetModalMessage()';
+          var msg = '@TempData.GetModalMessage()';
     if (msg !== "") {
       $("#ModalHeader").text('@TempData.GetModalHeader()');
       $("#ModalMessage").text(msg);
       $('#Modal').modal("show");
-
-      $('#Modal').on('hidden.bs.modal',         
-        function() {
-         @TempData.ModalClear();         
-        });
     }
   });
   </script>

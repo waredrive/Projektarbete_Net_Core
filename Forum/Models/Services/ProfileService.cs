@@ -10,6 +10,7 @@ using Forum.Models.ViewModels.ComponentViewModels.MemberOptionsViewModels;
 using Forum.Models.ViewModels.ComponentViewModels.NavbarViewModels;
 using Forum.Models.ViewModels.ProfileViewModels;
 using Forum.Validations;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
