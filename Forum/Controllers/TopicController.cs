@@ -33,7 +33,7 @@ namespace Forum.Controllers {
     public async Task<IActionResult> Create(string returnUrl = null) {
       ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
       if (!await _authorizationService.IsAuthorizedForCreateTopicAsync(User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       return View();
     }
@@ -48,7 +48,7 @@ namespace Forum.Controllers {
         return View(topicCreateVm);
 
       if (!await _authorizationService.IsAuthorizedForCreateTopicAsync(User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       await _topicService.AddAsync(topicCreateVm, User);
 
@@ -67,7 +67,7 @@ namespace Forum.Controllers {
       }
 
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       return View(await _topicService.GetTopicCreateVm(id));
     }
@@ -87,7 +87,7 @@ namespace Forum.Controllers {
         return View(topicEditVm);
 
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       await _topicService.UpdateAsync(topicEditVm, User);
 
@@ -106,7 +106,7 @@ namespace Forum.Controllers {
       }
 
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       return View(await _topicService.GetTopicDeleteVmAsync(id));
     }
@@ -126,7 +126,7 @@ namespace Forum.Controllers {
         return View(topicDeleteVm);
 
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       await _topicService.RemoveAsync(topicDeleteVm);
 
@@ -145,7 +145,7 @@ namespace Forum.Controllers {
       }
 
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       if (await _topicService.IsTopicLocked(id)) {
         TempData.ModalWarning("The Topic is already locked!");
@@ -170,7 +170,7 @@ namespace Forum.Controllers {
         return View(topicLockVm);
 
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       if (await _topicService.IsTopicLocked(topicLockVm.TopicId)) {
         TempData.ModalFailed("The Topic is already locked!");
@@ -193,7 +193,7 @@ namespace Forum.Controllers {
       }
 
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       if (!await _topicService.IsTopicLocked(id)) {
         TempData.ModalWarning("The Topic is already unlocked!");
@@ -218,7 +218,7 @@ namespace Forum.Controllers {
         return View(topicUnlockVm);
 
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       if (!await _topicService.IsTopicLocked(topicUnlockVm.TopicId)) {
         TempData.ModalFailed("The Topic is already unlocked");

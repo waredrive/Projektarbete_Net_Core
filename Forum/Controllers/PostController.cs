@@ -42,7 +42,7 @@ namespace Forum.Controllers {
       }
 
       if (!await _authorizationService.IsAuthorizedForPostCreateInThreadAsync(threadId, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       return View(new PostCreateVm {ThreadId = threadId});
     }
@@ -62,7 +62,7 @@ namespace Forum.Controllers {
       }
 
       if (!await _authorizationService.IsAuthorizedForPostCreateInThreadAsync(postCreateVm.ThreadId, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       await _postService.AddAsync(postCreateVm, User);
 
@@ -80,7 +80,7 @@ namespace Forum.Controllers {
       }
 
       if (!await _authorizationService.IsAuthorizedForPostEditAndDeleteAsync(id, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       return View(await _postService.GetPostEditVm(id));
     }
@@ -99,7 +99,7 @@ namespace Forum.Controllers {
         return View(postEditVm);
 
       if (!await _authorizationService.IsAuthorizedForPostEditAndDeleteAsync(postEditVm.PostId, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       await _postService.UpdateAsync(postEditVm, User);
       TempData.ModalSuccess("The Post has been updated!");
@@ -116,7 +116,7 @@ namespace Forum.Controllers {
       }
 
       if (!await _authorizationService.IsAuthorizedForPostEditAndDeleteAsync(id, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       return View(await _postService.GetPostDeleteVm(id));
     }
@@ -135,7 +135,7 @@ namespace Forum.Controllers {
         return View(postDeleteVm);
 
       if (!await _authorizationService.IsAuthorizedForPostEditAndDeleteAsync(postDeleteVm.PostId, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       await _postService.RemoveAsync(postDeleteVm);
       TempData.ModalSuccess("The Post has been deleted!");
@@ -153,7 +153,7 @@ namespace Forum.Controllers {
       }
 
       if (!await _authorizationService.IsAuthorizedForPostLockAsync(id, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       if (_postService.IsPostLocked(id)) {
         TempData.ModalWarning("The Post is already locked!");
@@ -178,7 +178,7 @@ namespace Forum.Controllers {
         return View(postLockVm);
 
       if (!await _authorizationService.IsAuthorizedForPostLockAsync(id, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       if (_postService.IsPostLocked(postLockVm.PostId)) {
         TempData.ModalFailed("The Post is already locked!");
@@ -200,8 +200,8 @@ namespace Forum.Controllers {
         return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
       }
 
-      if (!await _authorizationService.IsAuthorizedForPostLockAsync(id, User)) 
-        return RedirectToAction("AccessDenied", "Account");
+      if (!await _authorizationService.IsAuthorizedForPostLockAsync(id, User))
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       if (!_postService.IsPostLocked(id)) {
         TempData.ModalWarning("The Post is already unlocked!");
@@ -226,7 +226,7 @@ namespace Forum.Controllers {
         return View(postUnlockVm);
 
       if (!await _authorizationService.IsAuthorizedForPostLockAsync(id, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       if (!_postService.IsPostLocked(postUnlockVm.PostId)) {
         TempData.ModalFailed("The Post is already unlocked!");

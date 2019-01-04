@@ -50,7 +50,7 @@ namespace Forum.Controllers {
       }
 
       if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAsync(username, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       return View(await _profileService.GetProfileEditVmAsync(username));
     }
@@ -69,7 +69,7 @@ namespace Forum.Controllers {
         return View(await _profileService.GetProfileEditVmAsync(username));
 
       if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAsync(username, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       if (profileEditVm.ProfileImage != null) {
         var imageCheckResult = profileEditVm.ProfileImage.IsValidImage();
@@ -102,7 +102,7 @@ namespace Forum.Controllers {
       }
 
       if (!await _authorizationService.IsAuthorizedProfileChangeRoleAsync(username, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       return View(await _profileService.GetProfileRoleEditVmAsync(username));
     }
@@ -121,7 +121,7 @@ namespace Forum.Controllers {
         return View(profileRoleEditVm);
 
       if (!await _authorizationService.IsAuthorizedProfileChangeRoleAsync(username, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       await _profileService.UpdateProfileRoleAsync(username, profileRoleEditVm);
 
@@ -140,7 +140,7 @@ namespace Forum.Controllers {
       }
 
       if (!await _authorizationService.IsAuthorizedProfileBlockAsync(username, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       if (await _authorizationService.IsProfileBlockedAsync(username)) {
         TempData.ModalWarning("The Profile is already blocked!");
@@ -164,7 +164,7 @@ namespace Forum.Controllers {
         return View(profileBlockVm);
 
       if (!await _authorizationService.IsAuthorizedProfileBlockAsync(username, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       if (await _authorizationService.IsProfileBlockedAsync(username)) {
         TempData.ModalFailed("The Profile is already blocked!");
@@ -193,7 +193,7 @@ namespace Forum.Controllers {
       }
 
       if (!await _authorizationService.IsAuthorizedProfileBlockAsync(username, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
 
       if (!await _authorizationService.IsProfileBlockedAsync(username)) {
@@ -218,7 +218,7 @@ namespace Forum.Controllers {
         return View(profileUnblockVm);
 
       if (!await _authorizationService.IsAuthorizedProfileBlockAsync(username, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       if (!await _authorizationService.IsProfileBlockedAsync(username)) {
         TempData.ModalFailed("The Profile is already unblocked!");
@@ -243,7 +243,7 @@ namespace Forum.Controllers {
       if (await _authorizationService.IsAuthorizedForProfileDeleteAsync(username, User))
         return View(await _profileService.GetProfileDeleteVmAsync(username));
 
-      return RedirectToAction("AccessDenied", "Account");
+      return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
     }
 
     [Route("Delete/{username}")]
@@ -260,7 +260,7 @@ namespace Forum.Controllers {
         return View(profileDeleteVm);
 
       if (!await _authorizationService.IsAuthorizedForProfileDeleteAsync(profileDeleteVm.Username, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       await _profileService.RemoveAsync(profileDeleteVm, User);
       TempData.ModalSuccess("The Profile has been deleted!");

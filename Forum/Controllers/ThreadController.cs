@@ -43,7 +43,7 @@ namespace Forum.Controllers {
       }
 
       if (!await _authorizationService.IsAuthorizedForThreadCreateInTopicAsync(topicId, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       return View(new ThreadCreateVm {TopicId = topicId});
     }
@@ -57,7 +57,7 @@ namespace Forum.Controllers {
         return View(threadCreateVm);
 
       if (!await _authorizationService.IsAuthorizedForThreadCreateInTopicAsync(threadCreateVm.TopicId, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       await _threadService.AddAsync(threadCreateVm, User);
       TempData.ModalSuccess("The Thread has been created!");
@@ -72,7 +72,7 @@ namespace Forum.Controllers {
         return NotFound();
 
       if (!await _authorizationService.IsAuthorizedForThreadEditAsync(id, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       return View(await _threadService.GetThreadEditVm(id));
     }
@@ -89,7 +89,7 @@ namespace Forum.Controllers {
         return View(threadEditVm);
 
       if (!await _authorizationService.IsAuthorizedForThreadEditAsync(threadEditVm.ThreadId, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       await _threadService.UpdateAsync(threadEditVm, User);
 
@@ -105,7 +105,7 @@ namespace Forum.Controllers {
         return NotFound();
 
       if (!await _authorizationService.IsAuthorizedForThreadDeleteAsync(id, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       return View(await _threadService.GetThreadDeleteVm(id));
     }
@@ -122,7 +122,7 @@ namespace Forum.Controllers {
         return View(threadDeleteVm);
 
       if (!await _authorizationService.IsAuthorizedForThreadDeleteAsync(threadDeleteVm.ThreadId, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       await _threadService.RemoveAsync(threadDeleteVm);
 
@@ -139,7 +139,7 @@ namespace Forum.Controllers {
         return NotFound();
 
       if (!await _authorizationService.IsAuthorizedForThreadLockAsync(id, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       if (_threadService.IsThreadLocked(id)) {
         TempData.ModalWarning("The Thread is already locked!");
@@ -162,7 +162,7 @@ namespace Forum.Controllers {
         return View(threadLockVm);
 
       if (!await _authorizationService.IsAuthorizedForThreadLockAsync(id, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       if (_threadService.IsThreadLocked(threadLockVm.ThreadId)) {
         TempData.ModalFailed("The Thread is already locked!");
@@ -183,7 +183,7 @@ namespace Forum.Controllers {
         return NotFound();
 
       if (!await _authorizationService.IsAuthorizedForThreadLockAsync(id, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       if (!_threadService.IsThreadLocked(id)) {
         TempData.ModalWarning("The Thread is already unlocked!");
@@ -206,7 +206,7 @@ namespace Forum.Controllers {
         return View(threadUnlockVm);
 
       if (!await _authorizationService.IsAuthorizedForThreadLockAsync(id, User))
-        return RedirectToAction("AccessDenied", "Account");
+        return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
 
       if (!_threadService.IsThreadLocked(threadUnlockVm.ThreadId)) {
         TempData.ModalFailed("The Thread is already unlocked!");

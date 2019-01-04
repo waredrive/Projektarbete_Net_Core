@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Forum.Extensions;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.AccountViewModels;
@@ -210,7 +209,7 @@ namespace Forum.Controllers {
       await _accountService.SignOut();
       TempData.ModalSuccess("You have been logged out!");
 
-      return RedirectToAction(nameof(TopicController.Index), nameof(TopicController).Replace("Controller", string.Empty));
+      return this.RedirectToControllerAction<TopicController>(nameof(TopicController.Index));
     }
   }
 }
