@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Forum.Extensions;
+using Forum.Helpers;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.ProfileViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -23,16 +24,16 @@ namespace Forum.Controllers {
     [Route("Details/{username}")]
     [HttpGet]
     public async Task<IActionResult> Details(string username, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
 
       if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Profile does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (_sharedService.IsDeletedMember(username)) {
         TempData.ModalFailed("This Profile has been removed!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       return View(await _profileService.GetProfileDetailsVmAsync(username, User));
@@ -42,11 +43,11 @@ namespace Forum.Controllers {
     [Route("Update/{username}")]
     [HttpGet]
     public async Task<IActionResult> Edit(string username, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
 
       if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Profile does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAsync(username, User))
@@ -59,10 +60,10 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(string username, ProfileEditVm profileEditVm, string returnUrl) {
-      ViewBag.ReturnUrl = returnUrl;
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
       if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Profile does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!ModelState.IsValid)
@@ -95,10 +96,10 @@ namespace Forum.Controllers {
     [Route("Role/{username}")]
     [HttpGet]
     public async Task<IActionResult> EditRole(string username, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
       if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Profile does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!await _authorizationService.IsAuthorizedProfileChangeRoleAsync(username, User))
@@ -111,10 +112,10 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditRole(string username, ProfileRoleEditVm profileRoleEditVm, string returnUrl) {
-      ViewBag.ReturnUrl = returnUrl;
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
       if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Profile does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!ModelState.IsValid)
@@ -126,17 +127,17 @@ namespace Forum.Controllers {
       await _profileService.UpdateProfileRoleAsync(username, profileRoleEditVm);
 
       TempData.ModalSuccess($"The Role has been updated to {profileRoleEditVm.Role}!");
-      return RedirectToAction(nameof(Details), new {username, returnUrl});
+      return RedirectToAction(nameof(Details), new {username, returnUrl = ViewBag.ReturnUrl});
     }
 
     [Route("Block/{username}")]
     [HttpGet]
     public async Task<IActionResult> Block(string username, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
 
       if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Profile does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!await _authorizationService.IsAuthorizedProfileBlockAsync(username, User))
@@ -154,10 +155,10 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Block(string username, ProfileBlockVm profileBlockVm, string returnUrl) {
-      ViewBag.ReturnUrl = returnUrl;
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
       if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Profile does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!ModelState.IsValid)
@@ -186,10 +187,10 @@ namespace Forum.Controllers {
     [Route("Unblock/{username}")]
     [HttpGet]
     public async Task<IActionResult> Unblock(string username, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
       if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Profile does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!await _authorizationService.IsAuthorizedProfileBlockAsync(username, User))
@@ -208,10 +209,10 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Unblock(string username, ProfileUnblockVm profileUnblockVm, string returnUrl) {
-      ViewBag.ReturnUrl = returnUrl;
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl,  "/");
       if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Profile does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!ModelState.IsValid)
@@ -234,10 +235,10 @@ namespace Forum.Controllers {
     [Route("Delete/{username}")]
     [HttpGet]
     public async Task<IActionResult> Delete(string username, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
       if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Profile does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (await _authorizationService.IsAuthorizedForProfileDeleteAsync(username, User))
@@ -250,10 +251,10 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(string username, ProfileDeleteVm profileDeleteVm, string returnUrl) {
-      ViewBag.ReturnUrl = returnUrl;
- if (!_sharedService.DoesUserAccountExist(username)) {
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
+      if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Profile does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!ModelState.IsValid)

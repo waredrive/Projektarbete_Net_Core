@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Forum.Attributes;
 using Forum.Extensions;
+using Forum.Helpers;
 using Forum.Models.Identity;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.ThreadViewModels;
@@ -26,8 +27,8 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Index(int topicId, int page = 1) {
       if (!await _topicService.DoesTopicExist(topicId)) {
-        TempData.ModalFailed("Profile does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        TempData.ModalFailed("Topic does not exist!");
+        return this.RedirectToControllerAction<TopicController>(nameof(TopicController.Index));
       }
 
       return View(await _threadService.GetThreadsIndexVmAsync(User, topicId, page));
@@ -36,10 +37,10 @@ namespace Forum.Controllers {
     [Route("Create")]
     [HttpGet]
     public async Task<IActionResult> Create(int topicId, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
       if (!await _topicService.DoesTopicExist(topicId)) {
-        TempData.ModalFailed("Profile does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        TempData.ModalFailed("Topic does not exist!");
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!await _authorizationService.IsAuthorizedForThreadCreateInTopicAsync(topicId, User))
@@ -52,7 +53,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(ThreadCreateVm threadCreateVm, string returnUrl) {
-      ViewBag.ReturnUrl = returnUrl;
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
       if (!ModelState.IsValid)
         return View(threadCreateVm);
 
@@ -61,15 +62,17 @@ namespace Forum.Controllers {
 
       await _threadService.AddAsync(threadCreateVm, User);
       TempData.ModalSuccess("The Thread has been created!");
-      return Redirect(returnUrl);
+      return Redirect(ViewBag.ReturnUrl);
     }
 
     [Route("Update/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
-      if (!_threadService.DoesThreadExist(id))
-        return NotFound();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
+      if (!_threadService.DoesThreadExist(id)) {
+        TempData.ModalFailed("Topic does not exist!");
+        return Redirect(ViewBag.ReturnUrl);
+      }
 
       if (!await _authorizationService.IsAuthorizedForThreadEditAsync(id, User))
         return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
@@ -81,9 +84,12 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, ThreadEditVm threadEditVm, string returnUrl) {
-      ViewBag.ReturnUrl = returnUrl;
-      if (!_threadService.DoesThreadExist(id))
-        return NotFound();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
+      ;
+      if (!_threadService.DoesThreadExist(id)) {
+        TempData.ModalFailed("Topic does not exist!");
+        return Redirect(ViewBag.ReturnUrl);
+      }
 
       if (!ModelState.IsValid)
         return View(threadEditVm);
@@ -94,16 +100,19 @@ namespace Forum.Controllers {
       await _threadService.UpdateAsync(threadEditVm, User);
 
       TempData.ModalSuccess("The Thread has been updated!");
-      return Redirect(returnUrl);
+      return Redirect(ViewBag.ReturnUrl);
     }
 
     [Route("Delete/{id}")]
     [HttpGet]
     public async Task<IActionResult> Delete(int id, string returnUrl = null, string onRemoveReturnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
-      ViewBag.OnRemoveReturnUrl = onRemoveReturnUrl ?? Request.Headers["Referer"].ToString();
-      if (!_threadService.DoesThreadExist(id))
-        return NotFound();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
+      ViewBag.OnRemoveReturnUrl = StringHelper.FirstValidString(onRemoveReturnUrl, Request.Headers["Referer"].ToString(), "/");
+
+      if (!_threadService.DoesThreadExist(id)) {
+        TempData.ModalFailed("Topic does not exist!");
+        return Redirect(ViewBag.ReturnUrl);
+      }
 
       if (!await _authorizationService.IsAuthorizedForThreadDeleteAsync(id, User))
         return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
@@ -115,10 +124,12 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id, ThreadDeleteVm threadDeleteVm, string returnUrl, string onRemoveReturnUrl) {
-      ViewBag.ReturnUrl = returnUrl;
-      ViewBag.OnRemoveReturnUrl = onRemoveReturnUrl;
-      if (!_threadService.DoesThreadExist(id))
-        return NotFound();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
+      ViewBag.OnRemoveReturnUrl = StringHelper.FirstValidString(onRemoveReturnUrl, "/");
+      if (!_threadService.DoesThreadExist(id)) {
+        TempData.ModalFailed("Topic does not exist!");
+        return Redirect(ViewBag.ReturnUrl);
+      }
 
       if (!ModelState.IsValid)
         return View(threadDeleteVm);
@@ -136,9 +147,11 @@ namespace Forum.Controllers {
     [Route("Lock/{id}")]
     [HttpGet]
     public async Task<IActionResult> Lock(int id, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
-      if (!_threadService.DoesThreadExist(id))
-        return NotFound();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
+      if (!_threadService.DoesThreadExist(id)) {
+        TempData.ModalFailed("Topic does not exist!");
+        return Redirect(ViewBag.ReturnUrl);
+      }
 
       if (!await _authorizationService.IsAuthorizedForThreadLockAsync(id, User))
         return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
@@ -156,9 +169,11 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Lock(int id, ThreadLockVm threadLockVm, string returnUrl) {
-      ViewBag.ReturnUrl = returnUrl;
-      if (!_threadService.DoesThreadExist(id))
-        return NotFound();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
+      if (!_threadService.DoesThreadExist(id)) {
+        TempData.ModalFailed("Topic does not exist!");
+        return Redirect(ViewBag.ReturnUrl);
+      }
 
       if (!ModelState.IsValid)
         return View(threadLockVm);
@@ -173,16 +188,18 @@ namespace Forum.Controllers {
 
       await _threadService.LockAsync(threadLockVm, User);
       TempData.ModalSuccess("The Thread has been locked!");
-      return Redirect(returnUrl);
+      return Redirect(ViewBag.ReturnUrl);
     }
 
     [RolesAuthorize(Roles.Admin, Roles.Moderator)]
     [Route("Unlock/{id}")]
     [HttpGet]
     public async Task<IActionResult> Unlock(int id, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
-      if (!_threadService.DoesThreadExist(id))
-        return NotFound();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
+      if (!_threadService.DoesThreadExist(id)) {
+        TempData.ModalFailed("Topic does not exist!");
+        return Redirect(ViewBag.ReturnUrl);
+      }
 
       if (!await _authorizationService.IsAuthorizedForThreadLockAsync(id, User))
         return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));
@@ -200,9 +217,11 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Unlock(int id, ThreadUnlockVm threadUnlockVm, string returnUrl) {
-      ViewBag.ReturnUrl = returnUrl;
-      if (!_threadService.DoesThreadExist(id))
-        return NotFound();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
+      if (!_threadService.DoesThreadExist(id)) {
+        TempData.ModalFailed("Topic does not exist!");
+        return Redirect(ViewBag.ReturnUrl);
+      }
 
       if (!ModelState.IsValid)
         return View(threadUnlockVm);
@@ -218,7 +237,7 @@ namespace Forum.Controllers {
       await _threadService.UnlockAsync(threadUnlockVm, User);
 
       TempData.ModalSuccess("The Thread has been unlocked!");
-      return Redirect(returnUrl);
+      return Redirect(ViewBag.ReturnUrl);
     }
   }
 }

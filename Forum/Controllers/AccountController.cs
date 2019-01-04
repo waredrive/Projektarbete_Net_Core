@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Forum.Extensions;
+using Forum.Helpers;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -58,9 +59,9 @@ namespace Forum.Controllers {
     [Route("Login")]
     [HttpGet]
     public IActionResult Login(string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
       if (User.Identity.IsAuthenticated) {
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
       return View();
     }
@@ -75,8 +76,7 @@ namespace Forum.Controllers {
 
       var result = await _accountService.LoginAsync(accountLoginVm);
       if (result.Succeeded) {
-        var retUrl = Url.IsLocalUrl(returnUrl) ? returnUrl : "/";
-        return Redirect(retUrl);
+        return Redirect(Url.IsLocalUrl(returnUrl) ? returnUrl : "/");
       }
       ModelState.AddModelError(string.Empty, "Invalid login attempt.");
 
@@ -86,10 +86,10 @@ namespace Forum.Controllers {
     [Route("Update/{username}")]
     [HttpGet]
     public async Task<IActionResult> EditAccount(string username, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
       if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Account does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAsync(username, User))
@@ -102,10 +102,10 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditAccount(string username, AccountEditVm accountEditVm, string returnUrl) {
-      ViewBag.ReturnUrl = returnUrl;
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
       if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Account does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!ModelState.IsValid)
@@ -136,10 +136,10 @@ namespace Forum.Controllers {
     [Route("Update/Password/{username}")]
     [HttpGet]
     public async Task<IActionResult> EditPassword(string username, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
       if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Account does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAsync(username, User))
@@ -153,10 +153,10 @@ namespace Forum.Controllers {
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditPassword(string username, AccountPasswordEditVm accountPasswordEditVm,
       string returnUrl) {
-      ViewBag.ReturnUrl = returnUrl;
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
       if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Account does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!ModelState.IsValid)
@@ -180,12 +180,12 @@ namespace Forum.Controllers {
     [Route("Details/{username}")]
     [HttpGet]
     public async Task<IActionResult> Details(string username, string returnUrl = null, bool fromProfile = false) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
       ViewBag.FromProfile = fromProfile;
 
       if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Account does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!await _authorizationService.IsAuthorizedForAccountDetailsViewAsync(username, User))
@@ -198,9 +198,9 @@ namespace Forum.Controllers {
     [HttpGet]
     [Route("AccessDenied")]
     public IActionResult AccessDenied() {
-      ViewBag.ReturnUrl = Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(Request.Headers["Referer"].ToString(), "/");
       TempData.ModalNoPermission();
-      return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+      return Redirect(ViewBag.ReturnUrl);
     }
 
     [Route("Logout")]

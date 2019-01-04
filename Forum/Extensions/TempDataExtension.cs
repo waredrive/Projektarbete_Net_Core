@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.ViewFeatures;
+﻿using System;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace Forum.Extensions {
   public static class TempDataExtension {
@@ -17,6 +18,11 @@ namespace Forum.Extensions {
     private static void SetModalData(this ITempDataDictionary tempData, string header, string message) {
       tempData[ModalHeaderKey] = header;
       tempData[ModalMessageKey] = message;
+    }
+
+    public static bool ModalClear(this ITempDataDictionary tempData) {
+      tempData.Clear();
+      return true;
     }
 
     public static void ModalSuccess(this ITempDataDictionary tempData, string message) {

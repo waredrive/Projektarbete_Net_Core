@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Forum.Attributes;
 using Forum.Extensions;
+using Forum.Helpers;
 using Forum.Models.Identity;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.PostViewModels;
@@ -26,8 +27,11 @@ namespace Forum.Controllers {
     [Route("")]
     [HttpGet]
     public async Task<IActionResult> Index(int threadId, int? postId = null, int page = 1) {
-      if (!_threadService.DoesThreadExist(threadId))
-        return NotFound();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(Request.Headers["Referer"].ToString(), "/");
+      if (!_threadService.DoesThreadExist(threadId)) {
+        TempData.ModalFailed("Thread does not exist!");
+        return Redirect(ViewBag.ReturnUrl);
+      }
 
       return View(await _postService.GetPostsIndexVmAsync(User, threadId, page, postId));
     }
@@ -35,10 +39,10 @@ namespace Forum.Controllers {
     [Route("Create")]
     [HttpGet]
     public async Task<IActionResult> Create(int threadId, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
       if (!_threadService.DoesThreadExist(threadId)) {
         TempData.ModalFailed("Thread does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!await _authorizationService.IsAuthorizedForPostCreateInThreadAsync(threadId, User))
@@ -51,14 +55,14 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(PostCreateVm postCreateVm, string returnUrl) {
-      ViewBag.ReturnUrl = returnUrl;
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
 
       if (!ModelState.IsValid)
         return View(postCreateVm);
 
       if (!_threadService.DoesThreadExist(postCreateVm.ThreadId)) {
         TempData.ModalFailed("Thread does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!await _authorizationService.IsAuthorizedForPostCreateInThreadAsync(postCreateVm.ThreadId, User))
@@ -67,16 +71,16 @@ namespace Forum.Controllers {
       await _postService.AddAsync(postCreateVm, User);
 
       TempData.ModalSuccess("The Post has been created!");
-      return Redirect(returnUrl);
+      return Redirect(ViewBag.ReturnUrl);
     }
 
     [Route("Update/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
       if (!_postService.DoesPostExist(id)) {
         TempData.ModalFailed("Post does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!await _authorizationService.IsAuthorizedForPostEditAndDeleteAsync(id, User))
@@ -89,10 +93,10 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, PostEditVm postEditVm, string returnUrl) {
-      ViewBag.ReturnUrl = returnUrl;
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
       if (!_postService.DoesPostExist(id)) {
         TempData.ModalFailed("Post does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!ModelState.IsValid)
@@ -103,16 +107,16 @@ namespace Forum.Controllers {
 
       await _postService.UpdateAsync(postEditVm, User);
       TempData.ModalSuccess("The Post has been updated!");
-      return Redirect(returnUrl);
+      return Redirect(ViewBag.ReturnUrl);
     }
 
     [Route("Delete/{id}")]
     [HttpGet]
     public async Task<IActionResult> Delete(int id, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
       if (!_postService.DoesPostExist(id)) {
         TempData.ModalFailed("Post does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!await _authorizationService.IsAuthorizedForPostEditAndDeleteAsync(id, User))
@@ -125,10 +129,10 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id, PostDeleteVm postDeleteVm, string returnUrl) {
-      ViewBag.ReturnUrl = returnUrl;
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
       if (!_postService.DoesPostExist(id)) {
         TempData.ModalFailed("Post does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!ModelState.IsValid)
@@ -139,17 +143,17 @@ namespace Forum.Controllers {
 
       await _postService.RemoveAsync(postDeleteVm);
       TempData.ModalSuccess("The Post has been deleted!");
-      return Redirect(returnUrl);
+      return Redirect(ViewBag.ReturnUrl);
     }
 
     [RolesAuthorize(Roles.Admin, Roles.Moderator)]
     [Route("Lock/{id}")]
     [HttpGet]
     public async Task<IActionResult> Lock(int id, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
       if (!_postService.DoesPostExist(id)) {
         TempData.ModalFailed("Post does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!await _authorizationService.IsAuthorizedForPostLockAsync(id, User))
@@ -168,10 +172,10 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Lock(int id, PostLockVm postLockVm, string returnUrl) {
-      ViewBag.ReturnUrl = returnUrl;
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
       if (!_postService.DoesPostExist(id)) {
         TempData.ModalFailed("Post does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!ModelState.IsValid)
@@ -182,22 +186,22 @@ namespace Forum.Controllers {
 
       if (_postService.IsPostLocked(postLockVm.PostId)) {
         TempData.ModalFailed("The Post is already locked!");
-        return Redirect(returnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       await _postService.LockAsync(postLockVm, User);
       TempData.ModalSuccess("The Post has been Locked!");
-      return Redirect(returnUrl);
+      return Redirect(ViewBag.ReturnUrl);
     }
 
     [RolesAuthorize(Roles.Admin, Roles.Moderator)]
     [Route("Unlock/{id}")]
     [HttpGet]
     public async Task<IActionResult> Unlock(int id, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
       if (!_postService.DoesPostExist(id)) {
         TempData.ModalFailed("Post does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!await _authorizationService.IsAuthorizedForPostLockAsync(id, User))
@@ -216,10 +220,10 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Unlock(int id, PostUnlockVm postUnlockVm, string returnUrl) {
-      ViewBag.ReturnUrl = returnUrl;
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
       if (!_postService.DoesPostExist(id)) {
         TempData.ModalFailed("Post does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!ModelState.IsValid)
@@ -230,12 +234,12 @@ namespace Forum.Controllers {
 
       if (!_postService.IsPostLocked(postUnlockVm.PostId)) {
         TempData.ModalFailed("The Post is already unlocked!");
-        return Redirect(returnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       await _postService.UnlockAsync(postUnlockVm, User);
       TempData.ModalSuccess("The Post has been unlocked!");
-      return Redirect(returnUrl);
+      return Redirect(ViewBag.ReturnUrl);
     }
   }
 }

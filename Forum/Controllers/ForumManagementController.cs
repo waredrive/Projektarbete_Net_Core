@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Forum.Attributes;
 using Forum.Extensions;
+using Forum.Helpers;
 using Forum.Models.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -32,11 +33,11 @@ namespace Forum.Controllers {
     [Route("Locked/Topics/{username}")]
     [HttpGet]
     public async Task<IActionResult> LockedTopics(string username, int page = 1) {
-      ViewBag.ReturnUrl = Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(Request.Headers["Referer"].ToString(), "/");
 
       if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Profile does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       return View(await _forumManagementService.GetForumManagementLockedTopicsVmAsync(User, page, username));
@@ -51,11 +52,11 @@ namespace Forum.Controllers {
     [Route("Locked/Threads/{username}")]
     [HttpGet]
     public async Task<IActionResult> LockedThreads(string username, int page = 1) {
-      ViewBag.ReturnUrl = Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString( Request.Headers["Referer"].ToString(), "/");
 
       if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Profile does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       return View(await _forumManagementService.GetForumManagementLockedThreadsVmAsync(User, page, username));
@@ -70,11 +71,11 @@ namespace Forum.Controllers {
     [Route("Locked/Posts/{username}")]
     [HttpGet]
     public async Task<IActionResult> LockedPosts(string username, int page = 1) {
-      ViewBag.ReturnUrl = Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(Request.Headers["Referer"].ToString(), "/");
 
       if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Profile does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       return View(await _forumManagementService.GetForumManagementLockedPostsVmAsync(User, page, username));
@@ -89,10 +90,10 @@ namespace Forum.Controllers {
     [Route("Blocked/Members/{username}")]
     [HttpGet]
     public async Task<IActionResult> BlockedMembers(string username, int page = 1) {
-      ViewBag.ReturnUrl = Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(Request.Headers["Referer"].ToString(), "/");
       if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Profile does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       return View(await _forumManagementService.GetForumManagementBlockedMembersVmAsync(User, page, username));

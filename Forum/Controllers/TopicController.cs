@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Forum.Attributes;
 using Forum.Extensions;
+using Forum.Helpers;
 using Forum.Models.Identity;
 using Forum.Models.Services;
 using Forum.Models.ViewModels.TopicViewModels;
@@ -60,10 +61,10 @@ namespace Forum.Controllers {
     [Route("Update/{id}")]
     [HttpGet]
     public async Task<IActionResult> Edit(int id, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
       if (!await _topicService.DoesTopicExist(id)) {
         TempData.ModalFailed("Topic does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
@@ -77,10 +78,11 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, TopicEditVm topicEditVm, string returnUrl) {
-      ViewBag.ReturnUrl = returnUrl;
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl,  "/");
+      ;
       if (!await _topicService.DoesTopicExist(id)) {
         TempData.ModalFailed("Topic does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!ModelState.IsValid)
@@ -99,11 +101,11 @@ namespace Forum.Controllers {
     [Route("Delete/{id}")]
     [HttpGet]
     public async Task<IActionResult> Delete(int id, string returnUrl = null, string onRemoveReturnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
-      ViewBag.OnRemoveReturnUrl = onRemoveReturnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
+      ViewBag.OnRemoveReturnUrl = StringHelper.FirstValidString(onRemoveReturnUrl, Request.Headers["Referer"].ToString(), "/");
       if (!await _topicService.DoesTopicExist(id)) {
         TempData.ModalFailed("Topic does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
@@ -117,11 +119,11 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(int id, TopicDeleteVm topicDeleteVm, string returnUrl, string onRemoveReturnUrl) {
-      ViewBag.ReturnUrl = returnUrl;
-      ViewBag.OnRemoveReturnUrl = onRemoveReturnUrl;
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
+      ViewBag.OnRemoveReturnUrl = StringHelper.FirstValidString(onRemoveReturnUrl, "/");
       if (!await _topicService.DoesTopicExist(id)) {
         TempData.ModalFailed("Topic does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!ModelState.IsValid)
@@ -140,10 +142,10 @@ namespace Forum.Controllers {
     [Route("Lock/{id}")]
     [HttpGet]
     public async Task<IActionResult> Lock(int id, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
       if (!await _topicService.DoesTopicExist(id)) {
         TempData.ModalFailed("Topic does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
@@ -162,10 +164,10 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Lock(int id, TopicLockVm topicLockVm, string returnUrl) {
-      ViewBag.ReturnUrl = returnUrl;
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
       if (!await _topicService.DoesTopicExist(id)) {
         TempData.ModalFailed("Topic does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!ModelState.IsValid)
@@ -188,10 +190,10 @@ namespace Forum.Controllers {
     [Route("Unlock/{id}")]
     [HttpGet]
     public async Task<IActionResult> Unlock(int id, string returnUrl = null) {
-      ViewBag.ReturnUrl = returnUrl ?? Request.Headers["Referer"].ToString();
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
       if (!await _topicService.DoesTopicExist(id)) {
         TempData.ModalFailed("Topic does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(id, User))
@@ -210,10 +212,10 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Unlock(int id, TopicUnlockVm topicUnlockVm, string returnUrl) {
-      ViewBag.ReturnUrl = returnUrl;
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
       if (!await _topicService.DoesTopicExist(id)) {
         TempData.ModalFailed("Topic does not exist!");
-        return Redirect(string.IsNullOrEmpty(ViewBag.ReturnUrl) ? "/" : ViewBag.ReturnUrl);
+        return Redirect(ViewBag.ReturnUrl);
       }
 
       if (!ModelState.IsValid)
