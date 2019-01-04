@@ -14,10 +14,9 @@ namespace Forum {
     //TODO: Add not found to thread and posts to check if topic and thread exist. Use modal to display fail.
     //TODO: Check how to solve without access denied thread sleep.
     //TODO: Don't show deleted users posts and role in profile.
-    //TODO: Return values from services to act upon in controllers (i.e. if an entity is not added, display modal failed), can use savechangesasync for this.
+    //TODO: Return values from services to act upon in controllers (i.e. if an entity is not added, display modal failed), can use savechangesasync for this. Include authorization in those values.
     //TODO: https://www.smarterasp.net
     //TODO: Do not update if sending no new data. All edits/updates. Use own validationattribute and an "old topic/ old thread/ old posts" properties.
-    //TODO: Add seed of Default deleted user if possible?
     //TODO: Add SuperAdmin? - if so Admin cannot add SuperAdmin role and manipulate SuperAdmin.
     //TODO: Add areas?
     //TODO: A member can include idnavigation! Change all redundant searches for identityuser.

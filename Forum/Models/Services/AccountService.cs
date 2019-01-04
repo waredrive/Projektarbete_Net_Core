@@ -40,6 +40,9 @@ namespace Forum.Models.Services {
     }
 
     public async Task<IdentityResult> AddAsync(AccountRegisterVm accountRegisterVm) {
+      if (_sharedService.IsDeletedMember(accountRegisterVm.UserName))
+        return IdentityResult.Failed(new[]{ new IdentityError{Description = "Forbidden username" } });
+
       await CreateRolesAsync();
       var user = new IdentityUser {
         Email = accountRegisterVm.Email,
