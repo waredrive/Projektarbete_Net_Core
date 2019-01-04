@@ -245,7 +245,7 @@ namespace Forum.Models.Services {
       await _db.SaveChangesAsync();
 
       if (userIsOwner) {
-      await Task.Delay(500);
+        await _signInManager.SignOutAsync();
       }
     }
 
