@@ -26,11 +26,17 @@ namespace Forum.Controllers {
     [AllowAnonymous]
     [Route("")]
     [HttpGet]
-    public async Task<IActionResult> Index(int threadId, int? postId = null, int page = 1) {
+    public async Task<IActionResult> Index(int topicId, int threadId, int? postId = null, int page = 1) {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(Request.Headers["Referer"].ToString(), "/");
-      if (!_sharedService.DoesThreadExist(threadId)) {
+
+      if (!await _sharedService.DoesTopicExist(topicId)) {
+        TempData.ModalFailed("Topic does not exist!");
+        return this.RedirectToControllerAction<TopicController>(nameof(TopicController.Index));
+      }
+
+      if (!await _sharedService.DoesThreadExist(threadId)) {
         TempData.ModalFailed("Thread does not exist!");
-        return Redirect(ViewBag.ReturnUrl);
+        return this.RedirectToControllerAction<ThreadController>(nameof(ThreadController.Index), new{threadId});
       }
 
       return View(await _postService.GetPostsIndexVmAsync(User, threadId, page, postId));
@@ -38,11 +44,16 @@ namespace Forum.Controllers {
 
     [Route("Create")]
     [HttpGet]
-    public async Task<IActionResult> Create(int threadId, string returnUrl = null) {
+    public async Task<IActionResult> Create(int topicId, int threadId, string returnUrl = null) {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
-      if (!_sharedService.DoesThreadExist(threadId)) {
-        TempData.ModalFailed("Thread does not exist!");
-        return Redirect(ViewBag.ReturnUrl);
+      if (!await _sharedService.DoesTopicExist(topicId)) {
+        TempData.ModalFailed("The topic you trying to post to does not exist!");
+        return this.RedirectToControllerAction<TopicController>(nameof(TopicController.Index));
+      }
+
+      if (!await _sharedService.DoesThreadExist(threadId)) {
+        TempData.ModalFailed("Thread you trying to post to does not exist!");
+        return this.RedirectToControllerAction<ThreadController>(nameof(ThreadController.Index), new { threadId });
       }
 
       if (!await _authorizationService.IsAuthorizedForPostCreateInThreadAsync(threadId, User))
@@ -54,16 +65,21 @@ namespace Forum.Controllers {
     [Route("Create")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(PostCreateVm postCreateVm, string returnUrl) {
+    public async Task<IActionResult> Create(int topicId, int threadId,PostCreateVm postCreateVm, string returnUrl) {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
+
+      if (!await _sharedService.DoesTopicExist(topicId)) {
+        TempData.ModalFailed("The topic you trying to post to does not exist!");
+        return this.RedirectToControllerAction<TopicController>(nameof(TopicController.Index));
+      }
+
+      if (!await _sharedService.DoesThreadExist(threadId)) {
+        TempData.ModalFailed("Thread you trying to post to does not exist!");
+        return this.RedirectToControllerAction<ThreadController>(nameof(ThreadController.Index), new { threadId });
+      }
 
       if (!ModelState.IsValid)
         return View(postCreateVm);
-
-      if (!_sharedService.DoesThreadExist(postCreateVm.ThreadId)) {
-        TempData.ModalFailed("Thread does not exist!");
-        return Redirect(ViewBag.ReturnUrl);
-      }
 
       if (!await _authorizationService.IsAuthorizedForPostCreateInThreadAsync(postCreateVm.ThreadId, User))
         return this.RedirectToControllerAction<AccountController>(nameof(AccountController.AccessDenied));

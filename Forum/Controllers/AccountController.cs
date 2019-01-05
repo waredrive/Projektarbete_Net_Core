@@ -71,12 +71,14 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(AccountLoginVm accountLoginVm, string returnUrl) {
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
+
       if (!ModelState.IsValid)
         return View(accountLoginVm);
 
       var result = await _accountService.LoginAsync(accountLoginVm);
       if (result.Succeeded) {
-        return Redirect(Url.IsLocalUrl(returnUrl) ? returnUrl : "/");
+        return Redirect(ViewBag.ReturnUrl);
       }
       ModelState.AddModelError(string.Empty, "Invalid login attempt.");
 

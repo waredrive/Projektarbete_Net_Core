@@ -54,8 +54,8 @@ namespace Forum.Models.Services {
       return username.StartsWith(DeletedMember.UsernamePrefix, StringComparison.CurrentCultureIgnoreCase);
     }
 
-    public bool DoesThreadExist(int id) {
-      return _db.Thread.Any(t => t.Id == id);
+    public Task<bool> DoesThreadExist(int id) {
+      return _db.Thread.AnyAsync(t => t.Id == id);
     }
 
     public Task<bool> DoesTopicExist(int id) {
