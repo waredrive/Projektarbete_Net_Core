@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Forum.Controllers {
-  [Route("Thread/{threadId}")]
+  [Route("Forum/{topicId}/{threadId}")]
   public class PostController : Controller {
     private readonly AuthorizationService _authorizationService;
     private readonly PostService _postService;
