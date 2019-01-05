@@ -53,5 +53,14 @@ namespace Forum.Models.Services {
     public bool IsDeletedMember(string username) {
       return username.StartsWith(DeletedMember.UsernamePrefix, StringComparison.CurrentCultureIgnoreCase);
     }
+
+    public bool DoesThreadExist(int id) {
+      return _db.Thread.Any(t => t.Id == id);
+    }
+
+    public Task<bool> DoesTopicExist(int id) {
+      return _db.Topic.AnyAsync(t => t.Id == id);
+    }
+
   }
 }

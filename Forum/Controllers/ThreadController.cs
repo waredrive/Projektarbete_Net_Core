@@ -13,12 +13,12 @@ namespace Forum.Controllers {
   public class ThreadController : Controller {
     private readonly AuthorizationService _authorizationService;
     private readonly ThreadService _threadService;
-    private readonly TopicService _topicService;
+    private readonly SharedService _sharedService;
 
-    public ThreadController(ThreadService threadService, TopicService topicService,
+    public ThreadController(ThreadService threadService, SharedService sharedService,
       AuthorizationService authorizationService) {
       _threadService = threadService;
-      _topicService = topicService;
+      _sharedService = sharedService;
       _authorizationService = authorizationService;
     }
 
@@ -26,7 +26,7 @@ namespace Forum.Controllers {
     [Route("")]
     [HttpGet]
     public async Task<IActionResult> Index(int topicId, int page = 1) {
-      if (!await _topicService.DoesTopicExist(topicId)) {
+      if (!await _sharedService.DoesTopicExist(topicId)) {
         TempData.ModalFailed("Topic does not exist!");
         return this.RedirectToControllerAction<TopicController>(nameof(TopicController.Index));
       }
@@ -38,7 +38,7 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Create(int topicId, string returnUrl = null) {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
-      if (!await _topicService.DoesTopicExist(topicId)) {
+      if (!await _sharedService.DoesTopicExist(topicId)) {
         TempData.ModalFailed("Topic does not exist!");
         return Redirect(ViewBag.ReturnUrl);
       }
@@ -69,7 +69,7 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Edit(int id, string returnUrl = null) {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
-      if (!_threadService.DoesThreadExist(id)) {
+      if (!_sharedService.DoesThreadExist(id)) {
         TempData.ModalFailed("Topic does not exist!");
         return Redirect(ViewBag.ReturnUrl);
       }
@@ -86,7 +86,7 @@ namespace Forum.Controllers {
     public async Task<IActionResult> Edit(int id, ThreadEditVm threadEditVm, string returnUrl) {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
       ;
-      if (!_threadService.DoesThreadExist(id)) {
+      if (!_sharedService.DoesThreadExist(id)) {
         TempData.ModalFailed("Topic does not exist!");
         return Redirect(ViewBag.ReturnUrl);
       }
@@ -109,7 +109,7 @@ namespace Forum.Controllers {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
       ViewBag.OnRemoveReturnUrl = StringHelper.FirstValidString(onRemoveReturnUrl, Request.Headers["Referer"].ToString(), "/");
 
-      if (!_threadService.DoesThreadExist(id)) {
+      if (!_sharedService.DoesThreadExist(id)) {
         TempData.ModalFailed("Topic does not exist!");
         return Redirect(ViewBag.ReturnUrl);
       }
@@ -126,7 +126,7 @@ namespace Forum.Controllers {
     public async Task<IActionResult> Delete(int id, ThreadDeleteVm threadDeleteVm, string returnUrl, string onRemoveReturnUrl) {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
       ViewBag.OnRemoveReturnUrl = StringHelper.FirstValidString(onRemoveReturnUrl, "/");
-      if (!_threadService.DoesThreadExist(id)) {
+      if (!_sharedService.DoesThreadExist(id)) {
         TempData.ModalFailed("Topic does not exist!");
         return Redirect(ViewBag.ReturnUrl);
       }
@@ -148,7 +148,7 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Lock(int id, string returnUrl = null) {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
-      if (!_threadService.DoesThreadExist(id)) {
+      if (!_sharedService.DoesThreadExist(id)) {
         TempData.ModalFailed("Topic does not exist!");
         return Redirect(ViewBag.ReturnUrl);
       }
@@ -170,7 +170,7 @@ namespace Forum.Controllers {
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Lock(int id, ThreadLockVm threadLockVm, string returnUrl) {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
-      if (!_threadService.DoesThreadExist(id)) {
+      if (!_sharedService.DoesThreadExist(id)) {
         TempData.ModalFailed("Topic does not exist!");
         return Redirect(ViewBag.ReturnUrl);
       }
@@ -196,7 +196,7 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Unlock(int id, string returnUrl = null) {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
-      if (!_threadService.DoesThreadExist(id)) {
+      if (!_sharedService.DoesThreadExist(id)) {
         TempData.ModalFailed("Topic does not exist!");
         return Redirect(ViewBag.ReturnUrl);
       }
@@ -218,7 +218,7 @@ namespace Forum.Controllers {
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Unlock(int id, ThreadUnlockVm threadUnlockVm, string returnUrl) {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
-      if (!_threadService.DoesThreadExist(id)) {
+      if (!_sharedService.DoesThreadExist(id)) {
         TempData.ModalFailed("Topic does not exist!");
         return Redirect(ViewBag.ReturnUrl);
       }

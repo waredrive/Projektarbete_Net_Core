@@ -190,8 +190,5 @@ namespace Forum.Models.Services {
       return _db.Topic.Where(t => t.Id == id).AnyAsync(p => p.LockedBy != null);
     }
 
-    public Task<bool> DoesTopicExist(int id) {
-      return _db.Topic.AnyAsync(t => t.Id == id);
-    }
   }
 }

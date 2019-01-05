@@ -14,12 +14,12 @@ namespace Forum.Controllers {
   public class PostController : Controller {
     private readonly AuthorizationService _authorizationService;
     private readonly PostService _postService;
-    private readonly ThreadService _threadService;
+    private readonly SharedService _sharedService;
 
-    public PostController(PostService postService, ThreadService threadService,
+    public PostController(PostService postService, SharedService sharedService,
       AuthorizationService authorizationService) {
       _postService = postService;
-      _threadService = threadService;
+      _sharedService = sharedService;
       _authorizationService = authorizationService;
     }
 
@@ -28,7 +28,7 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Index(int threadId, int? postId = null, int page = 1) {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(Request.Headers["Referer"].ToString(), "/");
-      if (!_threadService.DoesThreadExist(threadId)) {
+      if (!_sharedService.DoesThreadExist(threadId)) {
         TempData.ModalFailed("Thread does not exist!");
         return Redirect(ViewBag.ReturnUrl);
       }
@@ -40,7 +40,7 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Create(int threadId, string returnUrl = null) {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
-      if (!_threadService.DoesThreadExist(threadId)) {
+      if (!_sharedService.DoesThreadExist(threadId)) {
         TempData.ModalFailed("Thread does not exist!");
         return Redirect(ViewBag.ReturnUrl);
       }
@@ -60,7 +60,7 @@ namespace Forum.Controllers {
       if (!ModelState.IsValid)
         return View(postCreateVm);
 
-      if (!_threadService.DoesThreadExist(postCreateVm.ThreadId)) {
+      if (!_sharedService.DoesThreadExist(postCreateVm.ThreadId)) {
         TempData.ModalFailed("Thread does not exist!");
         return Redirect(ViewBag.ReturnUrl);
       }
