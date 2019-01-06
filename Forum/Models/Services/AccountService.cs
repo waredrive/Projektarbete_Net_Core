@@ -109,17 +109,14 @@ namespace Forum.Models.Services {
       return _signInManager.SignOutAsync();
     }
 
-    public async Task<AccountEditVm> GetAccountEditVmAsync(ClaimsPrincipal user) {
-      var identityUser = await _userManager.FindByNameAsync(user.Identity.Name);
-      var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
-
-      return new AccountEditVm {
-        Username = identityUser.UserName,
-        Birthdate = memberFromDb.BirthDate,
-        Email = identityUser.Email,
-        FirstName = memberFromDb.FirstName,
-        LastName = memberFromDb.LastName
-      };
+    public Task<AccountEditVm> GetAccountEditVm(ClaimsPrincipal user) {
+      return _db.Member.Where(m => m.IdNavigation.UserName == user.Identity.Name).Select( m => new AccountEditVm {
+        Username = m.IdNavigation.UserName,
+        Birthdate = m.BirthDate,
+        Email = m.IdNavigation.Email,
+        FirstName = m.FirstName,
+        LastName = m.LastName
+      }).FirstOrDefaultAsync();
     }
 
     public async Task<IdentityResult> UpdateAccountAsync(AccountEditVm accountEditVm, ClaimsPrincipal user) {

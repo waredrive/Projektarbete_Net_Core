@@ -60,6 +60,8 @@ namespace Forum.Controllers {
     [HttpGet]
     public IActionResult Login(string returnUrl = null) {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
+      ViewBag.OnBackReturnUrl = StringHelper.FirstValidString(Request.Headers["Referer"].ToString(), "/");
+
       if (User.Identity.IsAuthenticated) {
         return Redirect(ViewBag.ReturnUrl);
       }
@@ -70,15 +72,16 @@ namespace Forum.Controllers {
     [Route("Login")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(AccountLoginVm accountLoginVm, string returnUrl) {
+    public async Task<IActionResult> Login(AccountLoginVm accountLoginVm, string returnUrl, string onBackReturnUrl) {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
+      ViewBag.OnBackReturnUrl = StringHelper.FirstValidString(onBackReturnUrl, "/");
 
       if (!ModelState.IsValid)
         return View(accountLoginVm);
 
       var result = await _accountService.LoginAsync(accountLoginVm);
       if (result.Succeeded) {
-        return Redirect(ViewBag.ReturnUrl);
+        return Redirect($"{ViewBag.ReturnUrl}?ReturnUrl={ViewBag.OnBackReturnUrl}");
       }
       ModelState.AddModelError(string.Empty, "Invalid login attempt.");
 
@@ -97,7 +100,7 @@ namespace Forum.Controllers {
       if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAsync(username, User))
         return RedirectToAction(nameof(AccessDenied));
 
-      return View(await _accountService.GetAccountEditVmAsync(User));
+      return View(await _accountService.GetAccountEditVm(User));
     }
 
     [Route("Update/{username}")]
