@@ -12,8 +12,8 @@ namespace Forum.Controllers {
   [Route("Forum/{topicId}")]
   public class ThreadController : Controller {
     private readonly AuthorizationService _authorizationService;
-    private readonly ThreadService _threadService;
     private readonly SharedService _sharedService;
+    private readonly ThreadService _threadService;
 
     public ThreadController(ThreadService threadService, SharedService sharedService,
       AuthorizationService authorizationService) {
@@ -112,7 +112,8 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Delete(int id, string returnUrl = null, string onRemoveReturnUrl = null) {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
-      ViewBag.OnRemoveReturnUrl = StringHelper.FirstValidString(onRemoveReturnUrl, Request.Headers["Referer"].ToString(), "/");
+      ViewBag.OnRemoveReturnUrl =
+        StringHelper.FirstValidString(onRemoveReturnUrl, Request.Headers["Referer"].ToString(), "/");
 
       if (!await _sharedService.DoesThreadExist(id)) {
         TempData.ModalFailed("Thread does not exist!");
@@ -128,7 +129,8 @@ namespace Forum.Controllers {
     [Route("Delete/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int id, ThreadDeleteVm threadDeleteVm, string returnUrl, string onRemoveReturnUrl) {
+    public async Task<IActionResult> Delete(int id, ThreadDeleteVm threadDeleteVm, string returnUrl,
+      string onRemoveReturnUrl) {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
       ViewBag.OnRemoveReturnUrl = StringHelper.FirstValidString(onRemoveReturnUrl, "/");
       if (!await _sharedService.DoesThreadExist(id)) {
@@ -163,7 +165,7 @@ namespace Forum.Controllers {
 
       if (_threadService.IsThreadLocked(id)) {
         TempData.ModalWarning("The Thread is already locked!");
-        return RedirectToAction(nameof(Unlock), new { returnUrl = ViewBag.ReturnUrl });
+        return RedirectToAction(nameof(Unlock), new {returnUrl = ViewBag.ReturnUrl});
       }
 
       return View(await _threadService.GetThreadLockVm(id));
@@ -211,7 +213,7 @@ namespace Forum.Controllers {
 
       if (!_threadService.IsThreadLocked(id)) {
         TempData.ModalWarning("The Thread is already unlocked!");
-        return RedirectToAction(nameof(Lock), new { returnUrl = ViewBag.ReturnUrl });
+        return RedirectToAction(nameof(Lock), new {returnUrl = ViewBag.ReturnUrl});
       }
 
       return View(await _threadService.GetThreadUnlockVm(id));

@@ -70,7 +70,7 @@ namespace Forum.Models.Services {
           CreatedBy = t.CreatedByNavigation.IdNavigation.UserName
         }));
 
-      topicsIndexVm.LatestPosts.AddRange(_db.Post.OrderByDescending(p => p.CreatedOn).Take(10).Select(p => 
+      topicsIndexVm.LatestPosts.AddRange(_db.Post.OrderByDescending(p => p.CreatedOn).Take(10).Select(p =>
         new TopicsIndexPostVm {
           PostId = p.Id,
           ThreadId = p.Thread,
@@ -83,7 +83,7 @@ namespace Forum.Models.Services {
       return topicsIndexVm;
     }
 
-  public Task<TopicEditVm> GetTopicCreateVm(int id) {
+    public Task<TopicEditVm> GetTopicCreateVm(int id) {
       return _db.Topic.Where(t => t.Id == id).Select(t => new TopicEditVm {
         TopicId = t.Id,
         TopicText = t.ContentText
@@ -174,7 +174,8 @@ namespace Forum.Models.Services {
       await _db.SaveChangesAsync();
     }
 
-    public async Task<TopicOptionsVm> GetTopicOptionsVmAsync(int topicId, IPrincipal user, string returnUrl, string onRemoveReturnUrl) {
+    public async Task<TopicOptionsVm> GetTopicOptionsVmAsync(int topicId, IPrincipal user, string returnUrl,
+      string onRemoveReturnUrl) {
       var isAuthorizedForTopicEditLockAndDelete =
         await _authorizationService.IsAuthorizedForTopicEditLockAndDeleteAsync(topicId, user as ClaimsPrincipal);
       return await _db.Topic.Where(t => t.Id == topicId).Select(t => new TopicOptionsVm {
@@ -189,6 +190,5 @@ namespace Forum.Models.Services {
     public Task<bool> IsTopicLocked(int id) {
       return _db.Topic.Where(t => t.Id == id).AnyAsync(p => p.LockedBy != null);
     }
-
   }
 }

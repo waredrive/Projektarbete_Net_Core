@@ -13,6 +13,5 @@ namespace Forum.Views.Shared.Components.Footer {
     public async Task<IViewComponentResult> InvokeAsync() {
       return View(await _sharedService.GetFooterVmAsync());
     }
-
   }
 }

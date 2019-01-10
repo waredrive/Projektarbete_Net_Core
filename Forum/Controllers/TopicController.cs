@@ -16,7 +16,8 @@ namespace Forum.Controllers {
     private readonly SharedService _sharedService;
     private readonly TopicService _topicService;
 
-    public TopicController(TopicService topicService, AuthorizationService authorizationService, SharedService sharedService) {
+    public TopicController(TopicService topicService, AuthorizationService authorizationService,
+      SharedService sharedService) {
       _topicService = topicService;
       _authorizationService = authorizationService;
       _sharedService = sharedService;
@@ -81,7 +82,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, TopicEditVm topicEditVm, string returnUrl) {
-      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl,  "/");
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
       ;
       if (!await _sharedService.DoesTopicExist(id)) {
         TempData.ModalFailed("Topic does not exist!");
@@ -105,7 +106,8 @@ namespace Forum.Controllers {
     [HttpGet]
     public async Task<IActionResult> Delete(int id, string returnUrl = null, string onRemoveReturnUrl = null) {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
-      ViewBag.OnRemoveReturnUrl = StringHelper.FirstValidString(onRemoveReturnUrl, Request.Headers["Referer"].ToString(), "/");
+      ViewBag.OnRemoveReturnUrl =
+        StringHelper.FirstValidString(onRemoveReturnUrl, Request.Headers["Referer"].ToString(), "/");
       if (!await _sharedService.DoesTopicExist(id)) {
         TempData.ModalFailed("Topic does not exist!");
         return Redirect(ViewBag.ReturnUrl);
@@ -121,7 +123,8 @@ namespace Forum.Controllers {
     [Route("Delete/{id}")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int id, TopicDeleteVm topicDeleteVm, string returnUrl, string onRemoveReturnUrl) {
+    public async Task<IActionResult> Delete(int id, TopicDeleteVm topicDeleteVm, string returnUrl,
+      string onRemoveReturnUrl) {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
       ViewBag.OnRemoveReturnUrl = StringHelper.FirstValidString(onRemoveReturnUrl, "/");
       if (!await _sharedService.DoesTopicExist(id)) {
@@ -156,7 +159,7 @@ namespace Forum.Controllers {
 
       if (await _topicService.IsTopicLocked(id)) {
         TempData.ModalWarning("The Topic is already locked!");
-        return RedirectToAction(nameof(Unlock), new { returnUrl = ViewBag.ReturnUrl });
+        return RedirectToAction(nameof(Unlock), new {returnUrl = ViewBag.ReturnUrl});
       }
 
       return View(await _topicService.GetTopicLockVmAsync(id));
@@ -204,7 +207,7 @@ namespace Forum.Controllers {
 
       if (!await _topicService.IsTopicLocked(id)) {
         TempData.ModalWarning("The Topic is already unlocked!");
-        return RedirectToAction(nameof(Lock), new { returnUrl = ViewBag.ReturnUrl });
+        return RedirectToAction(nameof(Lock), new {returnUrl = ViewBag.ReturnUrl});
       }
 
       return View(await _topicService.GetTopicUnlockVmAsync(id));

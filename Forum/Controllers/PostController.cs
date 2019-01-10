@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Forum.Attributes;
 using Forum.Extensions;
 using Forum.Helpers;
@@ -36,7 +35,7 @@ namespace Forum.Controllers {
 
       if (!await _sharedService.DoesThreadExist(threadId)) {
         TempData.ModalFailed("Thread does not exist!");
-        return this.RedirectToControllerAction<ThreadController>(nameof(ThreadController.Index), new{threadId});
+        return this.RedirectToControllerAction<ThreadController>(nameof(ThreadController.Index), new {threadId});
       }
 
       return View(await _postService.GetPostsIndexVmAsync(User, threadId, page, postId));
@@ -53,7 +52,7 @@ namespace Forum.Controllers {
 
       if (!await _sharedService.DoesThreadExist(threadId)) {
         TempData.ModalFailed("Thread you trying to post to does not exist!");
-        return this.RedirectToControllerAction<ThreadController>(nameof(ThreadController.Index), new { threadId });
+        return this.RedirectToControllerAction<ThreadController>(nameof(ThreadController.Index), new {threadId});
       }
 
       if (!await _authorizationService.IsAuthorizedForPostCreateInThreadAsync(threadId, User))
@@ -65,7 +64,7 @@ namespace Forum.Controllers {
     [Route("Create")]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(int topicId, int threadId,PostCreateVm postCreateVm, string returnUrl) {
+    public async Task<IActionResult> Create(int topicId, int threadId, PostCreateVm postCreateVm, string returnUrl) {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
 
       if (!await _sharedService.DoesTopicExist(topicId)) {
@@ -75,7 +74,7 @@ namespace Forum.Controllers {
 
       if (!await _sharedService.DoesThreadExist(threadId)) {
         TempData.ModalFailed("Thread you trying to post to does not exist!");
-        return this.RedirectToControllerAction<ThreadController>(nameof(ThreadController.Index), new { threadId });
+        return this.RedirectToControllerAction<ThreadController>(nameof(ThreadController.Index), new {threadId});
       }
 
       if (!ModelState.IsValid)
@@ -177,7 +176,7 @@ namespace Forum.Controllers {
 
       if (_postService.IsPostLocked(id)) {
         TempData.ModalWarning("The Post is already locked!");
-        return RedirectToAction(nameof(Unlock), new { returnUrl = ViewBag.ReturnUrl });
+        return RedirectToAction(nameof(Unlock), new {returnUrl = ViewBag.ReturnUrl});
       }
 
       return View(await _postService.GetPostLockVm(id));
@@ -225,7 +224,7 @@ namespace Forum.Controllers {
 
       if (!_postService.IsPostLocked(id)) {
         TempData.ModalWarning("The Post is already unlocked!");
-        return RedirectToAction(nameof(Lock), new { returnUrl = ViewBag.ReturnUrl });
+        return RedirectToAction(nameof(Lock), new {returnUrl = ViewBag.ReturnUrl});
       }
 
       return View(await _postService.GetPostUnlockVm(id));

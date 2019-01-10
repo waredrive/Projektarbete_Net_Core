@@ -11,9 +11,11 @@ namespace Forum.Views.Shared.Components.TopicOptions {
       _topicService = topicService;
     }
 
-    public async Task<IViewComponentResult> InvokeAsync(int topicId, string returnUrl = null, string onRemoveReturnUrl = null) {
+    public async Task<IViewComponentResult> InvokeAsync(int topicId, string returnUrl = null,
+      string onRemoveReturnUrl = null) {
       var currentUrl = Request.GetDisplayUrl();
-      return View(await _topicService.GetTopicOptionsVmAsync(topicId, User, returnUrl ?? currentUrl, onRemoveReturnUrl ?? currentUrl));
+      return View(await _topicService.GetTopicOptionsVmAsync(topicId, User, returnUrl ?? currentUrl,
+        onRemoveReturnUrl ?? currentUrl));
     }
   }
 }

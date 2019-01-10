@@ -1,18 +1,16 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
+﻿using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace Forum.Extensions {
   public static class TempDataExtension {
-
     private const string ModalHeaderKey = "ModalHeader";
     private const string ModalMessageKey = "ModalMessage";
 
     public static string GetModalHeader(this ITempDataDictionary tempData) {
-      return (string)tempData[ModalHeaderKey];
+      return (string) tempData[ModalHeaderKey];
     }
 
     public static string GetModalMessage(this ITempDataDictionary tempData) {
-      return (string)tempData[ModalMessageKey];
+      return (string) tempData[ModalMessageKey];
     }
 
     private static void SetModalData(this ITempDataDictionary tempData, string header, string message) {

@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Forum.Extensions;
 using Forum.Helpers;
 using Forum.Models.Services;
@@ -145,7 +144,7 @@ namespace Forum.Controllers {
 
       if (await _authorizationService.IsProfileBlockedAsync(username)) {
         TempData.ModalWarning("The Profile is already blocked!");
-        return RedirectToAction(nameof(Unblock), new { returnUrl = ViewBag.ReturnUrl });
+        return RedirectToAction(nameof(Unblock), new {returnUrl = ViewBag.ReturnUrl});
       }
 
       return View(await _profileService.GetProfileBlockVmAsync(username));
@@ -181,7 +180,7 @@ namespace Forum.Controllers {
       }
 
       TempData.ModalSuccess("The Profile has been blocked!");
-      return RedirectToAction(nameof(Details), new { returnUrl = ViewBag.ReturnUrl });
+      return RedirectToAction(nameof(Details), new {returnUrl = ViewBag.ReturnUrl});
     }
 
     [Route("Unblock/{username}")]
@@ -199,7 +198,7 @@ namespace Forum.Controllers {
 
       if (!await _authorizationService.IsProfileBlockedAsync(username)) {
         TempData.ModalWarning("The Profile is already unblocked!");
-        return RedirectToAction(nameof(Block), new { returnUrl = ViewBag.ReturnUrl });
+        return RedirectToAction(nameof(Block), new {returnUrl = ViewBag.ReturnUrl});
       }
 
       return View(await _profileService.GetProfileUnblockVmAsync(username));
@@ -209,7 +208,7 @@ namespace Forum.Controllers {
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Unblock(string username, ProfileUnblockVm profileUnblockVm, string returnUrl) {
-      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl,  "/");
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, "/");
       if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Profile does not exist!");
         return Redirect(ViewBag.ReturnUrl);
@@ -229,7 +228,7 @@ namespace Forum.Controllers {
       await _profileService.UnblockAsync(username);
 
       TempData.ModalSuccess("The Profile has been unblocked!");
-      return RedirectToAction(nameof(Details), new { returnUrl = ViewBag.ReturnUrl });
+      return RedirectToAction(nameof(Details), new {returnUrl = ViewBag.ReturnUrl});
     }
 
     [Route("Delete/{username}")]
@@ -275,7 +274,7 @@ namespace Forum.Controllers {
       return File(await _profileService.GetProfileImage(username), "image/*");
     }
 
-    [HttpGet("Search") ]
+    [HttpGet("Search")]
     public async Task<JsonResult> Search(string query) {
       var result = _profileService.GetSearchResultJsonAsync(query);
       return Json(await result);

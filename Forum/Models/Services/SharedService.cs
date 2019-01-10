@@ -61,6 +61,5 @@ namespace Forum.Models.Services {
     public Task<bool> DoesTopicExist(int id) {
       return _db.Topic.AnyAsync(t => t.Id == id);
     }
-
   }
 }

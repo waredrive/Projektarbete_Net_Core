@@ -62,9 +62,7 @@ namespace Forum.Controllers {
       ViewBag.ReturnUrl = StringHelper.FirstValidString(returnUrl, Request.Headers["Referer"].ToString(), "/");
       ViewBag.OnBackReturnUrl = StringHelper.FirstValidString(Request.Headers["Referer"].ToString(), "/");
 
-      if (User.Identity.IsAuthenticated) {
-        return Redirect(ViewBag.ReturnUrl);
-      }
+      if (User.Identity.IsAuthenticated) return Redirect(ViewBag.ReturnUrl);
       return View();
     }
 
@@ -80,9 +78,7 @@ namespace Forum.Controllers {
         return View(accountLoginVm);
 
       var result = await _accountService.LoginAsync(accountLoginVm);
-      if (result.Succeeded) {
-        return Redirect($"{ViewBag.ReturnUrl}?ReturnUrl={ViewBag.OnBackReturnUrl}");
-      }
+      if (result.Succeeded) return Redirect($"{ViewBag.ReturnUrl}?ReturnUrl={ViewBag.OnBackReturnUrl}");
       ModelState.AddModelError(string.Empty, "Invalid login attempt.");
 
       return View(accountLoginVm);
@@ -134,8 +130,9 @@ namespace Forum.Controllers {
           ModelState.AddModelError(string.Empty, error.Description);
         return View(accountEditVm);
       }
+
       TempData.ModalSuccess("Your Account has been updated!");
-      return RedirectToAction(nameof(Details), new { returnUrl = ViewBag.ReturnUrl });
+      return RedirectToAction(nameof(Details), new {returnUrl = ViewBag.ReturnUrl});
     }
 
     [Route("Update/Password/{username}")]
@@ -150,7 +147,7 @@ namespace Forum.Controllers {
       if (!await _authorizationService.IsAuthorizedForAccountAndProfileEditAsync(username, User))
         return RedirectToAction(nameof(AccessDenied));
 
-      return View(new AccountPasswordEditVm() { Username = username });
+      return View(new AccountPasswordEditVm {Username = username});
     }
 
     [Route("Update/Password/{username}")]
@@ -179,7 +176,7 @@ namespace Forum.Controllers {
       }
 
       TempData.ModalSuccess("Your password has been updated!");
-      return RedirectToAction(nameof(Details), new { username });
+      return RedirectToAction(nameof(Details), new {username});
     }
 
     [Route("Details/{username}")]

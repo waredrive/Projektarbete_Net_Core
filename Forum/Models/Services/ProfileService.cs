@@ -10,7 +10,6 @@ using Forum.Models.ViewModels.ComponentViewModels.MemberOptionsViewModels;
 using Forum.Models.ViewModels.ComponentViewModels.NavbarViewModels;
 using Forum.Models.ViewModels.ProfileViewModels;
 using Forum.Validations;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -73,7 +72,7 @@ namespace Forum.Models.Services {
       var memberFromDb = await _db.Member.FirstOrDefaultAsync(m => m.Id == identityUser.Id);
 
       if (_sharedService.IsDeletedMember(identityUser.UserName))
-        return IdentityResult.Failed(new IdentityError { Description = "This member cannot be edited" });
+        return IdentityResult.Failed(new IdentityError {Description = "This member cannot be edited"});
 
       var result = await _userManager.SetUserNameAsync(identityUser, profileEditVm.NewUsername);
 
@@ -91,7 +90,8 @@ namespace Forum.Models.Services {
 
         await _signInManager.SignOutAsync();
         await _signInManager.SignInAsync(identityUser, false, identityUser.Id);
-      } catch (Exception) {
+      }
+      catch (Exception) {
         await _userManager.SetUserNameAsync(identityUser, oldUserName);
         throw;
       }
@@ -189,7 +189,8 @@ namespace Forum.Models.Services {
           await _userManager.AddToRoleAsync(identityUser, profileRoleEditVm.Role);
           await _db.SaveChangesAsync();
         }
-      } catch (Exception) {
+      }
+      catch (Exception) {
         var roles = await _userManager.GetRolesAsync(identityUser);
         await _userManager.RemoveFromRolesAsync(identityUser, roles.ToArray());
         await _userManager.AddToRolesAsync(identityUser, roles);
@@ -245,9 +246,7 @@ namespace Forum.Models.Services {
 
       await _db.SaveChangesAsync();
 
-      if (userIsOwner) {
-        await _signInManager.SignOutAsync();
-      }
+      if (userIsOwner) await _signInManager.SignOutAsync();
     }
 
     private bool IsUserOwner(string username, ClaimsPrincipal user) {
@@ -281,7 +280,7 @@ namespace Forum.Models.Services {
 
     public async Task<object> GetSearchResultJsonAsync(string query) {
       var searchResult = _userManager.Users.Where(u => u.UserName.StartsWith(query))
-        .Select(u => new { username = u.UserName}).ToArrayAsync();
+        .Select(u => new {username = u.UserName}).ToArrayAsync();
       return await searchResult;
     }
 

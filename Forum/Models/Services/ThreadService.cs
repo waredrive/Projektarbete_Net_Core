@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
@@ -60,23 +59,24 @@ namespace Forum.Models.Services {
 
     public async Task<ThreadsIndexVm> GetThreadsIndexVmAsync(ClaimsPrincipal user, int topicId, int currentPage,
       int pageSize = 20) {
-
       var isAuthorizedForThreadCreate = await _authorizationService.IsAuthorizedForCreateThreadAsync(topicId, user);
       return await _db.Topic.Where(t => t.Id == topicId).Select(t => new ThreadsIndexVm {
         Pager = new Pager(t.Thread.Count, currentPage, pageSize),
         TopicId = t.Id,
         TopicText = t.ContentText,
         IsTopicLocked = t.LockedBy != null,
-        Threads = t.Thread.OrderByDescending(th => th.CreatedOn).Skip((currentPage - 1) * pageSize).Take(pageSize).Select(th => new ThreadsIndexThreadVm {
-          LatestPoster = th.Post.OrderByDescending(p => p.CreatedOn).Select(p => p.CreatedByNavigation.IdNavigation.UserName).FirstOrDefault(),
-          LatestPostedOn = th.Post.OrderByDescending(p => p.CreatedOn).Select(p => p.CreatedOn).FirstOrDefault(),
-          ThreadId = th.Id,
-          CreatedOn = th.CreatedOn,
-          CreatedBy = th.CreatedByNavigation.IdNavigation.UserName,
-          ThreadText = th.ContentText,
-          PostCount = th.Post.Count,
-          LockedBy = th.LockedByNavigation.IdNavigation.UserName
-        }).ToList(),
+        Threads = t.Thread.OrderByDescending(th => th.CreatedOn).Skip((currentPage - 1) * pageSize).Take(pageSize)
+          .Select(th => new ThreadsIndexThreadVm {
+            LatestPoster = th.Post.OrderByDescending(p => p.CreatedOn)
+              .Select(p => p.CreatedByNavigation.IdNavigation.UserName).FirstOrDefault(),
+            LatestPostedOn = th.Post.OrderByDescending(p => p.CreatedOn).Select(p => p.CreatedOn).FirstOrDefault(),
+            ThreadId = th.Id,
+            CreatedOn = th.CreatedOn,
+            CreatedBy = th.CreatedByNavigation.IdNavigation.UserName,
+            ThreadText = th.ContentText,
+            PostCount = th.Post.Count,
+            LockedBy = th.LockedByNavigation.IdNavigation.UserName
+          }).ToList(),
         IsAuthorizedForThreadCreate = isAuthorizedForThreadCreate
       }).FirstOrDefaultAsync();
     }
@@ -174,7 +174,8 @@ namespace Forum.Models.Services {
       await _db.SaveChangesAsync();
     }
 
-    public async Task<ThreadOptionsVm> GetThreadOptionsVmAsync(int threadId, IPrincipal user, string returnUrl, string onRemoveReturnUrl) {
+    public async Task<ThreadOptionsVm> GetThreadOptionsVmAsync(int threadId, IPrincipal user, string returnUrl,
+      string onRemoveReturnUrl) {
       var claimsPrincipalUser = user as ClaimsPrincipal;
 
       var isAuthorizedForThreadLock =

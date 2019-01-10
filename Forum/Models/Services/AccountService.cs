@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Claims;
@@ -9,7 +8,6 @@ using Forum.Models.Entities;
 using Forum.Models.Identity;
 using Forum.Models.ViewModels.AccountViewModels;
 using Forum.Validations;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,7 +22,8 @@ namespace Forum.Models.Services {
 
     public AccountService(
       UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,
-      RoleManager<IdentityRole> roleManager, ForumDbContext db, AuthorizationService authorizationService, SharedService sharedService) {
+      RoleManager<IdentityRole> roleManager, ForumDbContext db, AuthorizationService authorizationService,
+      SharedService sharedService) {
       _userManager = userManager;
       _signInManager = signInManager;
       _roleManager = roleManager;
@@ -41,7 +40,7 @@ namespace Forum.Models.Services {
 
     public async Task<IdentityResult> AddAsync(AccountRegisterVm accountRegisterVm) {
       if (_sharedService.IsDeletedMember(accountRegisterVm.UserName))
-        return IdentityResult.Failed(new[]{ new IdentityError{Description = "Forbidden username" } });
+        return IdentityResult.Failed(new IdentityError {Description = "Forbidden username"});
 
       await CreateRolesAsync();
       var user = new IdentityUser {
@@ -78,9 +77,7 @@ namespace Forum.Models.Services {
     }
 
 
-
     public async Task<SignInResult> LoginAsync(AccountLoginVm accountLoginVm) {
-
       if (!_sharedService.DoesUserAccountExist(accountLoginVm.UserName))
         return SignInResult.Failed;
 
@@ -110,7 +107,7 @@ namespace Forum.Models.Services {
     }
 
     public Task<AccountEditVm> GetAccountEditVm(ClaimsPrincipal user) {
-      return _db.Member.Where(m => m.IdNavigation.UserName == user.Identity.Name).Select( m => new AccountEditVm {
+      return _db.Member.Where(m => m.IdNavigation.UserName == user.Identity.Name).Select(m => new AccountEditVm {
         Username = m.IdNavigation.UserName,
         Birthdate = m.BirthDate,
         Email = m.IdNavigation.Email,

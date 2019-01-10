@@ -52,7 +52,7 @@ namespace Forum.Controllers {
     [Route("Locked/Threads/{username}")]
     [HttpGet]
     public async Task<IActionResult> LockedThreads(string username, int page = 1) {
-      ViewBag.ReturnUrl = StringHelper.FirstValidString( Request.Headers["Referer"].ToString(), "/");
+      ViewBag.ReturnUrl = StringHelper.FirstValidString(Request.Headers["Referer"].ToString(), "/");
 
       if (!_sharedService.DoesUserAccountExist(username)) {
         TempData.ModalFailed("Profile does not exist!");
@@ -98,6 +98,5 @@ namespace Forum.Controllers {
 
       return View(await _forumManagementService.GetForumManagementBlockedMembersVmAsync(User, page, username));
     }
-
   }
 }

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using Forum.Models.ViewModels.ComponentViewModels.TopicOptionsViewModels;
 
 namespace Forum.Models.ViewModels.TopicViewModels {
   public class TopicsIndexVm {
