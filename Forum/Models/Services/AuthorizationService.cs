@@ -83,9 +83,6 @@ namespace Forum.Models.Services {
       return !_db.Topic.Where(t => t.Id == id).Any(t => t.LockedBy != null);
     }
 
-    // The user is authorized as long as he is the only one that posted on the thread,
-    // the thread or topic is not locked and the thread is created by the user.
-    // Admins and Moderators have no restrictions.
     public async Task<bool> IsAuthorizedForThreadEditAsync(int threadId, ClaimsPrincipal user) {
       if (!user.Identity.IsAuthenticated)
         return false;
@@ -117,11 +114,6 @@ namespace Forum.Models.Services {
              threadFromDb.TopicNavigation.LockedOn == null && threadFromDb.CreatedOn >= DateTime.UtcNow.AddMinutes(-MinutesToAllowEditAndDelete);
     }
 
-    // The user is authorized as long as he is the only one that posted on the thread,
-    // the thread or topic is not locked and the thread is created by the user.
-    // The Moderator follow the same rules as user but can delete other users threads (as long as they only contain post from thread
-    // creator).
-    // Admins have no restrictions.
     public async Task<bool> IsAuthorizedForThreadDeleteAsync(int threadId, ClaimsPrincipal user) {
       if (!user.Identity.IsAuthenticated)
         return false;
@@ -192,9 +184,6 @@ namespace Forum.Models.Services {
       return false;
     }
 
-    // The user is authorized as long as the thread or post
-    // is not locked and the post is created by the user.
-    // Admins and Moderators have no restrictions.
     public async Task<bool> IsAuthorizedForPostEditAndDeleteAsync(int postId, ClaimsPrincipal user) {
       var postFromDb = await _db.Post.Include(t => t.ThreadNavigation).FirstOrDefaultAsync(t => t.Id == postId);
       return postFromDb != null && await IsAuthorizedForPostEditAndDeleteAsync(postFromDb, user);
