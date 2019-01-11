@@ -19,6 +19,7 @@ namespace Forum.Models.ViewModels.TopicViewModels {
   }
 
   public class TopicsIndexPostVm {
+    public int TopicId { get; set; }
     public int ThreadId { get; set; }
     public int PostId { get; set; }
     public string ThreadText { get; set; }
@@ -34,6 +35,7 @@ namespace Forum.Models.ViewModels.TopicViewModels {
   }
 
   public class TopicsIndexLatestThreadVm {
+    public int TopicId { get; set; }
     public int ThreadId { get; set; }
     public string ThreadText { get; set; }
     public DateTime? CreatedOn { get; set; }

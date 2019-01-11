@@ -64,6 +64,7 @@ namespace Forum.Models.Services {
 
       topicsIndexVm.LatestThreads.AddRange(_db.Thread.OrderByDescending(t => t.CreatedOn).Take(10).Select(t =>
         new TopicsIndexLatestThreadVm {
+          TopicId = t.Topic,
           ThreadId = t.Id,
           ThreadText = t.ContentText,
           CreatedOn = t.CreatedOn,
@@ -72,6 +73,7 @@ namespace Forum.Models.Services {
 
       topicsIndexVm.LatestPosts.AddRange(_db.Post.OrderByDescending(p => p.CreatedOn).Take(10).Select(p =>
         new TopicsIndexPostVm {
+          TopicId = p.ThreadNavigation.Topic,
           PostId = p.Id,
           ThreadId = p.Thread,
           ThreadText = p.ThreadNavigation.ContentText,

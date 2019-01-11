@@ -2,6 +2,7 @@
 
 namespace Forum.Models.ViewModels.ForumManagementViewModels {
   public class ForumManagementLockedPostVm {
+    public int TopicId { get; set; }
     public int ThreadId { get; set; }
     public int PostId { get; set; }
     public string ThreadText { get; set; }

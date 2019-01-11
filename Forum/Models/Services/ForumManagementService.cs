@@ -132,6 +132,7 @@ namespace Forum.Models.Services {
         var createdBy = await _userManager.FindByIdAsync(post.CreatedBy);
 
         posts.Add(new ForumManagementLockedPostVm {
+          TopicId = post.ThreadNavigation.Topic,
           ThreadId = post.Thread,
           PostId = post.Id,
           CreatedOn = post.CreatedOn,

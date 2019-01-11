@@ -4,7 +4,7 @@
   @foreach (var thread in Model) {
     <tr>
       <td style="width: 30%" class="align-middle">
-        <a asp-controller="Post" asp-action="index" asp-route-threadId="@thread.ThreadId" class="light">
+        <a asp-controller="Post" asp-action="index" asp-route-threadId="@thread.ThreadId" asp-route-topicId="@thread.TopicId" class="light">
           <p class="pb-0 mb-0">@thread.ThreadText</p>
         </a>
       </td>

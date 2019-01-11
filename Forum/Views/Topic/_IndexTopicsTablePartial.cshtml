@@ -33,7 +33,7 @@
           <img class="rounded float-left" src="@Url.Action("ProfileImage", "Profile", new{username = topic.LatestThreadPostedTo.LatestCommenter})" alt="Profile picture" style="width: 50px; height: 50px" />
         </td>
         <td style="width: 29%" class="align-middle">
-          <p class="pb-0 mb-0 small"><a asp-controller="Post" asp-action="index" asp-route-threadId="@topic.LatestThreadPostedTo.ThreadId" class="light">@topic.LatestThreadPostedTo.ThreadText</a></p>
+          <p class="pb-0 mb-0 small"><a asp-controller="Post" asp-action="index" asp-route-threadId="@topic.LatestThreadPostedTo.ThreadId" asp-route-topicId="@topic.TopicId" class="light">@topic.LatestThreadPostedTo.ThreadText</a></p>
           <p class="pb-0 mb-0 small">By <a asp-controller="Profile" asp-action="Details" asp-route-username="@topic.LatestThreadPostedTo.LatestCommenter" class="light">@topic.LatestThreadPostedTo.LatestCommenter</a></p>
           <p class="pb-0 mb-0 small">@topic.LatestThreadPostedTo.LatestCommentTime</p>
         </td>
