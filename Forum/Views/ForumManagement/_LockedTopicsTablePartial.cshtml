@@ -1,0 +1,41 @@
+﻿@model List<ForumManagementLockedTopicVm>
+@if (Model.Any()) { 
+<table class="table table-striped table-dark">
+  @foreach (var topic in Model) {
+    <tr>
+      <td style="width: 30%" class="align-middle">
+        <a asp-controller="Thread" asp-action="index" asp-route-topicId="@topic.TopicId" class="light">
+          <p class="pb-0 mb-0">@topic.TopicText</p>
+        </a>
+      </td>
+      <td style="width: 1%;" class="align-middle pr-0">
+        <img class="rounded float-left" src="@Url.Action("ProfileImage", "Profile", new{username = topic.CreatedBy})" alt="Profile picture" style="width: 50px; height: 50px" />
+      </td>
+      <td style="width: 19%" class="align-middle">
+        <p class="pb-0 mb-0 small">
+          Created by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@topic.CreatedBy" class="light">@topic.CreatedBy</a>
+        </p>
+        <p class="pb-0 mb-0 small">
+          Created on: @topic.CreatedOn
+        </p>
+      </td>
+      <td style="width: 1%;" class="align-middle pr-0">
+        <img class="rounded float-left" src="@Url.Action("ProfileImage", "Profile", new{username = topic.LockedBy})" alt="Profile picture" style="width: 50px; height: 50px" />
+      </td>
+      <td style="width: 19%" class="align-middle">
+        <p class="pb-0 mb-0 small">
+          Locked by: <a asp-controller="Profile" asp-action="Details" asp-route-username="@topic.LockedBy" class="light">@topic.LockedBy</a>
+        </p>
+        <p class="pb-0 mb-0 small">
+          Locked on: @topic.LockedOn
+        </p>
+      </td>
+      <td style="width: 20%" class="align-middle  text-center">
+        @await Component.InvokeAsync("TopicOptions", new { topicId = topic.TopicId })
+      </td>
+    </tr>
+  }
+</table>
+} else {
+<h5 class="text-center text-light mb-4">No locked topics!</h5>
+}

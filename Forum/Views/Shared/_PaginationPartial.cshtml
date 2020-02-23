@@ -1,0 +1,28 @@
+﻿@model Pager
+@if (Model.EndPage > 1) {
+  <ul class="pagination pagination-sm">
+    @if (Model.CurrentPage > 1) {
+      <li class="page-item">
+        <a asp-route-page="1" class="page-link light"><i class="fas fa-fast-backward"></i></a>
+      </li>
+      <li class="page-item">
+        <a asp-route-page="@(Model.CurrentPage - 1)" class="page-link light"><i class="fas fa-step-backward"></i></a>
+      </li>
+    }
+
+    @for (var page = Model.StartPage; page <= Model.EndPage; page++) {
+      <li class="page-item @(page == Model.CurrentPage ? "disabled" : "")">
+        <a asp-route-page="@(page)" class="page-link light">@(page)</a>
+      </li>
+    }
+
+    @if (Model.CurrentPage < Model.TotalPages) {
+      <li class="page-item">
+        <a asp-route-page="@(Model.CurrentPage + 1)" class="page-link light"><i class="fas fa-step-forward"></i></a>
+      </li>
+      <li class="page-item">
+        <a asp-route-page="@(Model.TotalPages)" class="page-link light"><i class="fas fa-fast-forward"></i></a>
+      </li>
+    }
+  </ul>
+}			

@@ -1,0 +1,66 @@
+﻿html {
+  overflow-y: scroll;
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  padding-right: 0 !important;
+  margin-bottom: 60px;
+}
+
+.modal-open {
+  overflow-y: auto;
+}
+
+
+footer {
+  bottom: 0;
+  height: 60px;
+  width: 100%;
+  position: absolute;
+}
+
+.breadcrumb-item::before {
+  color: #f8f9fa !important;
+}
+
+.pagination > li > a, .pagination > li > span {
+  background-color: #868e96;
+}
+
+.pagination > li.disabled > a, .pagination > li.disabled > span {
+  background-color: #868e96 !important;
+}
+
+a {
+  text-decoration: none !important;
+  color: black;
+}
+
+  a:hover {
+    color: #3d3d3d;
+  }
+
+  a.light {
+    text-decoration: none !important;
+    color: #f8f9fa;
+  }
+
+    a.light:hover {
+      color: #d6d6d6;
+    }
+
+.tt-menu .tt-dataset {
+  display: block;
+  width: 100%;
+  padding: 3px 20px;
+  clear: both;
+  font-weight: normal;
+  line-height: 1.5;
+  color: #373a3c;
+  text-align: inherit;
+  white-space: nowrap;
+  background: none;
+  border: 0;
+}

@@ -1,0 +1,35 @@
+﻿@model TopicUnlockVm
+
+@{
+  ViewBag.Title = "Unlock Topic";
+}
+
+<div class="container">
+  <div class="col-12 rounded my-5 bg-secondary p-5 text-light">
+    <h1>Unlock: @Model.TopicText</h1>
+    <br />
+    <div class="row">
+      <div class="col-6">
+        <p>Created by: @Model.CreatedBy</p>
+        <p>Created on: @Model.CreatedOn</p>
+        <p>Locked by: @Model.LockedBy</p>
+        <p>Locked on: @Model.LockedOn</p>
+      </div>
+      <div class="col-6">
+        <p>Total threads in topic: @Model.ThreadCount</p>
+        <p>Total posts in topic: @Model.PostCount</p>
+      </div>
+    </div>
+    <div class="row py-3">
+      <div class="col-12">
+        <form asp-controller="Topic" asp-action="Unlock" asp-route-returnUrl="@ViewBag.ReturnUrl">
+          <div class="btn-group float-right">
+            @Html.HiddenFor(m => m.TopicId)
+            <input type="submit" class="btn btn-warning rounded-left" value="Unlock Topic" />
+            <a href="@ViewBag.ReturnUrl" class="btn btn-primary">Back</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

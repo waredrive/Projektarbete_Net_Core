@@ -1,0 +1,50 @@
+﻿@model ThreadsIndexVm
+@{
+  ViewBag.Title = Model.TopicText;
+}
+<div class="container-fluid">
+  <div class="col-md-12">
+    <div class="row">
+      <h3 class="text-light pt-2">
+      @if (Model.IsTopicLocked) {
+        <i class="fas fa-ban fa-lg text-danger"></i>
+      }
+        @Model.TopicText
+      </h3>
+    </div>
+    <div class="my-auto row pt-2">
+      @await Component.InvokeAsync("TopicOptions", new{ topicId = Model.TopicId, onRemoveReturnUrl ="/" })
+    </div>
+  </div>
+  @if (Model.IsAuthorizedForThreadCreate) {
+    <div class="col-md-12 py-3">
+      <div class="row">
+        <a asp-controller="Thread" asp-action="Create" class="btn btn-primary">Add new thread</a>
+      </div>
+    </div>
+  }
+  <nav>
+    <ol class="breadcrumb bg-secondary">
+      <li class="breadcrumb-item">
+        <a asp-controller="Topic" asp-action="index" class="light">Forum</a>
+      </li>
+      <li class="breadcrumb-item active">
+        <a asp-controller="Thread" asp-action="index" asp-route-page="1" class="light">@Model.TopicText</a>
+      </li>
+    </ol>
+  </nav>
+  <div class="row">
+    <div class="col-md-12">
+      <partial name="_IndexThreadsTablePartial" for="@Model.Threads" />
+      <div>
+        <partial name="_PaginationPartial" for="@Model.Pager" />
+      </div>
+    </div>
+  </div>
+</div>
+
+@section footer {
+  @await Component.InvokeAsync("Footer")
+}
+
+

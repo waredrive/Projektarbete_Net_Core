@@ -1,0 +1,29 @@
+﻿@model TopicsIndexVm
+@{
+  ViewBag.Title = "Forum Topics";
+}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-8">
+      <h1 class="text-light">Welcome to the Forum!</h1>
+      @if (Model.IsAuthorizedForTopicCreate) {
+        <a asp-controller="Topic" asp-action="Create" class="btn btn-primary my-3">Add new topic</a>
+      }
+      <partial name="_IndexTopicsTablePartial" for="@Model.Topics" />
+    </div>
+    <div class="col-md-4 text-light">
+      <div class="mt-2">
+        <h4 class="text-center">Latest Posts</h4>
+        <partial name="_LatestPostsTablePartial" for="@Model.LatestPosts" />
+      </div>
+      <div class="mt-4">
+        <h4 class="text-center">Latest Threads</h4>
+        <partial name="_LatestThreadsTablePartial" for="@Model.LatestThreads" />
+      </div>
+    </div>
+  </div>
+</div>
+@section footer {
+  @await Component.InvokeAsync("Footer")
+}
+

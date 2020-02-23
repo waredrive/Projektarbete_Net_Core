@@ -1,0 +1,32 @@
+﻿@model ForumManagementBlockedMembersVm
+@{
+  ViewBag.Title = "All Blocked Members";
+}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-10">
+      <div class="row mt-4">
+        <div class="col-md-12">
+          @if (Model.UserName != null) {
+            <h4 class="text-center text-light mb-3">Members Blocked By @Model.UserName @if (Model.UserName == User.Identity.Name) {<span>(You)</span>}</h4>
+          } else {
+          <h4 class="text-center text-light mb-3">All Blocked Members</h4>
+          }
+          <partial name="_BlockedMembersTablePartial" for="@Model.BlockedMembers"/>
+          <partial name="_PaginationPartial" for="@Model.Pager"/>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <partial name="_StatisticsPartial" for="@Model.Statistics" />
+    </div>
+  </div>
+</div>
+
+@section footer {
+  @await Component.InvokeAsync("Footer")
+}
+
+@section scripts {
+  <partial name="_StatisticsScriptsPartial"/>
+}

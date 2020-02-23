@@ -1,0 +1,15 @@
+﻿@model List<TopicsIndexPostVm>
+
+<table class="table table-striped table-dark">
+  @foreach (var post in Model) {
+    <tr>
+      <td style="width: 50px;" class="align-middle pr-0">
+        <img class="rounded float-left" src="@Url.Action("ProfileImage", "Profile", new{username = post.LatestCommenter})" alt="Profile picture" style="width: 50px; height: 50px" />
+      </td>
+      <td class="align-middle">
+        <p class="pb-0 mb-0 small"><a asp-controller="Post" asp-action="index" asp-route-threadId="@post.ThreadId" asp-route-topicId="@post.TopicId"asp-route-postId="@post.PostId" asp-fragment="@post.PostId" class="light">@post.ThreadText</a></p>
+        <p class="pb-0 mb-0 small">Last post: <a asp-controller="Profile" asp-action="Details" asp-route-username="@post.LatestCommenter" class="light">@post.LatestCommenter </a>(@post.LatestCommentTime)</p>
+      </td>
+    </tr>
+  }
+</table>

@@ -1,0 +1,30 @@
+﻿@model PostCreateVm
+
+@{
+  ViewBag.Title = "Create Post";
+}
+
+<div class="container">
+  <div class="col-12 rounded my-5 bg-secondary p-5 text-light">
+    <h1>Create Post</h1>
+    <br />
+    <form asp-controller="Post" asp-action="Create" asp-route-returnUrl="@ViewBag.ReturnUrl"  autocomplete="off">
+      <div asp-validation-summary="ModelOnly"  class="text-danger bg-white rounded py-1"></div>
+      <div class="form-group">
+        <label asp-for="PostText" class="control-label"></label>
+        <textarea asp-for="PostText" rows="10" class="form-control"></textarea>
+        <span asp-validation-for="PostText"  class="text-danger bg-white rounded-bottom py-1"></span>
+      </div>
+      <br />
+      <div class="btn-group float-right">
+        <button type="submit" class="btn btn-warning">Create</button>
+        <a href="@ViewBag.ReturnUrl" class="btn btn-primary">Back</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+@section scripts {
+  <partial name="_ValidationScriptsPartial" />
+}

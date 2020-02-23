@@ -1,0 +1,33 @@
+﻿@model TopicDeleteVm
+
+@{
+  ViewBag.Title = "Delete Topic";
+}
+
+<div class="container">
+  <div class="col-12 rounded my-5 bg-secondary p-5 text-light">
+    <h1>Delete: @Model.TopicText</h1>
+    <br />
+    <div class="row">
+      <div class="col-6">
+        <p>Created by: @Model.CreatedBy</p>
+        <p>Created on: @Model.CreatedOn</p>
+      </div>
+      <div class="col-6">
+        <p>Total threads in topic: @Model.ThreadCount</p>
+        <p>Total posts in topic: @Model.PostCount</p>
+      </div>
+    </div>
+    <div class="row py-3">
+      <div class="col-12">
+        <form asp-controller="Topic" asp-action="Delete" asp-route-returnUrl="@ViewBag.ReturnUrl" asp-route-onRemoveReturnUrl="@ViewBag.OnRemoveReturnUrl">
+          <div class="btn-group float-right">
+            @Html.HiddenFor(m => m.TopicId)
+            <input type="submit" class="btn btn-danger rounded-left" value="Delete Topic"/>
+            <a href="@ViewBag.ReturnUrl" class="btn btn-primary">Back</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

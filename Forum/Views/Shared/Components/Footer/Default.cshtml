@@ -1,0 +1,20 @@
+﻿@model FooterVm
+
+<footer class="bg-secondary" >
+<div class="container-fluid text-light bg-secondary">
+  <div class="row pt-3">
+    <div class="col-md-3">
+      <p class="text-center">Total members: @Model.TotalMembers</p>
+    </div>
+    <div class="col-md-3 text-center">
+      <p class="text-center">Newest member: <a asp-controller="Profile" asp-action="Details" asp-route-username="@Model.NewestMember" class="light">@Model.NewestMember</a> </p>
+    </div>
+    <div class="col-md-3 text-center">
+      <p class="text-center">Most active member: <a asp-controller="Profile" asp-action="Details" asp-route-username="@Model.MostActiveMember" class="light">@Model.MostActiveMember</a></p>
+    </div>
+    <div class="col-md-3 text-center">
+      <p class="text-center">Total posts: @Model.TotalPosts</p>
+    </div>
+  </div>
+</div>
+</footer>

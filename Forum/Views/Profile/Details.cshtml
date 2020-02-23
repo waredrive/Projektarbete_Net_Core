@@ -1,0 +1,46 @@
+﻿@model ProfileDetailsVm
+@{
+  ViewBag.Title = "Profile Details";
+}
+
+<div class="container rounded my-5 bg-secondary p-5 text-light">
+  <div class="row">
+    <div class="col-md-4 mb-4 text-center">
+      <h1>@Model.Username</h1>
+    </div>
+    <div class="col-md-8"></div>
+  </div>
+  <div class="row">
+    <div class="col-md-4 text-center">
+      <img class="rounded" src="@Url.Action("ProfileImage", "Profile", new{username = Model.Username})" style="width: 240px; height: 240px;" alt="Profile picture"/>
+    </div>
+    <div class="col-md-8">
+      <div>
+        <p>Joined: @Model.CreatedOn</p>
+        @if (Model.BlockedBy != null) {
+          <p>Blocked on: @Model.BlockedOn</p>
+          <p>Blocked by: @Model.BlockedBy</p>
+          <p>Blocked ending: @Model.BlockedEnd</p>
+        }
+        <p>Total threads: @Model.TotalThreads</p>
+        <p>Total posts: @Model.TotalPosts</p>
+        @if (Model.Roles.Length > 0) {
+          <p>Roles: @string.Join(", ", Model.Roles)</p>
+        }
+      </div>
+      <br/>
+      @await Component.InvokeAsync("MemberOptions", new {username = Model.Username, returnUrl = ViewBag.ReturnUrl})
+    </div>
+  </div>
+  <div class="row py-3">
+    <div class="col-md-12">
+      <br/>
+      <div class="btn-group float-right">
+        @if (Model.IsAuthorizedForAccountView && !Model.IsUserOwner) {
+          <a asp-controller="Account" asp-action="Details" asp-route-username="@Model.Username" asp-route-returnUrl="@ViewBag.ReturnUrl" asp-route-fromProfile="true" class="btn btn-warning">Account Details</a>
+        }
+        <a href="@ViewBag.ReturnUrl" class="btn btn-primary">Back</a>
+      </div>
+    </div>
+  </div>
+</div>

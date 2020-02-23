@@ -1,0 +1,48 @@
+﻿@model ForumManagementIndexVm
+@{
+  ViewBag.Title = "Forum Management";
+}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-10">
+      <div class="row mt-4">
+        <div class="col-md-12">
+          <h4 class="text-center text-light mb-3">Ten Latest Locked Topics</h4>
+          <partial name="_LockedTopicsTablePartial" for="@Model.LatestLockedTopics" />
+        </div>
+      </div>
+      <div class="row mt-4">
+        <div class="col-md-12">
+          <h4 class="text-center text-light mb-3">Ten Latest Locked Threads</h4>
+          <partial name="_LockedThreadsTablePartial" for="@Model.LatestLockedThreads" />
+        </div>
+      </div>
+      <div class="row mt-4">
+        <div class="col-md-12">
+          <h4 class="text-center text-light mb-3">Ten Latest Locked Posts</h4>
+          <partial name="_LockedPostsTablePartial" for="@Model.LatestLockedPosts" />
+        </div>
+      </div>
+      <div class="row mt-4">
+        <div class="col-md-12">
+          <h4 class="text-center text-light mb-3">Ten Latest Blocked Members</h4>
+          <partial name="_BlockedMembersTablePartial" for="@Model.LatestBlockedMembers" />
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <partial name="_StatisticsPartial" for="@Model.Statistics" />
+    </div>
+  </div>
+</div>
+
+@section footer {
+  @await Component.InvokeAsync("Footer")
+}
+
+
+@section scripts {
+  <partial name="_StatisticsScriptsPartial" />
+}
+
+

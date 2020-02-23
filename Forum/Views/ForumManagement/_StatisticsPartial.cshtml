@@ -1,0 +1,19 @@
+﻿@model ForumManagementStatisticsVm
+<div class="mx-2 rounded bg-secondary text-light pb-5 sticky-top" style=" z-index: 5;">
+  <h2 class="p-2 text-center">Statistics</h2>
+  <h4 class="p-2 text-center">All</h4>
+  <ul class="list-group text-dark">
+    <a asp-controller="ForumManagement" asp-action="Index" class="list-group-item list-group-item-action">Latest Blocked</a>
+    <a asp-controller="ForumManagement" asp-action="BlockedMembers" asp-route-username="@null" class="list-group-item list-group-item-action">Members blocked: @Model.BlockedMembersCount</a>
+    <a asp-controller="ForumManagement" asp-action="LockedTopics" asp-route-username="@null" class="list-group-item list-group-item-action">Topics locked: @Model.LockedTopicsCount</a>
+    <a asp-controller="ForumManagement" asp-action="LockedThreads" asp-route-username="@null" class="list-group-item list-group-item-action">Threads locked: @Model.LockedThreadsCount</a>
+    <a asp-controller="ForumManagement" asp-action="LockedPosts" asp-route-username="@null" class="list-group-item list-group-item-action">Posts locked: @Model.LockedPostsCount</a>
+  </ul>
+  <h4 class="pt-4 pb-2 text-center">@Model.UserName @if (Model.UserName == User.Identity.Name) {<span>(You)</span>}</h4>
+  <ul class="list-group text-dark">
+    <a asp-controller="ForumManagement" asp-action="BlockedMembers" asp-route-username="@Model.UserName" class="list-group-item list-group-item-action">Members blocked: @Model.BlockedByUserMembersCount</a>
+    <a asp-controller="ForumManagement" asp-action="LockedTopics" asp-route-username="@Model.UserName" class="list-group-item list-group-item-action">Topics locked: @Model.LockedByUserTopicsCount</a>
+    <a asp-controller="ForumManagement" asp-action="LockedThreads" asp-route-username="@Model.UserName" class="list-group-item list-group-item-action">Threads locked: @Model.LockedByUserThreadsCount</a>
+    <a asp-controller="ForumManagement" asp-action="LockedPosts" asp-route-username="@Model.UserName" class="list-group-item list-group-item-action">Posts locked: @Model.LockedByUserPostsCount</a>
+  </ul>
+</div>
